@@ -1,0 +1,95 @@
+<head>
+  <title>Novel Infectious Agent Monitoring</title>
+</head>
+
+<body>
+  <div class="col-md-12">
+    <h1>Novel Infectious Agent Monitoring</h1>
+  </div>
+  {{> info}}
+</body>
+
+<template name="info">
+  <div class="col-md-6 pull-left">
+    <div class="panel panel-primary">
+      <div class="panel-body">
+        {{> left}}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 pull-right">
+    <div class="panel panel-primary">
+      <div class="panel-body">
+        {{> right}}
+      </div>
+    </div>
+  </div>
+
+</template>
+
+<template name="left">
+  <div id="recentlyMentionedInfectiousAgents">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h4>Recently Mentioned Infectious Agents</h4>
+      </div>
+      <div class="panel-body">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Recently Mentioned Agents</th>
+              <th>Mentions</th>
+            </tr>
+          </thead>
+          <tbody>
+            No Data
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div id="frequentlyMentionedInfectiousAgents">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h4>Frequently Mentioned Infectious Agents</h4>
+      </div>
+      <div class="panel-body">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Frequently Mentioned Agents</th>
+              <th>Mentions</th>
+            </tr>
+          </thead>
+          <tbody>
+            No Data
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="right">
+  {{> timeline}}
+  <div id="recentDescriptors">
+    <h2>Recent Descriptors</h2>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+  <div id="frequentDescriptors">
+    <h2>Frequent Descriptors</h2>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<template name="timeline">
+  <div id="timeline">
+    <canvas id="myChart" width="400" height="200"></canvas>
+  </div>
+</template>
