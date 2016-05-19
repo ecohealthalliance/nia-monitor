@@ -6,8 +6,6 @@ if Meteor.isClient
     'March'
     'April'
     'May'
-    'June'
-    'July'
   ]
   datasets: [ {
     label: 'My First dataset'
@@ -29,18 +27,84 @@ if Meteor.isClient
     pointRadius: 1
     pointHitRadius: 10
     data: [
-      65
-      59
-      80
-      81
-      56
-      55
-      40
+      13
+      66
+      3014
+      8006
+      11236
     ]
   } ]
 
-  #Template.timeline.onRendered ->
-  #  myLineChart = new Chart($("#myChart"),
-  #  type: 'line'
-  #  data: Meteor.data
-  #  options: options: xAxes: [ { display: false } ])
+  $('#recentlyMentionedInfectiousAgentsTable').on 'click-row.bs.table', (e,
+    row, $element) ->
+    console.log(row, $element)
+    return
+
+  $('.recentlyMentionedInfectiousAgentsTableRow').click ->
+    console.log 'row was clicked'
+    return
+
+  $(document).ready ->
+    $("#spinner").show()
+    Meteor.call 'getRecentlyMentionedInfectiousAgents', (err, response) ->
+      if err == undefined
+        $("#recentlyMentionedInfectiousAgentsTable > tbody").empty()
+        for i in response.ia
+          $("#recentlyMentionedInfectiousAgentsTable > tbody:last-child")
+          .append('<tr><td class="recentlyMentionedInfectiousAgentsTableRow"
+          data-agentName="'+i.name+'"><h3>'+i.name+'</h3>Date: '+i.date+
+          '<br> Link: <a href="www.google.com">i.name link</a></td></tr>')
+
+      $('.recentlyMentionedInfectiousAgentsTableRow').click ->
+        $("#spinner").show()
+        $('.recentlyMentionedInfectiousAgentsTableRow').removeClass('info')
+        $(this).addClass('info')
+        Meteor.call 'getRecentDescriptors', this.dataset.agentname,
+        (err, response) ->
+          if err == undefined
+            $("#recentDescriptorsTable > tbody").empty()
+            for i in response.rd
+              $("#recentDescriptorsTable > tbody:last-child")
+              .append('<tr><td class="recentDescriptorsTableRow"
+              data-agentName="'+i.name+'"><h3>'+i.name+'</h3>Date: '+i.date+
+              '<br> Link: <a href="www.google.com">i.name link</a></td></tr>')
+          $("#spinner").hide()
+
+        Meteor.call 'getFrequentDescriptors', this.dataset.agentname,
+        (err, response) ->
+          if err == undefined
+            $("#frequentDescriptorsTable > tbody").empty()
+            for i in response.fd
+              $("#frequentDescriptorsTable > tbody:last-child")
+              .append('<tr><td>'+i.name+'</td><td>'+i.count+'</td></tr>')
+          $("#spinner").hide()
+        return
+      $("#spinner").hide()
+
+    Meteor.call 'getFrequentlyMentionedInfectiousAgents', (err, response) ->
+      if err == undefined
+        $("#frequentlyMentionedInfectiousAgentsTable > tbody").empty()
+        for i in response.ia
+          $("#frequentlyMentionedInfectiousAgentsTable > tbody:last-child")
+          .append('<tr><td>'+i.name+'</td><td>'+i.count+'</td></tr>')
+
+    myLineChart = new Chart($("#canvas"),
+    type: 'line'
+    data: Meteor.data
+    options: xAxes: [ { display: false } ], scaleShowLabels : false, scales: {
+      yAxes: [ {
+        gridLines: {
+          lineWidth: 0,
+          color: "rgba(255,255,255,0)"
+          }
+        }]
+      xAxes: [ {
+        gridLines: {
+          lineWidth: 0,
+          color: "rgba(255,255,255,0)"
+          }
+        }]
+    })
+    return
+
+  Template.timeline.onRendered ->

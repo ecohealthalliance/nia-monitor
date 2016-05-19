@@ -3,6 +3,9 @@
 </head>
 
 <body>
+  <div id="spinner" style="display:none;">
+    <i id="spinnerElement" class="fa fa-spinner fa-spin"></i>
+  </div>
   <div class="col-md-12">
     <h1>Novel Infectious Agent Monitoring</h1>
   </div>
@@ -33,13 +36,9 @@
       <div class="panel-heading">
         <h4>Recently Mentioned Infectious Agents</h4>
       </div>
-      <div class="panel-body">
-        <table class="table table-striped">
+      <div class="">
+        <table id="recentlyMentionedInfectiousAgentsTable" class="table table-striped">
           <thead>
-            <tr>
-              <th>Recently Mentioned Agents</th>
-              <th>Mentions</th>
-            </tr>
           </thead>
           <tbody>
             No Data
@@ -53,13 +52,9 @@
       <div class="panel-heading">
         <h4>Frequently Mentioned Infectious Agents</h4>
       </div>
-      <div class="panel-body">
-        <table class="table table-striped">
+      <div class="">
+        <table id="frequentlyMentionedInfectiousAgentsTable" class="table table-striped">
           <thead>
-            <tr>
-              <th>Frequently Mentioned Agents</th>
-              <th>Mentions</th>
-            </tr>
           </thead>
           <tbody>
             No Data
@@ -74,22 +69,24 @@
   {{> timeline}}
   <div id="recentDescriptors">
     <h2>Recent Descriptors</h2>
-    <table class="table table-striped">
+    <table id="recentDescriptorsTable" class="table table-striped">
       <tbody>
+        Select an Infectious Agent
       </tbody>
     </table>
   </div>
   <div id="frequentDescriptors">
     <h2>Frequent Descriptors</h2>
-    <table class="table table-striped">
+    <table id="frequentDescriptorsTable" class="table table-striped">
       <tbody>
+        Select an Infectious Agent
       </tbody>
     </table>
   </div>
 </template>
 
 <template name="timeline">
-  <div id="timeline">
-    <canvas id="myChart" width="400" height="200"></canvas>
+  <div id="timeline" style="width:400px height:200px">
+    <canvas id="canvas" width="400" height="200"></canvas>
   </div>
 </template>
