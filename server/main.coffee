@@ -24,13 +24,13 @@ Meteor.methods(
   'getRecentlyMentionedInfectiousAgents' : () ->
     Meteor._sleepForMs(5000)
     ia = {"ia":[
-      {"name":"Zika", "date":"11/11/2021"},
-      {"name":"Smallpox", "date":"11/11/2021"},
-      {"name":"Yellow Fever", "date":"11/11/2021"},
-      {"name":"Cholera", "date":"11/11/2021"},
-      {"name":"Spanish Flu", "date":"11/11/2021"},
-      {"name":"Polio", "date":"11/11/2021"},
-      {"name":"Pertussis", "date":"11/11/2021"}
+      {"name":"Zika", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"Smallpox", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"Yellow Fever", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"Cholera", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"Spanish Flu", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"Polio", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"Pertussis", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"}
       ]}
     return ia
 
@@ -51,14 +51,14 @@ Meteor.methods(
     Meteor._sleepForMs(5000)
     #get recent descriptor for infectious agent (ia)
     rd = {"rd":[
-      {"name":"Antibiotic-resistant"+ia, "date":"11/11/2021"},
-      {"name":"carbapenemases-producing"+ia, "date":"11/11/2021"},
-      {"name":"Descriptor 1"+ia, "date":"11/11/2021"},
-      {"name":"Descriptor 2"+ia, "date":"11/11/2021"},
-      {"name":"Descriptor 3"+ia, "date":"11/11/2021"},
-      {"name":"Descriptor 4"+ia, "date":"11/11/2021"},
-      {"name":"Descriptor 5"+ia, "date":"11/11/2021"},
-      {"name":"Descriptor 6"+ia, "date":"11/11/2021"}
+      {"name":"Antibiotic-resistant"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"carbapenemases-producing"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"Descriptor 1"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"Descriptor 2"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"Descriptor 3"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"Descriptor 4"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"Descriptor 5"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
+      {"name":"Descriptor 6"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
       ]}
     return rd
 
