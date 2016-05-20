@@ -52,7 +52,7 @@ if Meteor.isClient
         for i in response.ia
           $("#recentlyMentionedInfectiousAgentsTable > tbody:last-child")
           .append('<tr><td class="recentlyMentionedInfectiousAgentsTableRow"
-          data-agentName="'+i.name+'"><h3>'+i.name+'</h3>Date: '+i.date+
+          data-agentName="' + i.name + '"><h3>' + i.name + '</h3>Date: ' + i.date +
           '<br> Link: <a href="www.google.com">i.name link</a></td></tr>')
 
       $('.recentlyMentionedInfectiousAgentsTableRow').click ->
@@ -66,7 +66,7 @@ if Meteor.isClient
             for i in response.rd
               $("#recentDescriptorsTable > tbody:last-child")
               .append('<tr><td class="recentDescriptorsTableRow"
-              data-agentName="'+i.name+'"><h3>'+i.name+'</h3>Date: '+i.date+
+              data-agentName="' + i.name + '"><h3>' + i.name + '</h3>Date: ' + i.date +
               '<br> Link: <a href="www.google.com">i.name link</a></td></tr>')
           $("#spinner").hide()
 
@@ -76,7 +76,7 @@ if Meteor.isClient
             $("#frequentDescriptorsTable > tbody").empty()
             for i in response.fd
               $("#frequentDescriptorsTable > tbody:last-child")
-              .append('<tr><td>'+i.name+'</td><td>'+i.count+'</td></tr>')
+              .append('<tr><td>' + i.name + '</td><td>' + i.count + '</td></tr>')
           $("#spinner").hide()
         return
       $("#spinner").hide()
@@ -86,12 +86,12 @@ if Meteor.isClient
         $("#frequentlyMentionedInfectiousAgentsTable > tbody").empty()
         for i in response.ia
           $("#frequentlyMentionedInfectiousAgentsTable > tbody:last-child")
-          .append('<tr><td>'+i.name+'</td><td>'+i.count+'</td></tr>')
+          .append('<tr><td>' + i.name + '</td><td>' + i.count + '</td></tr>')
 
     myLineChart = new Chart($("#canvas"),
     type: 'line'
     data: Meteor.data
-    options: xAxes: [ { display: false } ], scaleShowLabels : false, scales: {
+    options: xAxes: [ { display: false } ], scaleShowLabels: false, scales: {
       yAxes: [ {
         gridLines: {
           lineWidth: 0,
