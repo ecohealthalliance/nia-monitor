@@ -61,6 +61,7 @@ if Meteor.isClient
           if err == undefined
             $("#recentDescriptorsTable > tbody").empty().append(
               Blaze.toHTMLWithData(Template.recentDescriptors, response))
+
           $("#spinner").hide()
 
         Meteor.call 'getFrequentDescriptors', this.dataset.agentname,
@@ -69,6 +70,7 @@ if Meteor.isClient
             $("#frequentDescriptorsTable > tbody").empty().append(
               Blaze.toHTMLWithData(Template.frequentDescriptors,
               response))
+
           $("#spinner").hide()
         return
       $("#spinner").hide()
@@ -82,7 +84,7 @@ if Meteor.isClient
     myLineChart = new Chart($("#canvas"),
     type: 'line'
     data: Meteor.data
-    options: xAxes: [ { display: false } ], scaleShowLabels : false, scales: {
+    options: xAxes: [ { display: false } ], scaleShowLabels: false, scales: {
       yAxes: [ {
         gridLines: {
           lineWidth: 0,
