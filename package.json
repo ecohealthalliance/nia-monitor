@@ -6,5 +6,16 @@
   },
   "dependencies": {
     "meteor-node-stubs": "~0.2.0"
-  }
+  },
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ecohealthalliance/nia-monitor.git"
+  },
+  "author": "EcoHealth Alliance",
+  "license": "ASL",
+  "bugs": {
+    "url": "https://github.com/ecohealthalliance/nia-monitor/issues"
+  },
+  "homepage": "https://github.com/ecohealthalliance/nia-monitor"
 }
