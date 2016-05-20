@@ -48,12 +48,9 @@ if Meteor.isClient
     $("#spinner").show()
     Meteor.call 'getRecentlyMentionedInfectiousAgents', (err, response) ->
       if err == undefined
-        $("#recentlyMentionedInfectiousAgentsTable > tbody").empty()
-        for i in response.ia
-          $("#recentlyMentionedInfectiousAgentsTable > tbody:last-child")
-          .append('<tr><td class="recentlyMentionedInfectiousAgentsTableRow"
-          data-agentName="'+i.name+'"><h3>'+i.name+'</h3>Date: '+i.date+
-          '<br> Link: <a href="www.google.com">i.name link</a></td></tr>')
+        $("#recentlyMentionedInfectiousAgentsTable > tbody").empty().append(
+          Blaze.toHTMLWithData(Template.recentlyMentionedInfectiousAgents,
+          response))
 
       $('.recentlyMentionedInfectiousAgentsTableRow').click ->
         $("#spinner").show()
@@ -62,31 +59,25 @@ if Meteor.isClient
         Meteor.call 'getRecentDescriptors', this.dataset.agentname,
         (err, response) ->
           if err == undefined
-            $("#recentDescriptorsTable > tbody").empty()
-            for i in response.rd
-              $("#recentDescriptorsTable > tbody:last-child")
-              .append('<tr><td class="recentDescriptorsTableRow"
-              data-agentName="'+i.name+'"><h3>'+i.name+'</h3>Date: '+i.date+
-              '<br> Link: <a href="www.google.com">i.name link</a></td></tr>')
+            $("#recentDescriptorsTable > tbody").empty().append(
+              Blaze.toHTMLWithData(Template.recentDescriptors, response))
           $("#spinner").hide()
 
         Meteor.call 'getFrequentDescriptors', this.dataset.agentname,
         (err, response) ->
           if err == undefined
-            $("#frequentDescriptorsTable > tbody").empty()
-            for i in response.fd
-              $("#frequentDescriptorsTable > tbody:last-child")
-              .append('<tr><td>'+i.name+'</td><td>'+i.count+'</td></tr>')
+            $("#frequentDescriptorsTable > tbody").empty().append(
+              Blaze.toHTMLWithData(Template.frequentDescriptors,
+              response))
           $("#spinner").hide()
         return
       $("#spinner").hide()
 
     Meteor.call 'getFrequentlyMentionedInfectiousAgents', (err, response) ->
       if err == undefined
-        $("#frequentlyMentionedInfectiousAgentsTable > tbody").empty()
-        for i in response.ia
-          $("#frequentlyMentionedInfectiousAgentsTable > tbody:last-child")
-          .append('<tr><td>'+i.name+'</td><td>'+i.count+'</td></tr>')
+        $("#frequentlyMentionedInfectiousAgentsTable > tbody").empty().append(
+          Blaze.toHTMLWithData(Template.frequentlyMentionedInfectiousAgents,
+          response))
 
     myLineChart = new Chart($("#canvas"),
     type: 'line'

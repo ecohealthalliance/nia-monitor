@@ -90,3 +90,48 @@
     <canvas id="canvas" width="400" height="200"></canvas>
   </div>
 </template>
+
+<template name="recentDescriptors">
+  {{#each rd}}
+    <tr>
+      <td class="recentDescriptorsTableRow" data-agentName="'+i.name+'">
+        <h3>{{name}}</h3>
+        Date: {{date}}
+        <br>
+        Link: <a href="{{link}}">{{linkName}}</a>
+      </td>
+    </tr>
+  {{/each}}
+</template>
+
+<template name="recentlyMentionedInfectiousAgents">
+  {{#each ia}}
+    <tr>
+      <td class="recentlyMentionedInfectiousAgentsTableRow"
+      data-agentName="{{name}}">
+        <h3>{{name}}</h3>
+        Date: {{date}}
+        <br>
+        Link: <a href="{{link}}">{{linkName}}</a>
+      </td>
+    </tr>
+  {{/each}}
+</template>
+
+<template name="frequentlyMentionedInfectiousAgents">
+  {{#each ia}}
+    <tr>
+      <td>{{name}}</td>
+      <td>{{count}}</td>
+    </tr>
+  {{/each}}
+</template>
+
+<template name="frequentDescriptors">
+  {{#each fd}}
+    <tr>
+      <td>{{name}}</td>
+      <td>{{count}}</td>
+    </tr>
+  {{/each}}
+</template>
