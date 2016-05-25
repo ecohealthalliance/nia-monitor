@@ -118,24 +118,24 @@
 </template>
 
 <template name="recentlyMentionedInfectiousAgents">
-  {{#each ia}}
+  {{#each bindings}}
     <tr>
       <td class="recentlyMentionedInfectiousAgentsTableRow"
-      data-agentName="{{name}}">
-        <h3>{{name}}</h3>
-        Date: {{date}}
+      data-agentName="{{word.value}}">
+        <h3>{{word.value}}</h3>
+        Date: {{dateTime.value}}
         <br>
-        Link: <a href="{{link}}">{{linkName}}</a>
+        Link: <a href="{{article.value}}">{{article.value}}</a>
       </td>
     </tr>
   {{/each}}
 </template>
 
 <template name="frequentlyMentionedInfectiousAgents">
-  {{#each ia}}
+  {{#each bindings}}
     <tr>
-      <td>{{name}}</td>
-      <td>{{count}}</td>
+      <td>{{word.value}}</td>
+      <td>{{count.value}}</td>
     </tr>
   {{/each}}
 </template>

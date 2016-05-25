@@ -1,19 +1,15 @@
 Meteor.startup ->
 
-SPARQurL = process.env.SPARQurL
+SPARQurL = 'http://10.0.2.230:3030/dataset'
 
 Meteor.methods(
-  #stub for data retrieval from SPARQL request.
-  'termSearch' : (query, options) ->
-    options ?= {}
-    if @userId
-      response = HTTP.post(
-        "#{SPARQurL}/search",
-          data:
-            query: query,
-            options: options
-      )
-      JSON.parse(response.content)
+  'SPARQLquery': (query) ->
+    response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
+      headers:
+        "Accept": "application/sparql-results+json"
+    )
+    return JSON.parse(response.content)
+
 
   'SPARQurL': () ->
     SPARQurL
@@ -22,33 +18,42 @@ Meteor.methods(
     JSON.parse
 
   'getRecentlyMentionedInfectiousAgents' : () ->
-    Meteor._sleepForMs(5000)
-    ia = {"ia":[
-      {"name":"Zika", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"Smallpox", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"Yellow Fever", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"Cholera", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"Spanish Flu", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"Polio", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"Pertussis", "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"}
-      ]}
-    return ia
+    query = 'prefix anno: <http://www.eha.io/types/annotation_prop/>
+            prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
+            prefix promed: <http://www.eha.io/types/promed/>
 
-  'getFrequentlyMentionedInfectiousAgents' : () ->
-    Meteor._sleepForMs(5000)
-    ia = {"ia":[
-      {"name":"Zika", "count":"572"},
-      {"name":"Spanish Flu", "count":"541"},
-      {"name":"Smallpox", "count":"422"},
-      {"name":"Pertussis", "count":"129"},
-      {"name":"Yellow Fever", "count":"45"},
-      {"name":"Polio", "count":"23"},
-      {"name":"Cholera", "count":"6"}
-      ]}
-    return ia
+            SELECT DISTINCT ?article ?word ?dateTime
+            WHERE {
+             ?article promed:date ?dateTime.
+             ?phrase anno:root/anno:pos "NOUN";
+                 anno:root/rdf:label ?word.
+             ?phrase anno:source_doc ?article;
+                 }
 
-  'getRecentDescriptors' : (ia) ->
-    Meteor._sleepForMs(5000)
+            ORDER BY DESC(?dateTime)
+
+            LIMIT 10'
+    return Meteor.call 'SPARQLquery', query
+
+  'getFrequentlyMentionedInfectiousAgents': () ->
+    query = "prefix anno: <http://www.eha.io/types/annotation_prop/>
+            prefix dep: <http://www.eha.io/types/annotation_prop/dep/>
+            prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT ?word
+                (count(?s) as ?count)
+            WHERE {
+                ?s anno:root ?r .
+                ?r anno:pos 'NOUN' ;
+                   rdf:label ?word .
+            }
+            GROUP BY ?word
+            ORDER BY DESC(?count)
+            LIMIT 10
+        "
+    return Meteor.call 'SPARQLquery', query
+
+
+  'getRecentDescriptors': (ia) ->
     #get recent descriptor for infectious agent (ia)
     rd = {"rd":[
       {"name":"Antibiotic-resistant"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
@@ -63,7 +68,6 @@ Meteor.methods(
     return rd
 
   'getFrequentDescriptors' : (ia) ->
-    Meteor._sleepForMs(5000)
     #get frequent descriptors for infectious agent (ia)
     fd = {"fd":[
       {"name":"Antibiotic-resistant"+ia, "count":"572"},
