@@ -50,7 +50,7 @@ if Meteor.isClient
       if err == undefined
         $("#recentlyMentionedInfectiousAgentsTable > tbody").empty().append(
           Blaze.toHTMLWithData(Template.recentlyMentionedInfectiousAgents,
-          response))
+          response.results))
 
       $('.recentlyMentionedInfectiousAgentsTableRow').click ->
         $("#spinner").show()
@@ -79,7 +79,7 @@ if Meteor.isClient
       if err == undefined
         $("#frequentlyMentionedInfectiousAgentsTable > tbody").empty().append(
           Blaze.toHTMLWithData(Template.frequentlyMentionedInfectiousAgents,
-          response))
+          response.results))
 
     myLineChart = new Chart($("#canvas"),
     type: 'line'
