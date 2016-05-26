@@ -35,8 +35,6 @@ if Meteor.isClient
     ]
   } ]
 
-  Session.setDefault("templateName", "info")
-
   Template.body.helpers template_name: ->
     Session.get 'templateName'
   Template.body.events
@@ -109,6 +107,7 @@ if Meteor.isClient
     return
 
   Template.timeline.onRendered ->
+
     myLineChart = new Chart($("#canvas"),
     type: 'line'
     data: Meteor.data

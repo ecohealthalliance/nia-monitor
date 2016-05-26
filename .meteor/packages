@@ -27,3 +27,7 @@ http
 momentjs:moment
 session
 iron:router
+
+# For testing
+xolvio:backdoor
+xolvio:cleaner
