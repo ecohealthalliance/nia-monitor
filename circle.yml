@@ -45,12 +45,15 @@ test:
 
 deployment:
   master:
-    branch: master
+    branch: ci
     commands:
       - meteor build /tmp/ehabuild --directory
       - cp ./Dockerfile /tmp/ehabuild/bundle/
       - docker build -t eha/nia-monitor /tmp/ehabuild/bundle/
       - docker save eha/nia-monitor | gzip -9 > nia-monitor.docker.tgz
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker tag eha/nia-monitor ditdevops/eha-nia-monitor
+      - docker push ditdevops/eha-nia-monitor
 
 general:
   artifacts:
