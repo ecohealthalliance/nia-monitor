@@ -48,6 +48,15 @@ if Meteor.isClient
     $("#spinner").show()
     Meteor.call 'getRecentlyMentionedInfectiousAgents', (err, response) ->
       if err == undefined
+        for binding in response.results.bindings
+          mentionDate = moment(new Date(binding.dateTime.value))
+          today = moment(new Date())
+          binding.days = {value: today.diff(mentionDate, 'days')}
+          binding.months = {value: today.diff(mentionDate, 'months')}
+          #show days or months since last mention
+          if binding.days.value > 30
+            binding.dm = true
+
         $("#recentlyMentionedInfectiousAgentsTable > tbody").empty().append(
           Blaze.toHTMLWithData(Template.recentlyMentionedInfectiousAgents,
           response.results))

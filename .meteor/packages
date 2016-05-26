@@ -24,3 +24,4 @@ mquandalle:stylus
 twbs:bootstrap
 fortawesome:fontawesome
 http
+momentjs:moment
