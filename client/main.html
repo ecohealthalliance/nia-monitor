@@ -9,10 +9,33 @@
   <div class="col-md-12">
     <h1>Novel Infectious Agent Monitoring</h1>
   </div>
-  {{> info}}
 </body>
 
-<template name="info">
+<template name="detail">
+  <div class="col-md-12">
+    <div class="panel panel-primary">
+      <div class="panel-body">
+        <button class="fa fa-arrow-circle-left fa-4 pull-right"></button>
+        <div class="col-md-6 pull-left">
+          <div class="panel panel-primary">
+            <div class="panel-body">
+              {{> detailLeft}}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 pull-right">
+          <div class="panel panel-primary">
+            <div class="panel-body">
+              {{> detailRight}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="main">
   <div class="col-md-6 pull-left">
     <div class="panel panel-primary">
       <div class="panel-body">
@@ -47,6 +70,8 @@
       </div>
     </div>
   </div>
+</template>
+<template name="right">
   <div id="frequentlyMentionedInfectiousAgents">
     <div class="panel panel-primary">
       <div class="panel-heading">
@@ -65,7 +90,7 @@
   </div>
 </template>
 
-<template name="right">
+<template name="detailLeft">
   {{> timeline}}
   <br>
   <div id="recentDescriptors">
@@ -82,6 +107,8 @@
       </div>
     </div>
   </div>
+</template>
+<template name="detailRight">
   <div id="frequentDescriptors">
     <div class="panel panel-primary">
       <div class="panel-heading">
@@ -111,7 +138,7 @@
         <h3>{{name}}</h3>
         Date: {{date}}
         <br>
-        Link: <a href="{{link}}">{{linkName}}</a>
+        Link: <a href="{{link}}" target="_blank">{{linkName}}</a>
       </td>
     </tr>
   {{/each}}
@@ -133,7 +160,7 @@
           Days since last mention: {{days.value}}
         {{/if}}
         <br>
-        Link: <a href="{{article.value}}">{{article.value}}</a>
+        Link: <a href="{{article.value}}" target="_blank">{{article.value}}</a>
       </td>
     </tr>
   {{/each}}

@@ -35,6 +35,15 @@ if Meteor.isClient
     ]
   } ]
 
+  Session.setDefault("templateName", "info")
+
+  Template.body.helpers template_name: ->
+    Session.get 'templateName'
+  Template.body.events
+    'click .recentlyMentionedInfectiousAgentsTableRow': ->
+      #Session.set 'templateName', 'detail'
+      return
+
   $('#recentlyMentionedInfectiousAgentsTable').on 'click-row.bs.table', (e,
     row, $element) ->
     console.log(row, $element)
@@ -42,6 +51,29 @@ if Meteor.isClient
 
   $('.recentlyMentionedInfectiousAgentsTableRow').click ->
     console.log 'row was clicked'
+    return
+
+  Router.route '/', ->
+    @render 'main'
+    return
+
+  Router.route '/detail/:_agentName', ->
+    @render 'detail'
+    $("#spinner").show()
+    Meteor.call 'getRecentDescriptors', @params._agentName,
+    (err, response) ->
+      if err == undefined
+        $("#recentDescriptorsTable > tbody").empty().append(
+          Blaze.toHTMLWithData(Template.recentDescriptors, response))
+      $("#spinner").hide()
+
+    Meteor.call 'getFrequentDescriptors', @params._agentName,
+    (err, response) ->
+      if err == undefined
+        $("#frequentDescriptorsTable > tbody").empty().append(
+          Blaze.toHTMLWithData(Template.frequentDescriptors,
+          response))
+      $("#spinner").hide()
     return
 
   $(document).ready ->
@@ -65,23 +97,8 @@ if Meteor.isClient
         $("#spinner").show()
         $('.recentlyMentionedInfectiousAgentsTableRow').removeClass('info')
         $(this).addClass('info')
-        Meteor.call 'getRecentDescriptors', this.dataset.agentname,
-        (err, response) ->
-          if err == undefined
-            $("#recentDescriptorsTable > tbody").empty().append(
-              Blaze.toHTMLWithData(Template.recentDescriptors, response))
-
-          $("#spinner").hide()
-
-        Meteor.call 'getFrequentDescriptors', this.dataset.agentname,
-        (err, response) ->
-          if err == undefined
-            $("#frequentDescriptorsTable > tbody").empty().append(
-              Blaze.toHTMLWithData(Template.frequentDescriptors,
-              response))
-
-          $("#spinner").hide()
-        return
+        window.open("/detail/" + this.dataset.agentname)
+        $("#spinner").hide()
       $("#spinner").hide()
 
     Meteor.call 'getFrequentlyMentionedInfectiousAgents', (err, response) ->
@@ -89,7 +106,9 @@ if Meteor.isClient
         $("#frequentlyMentionedInfectiousAgentsTable > tbody").empty().append(
           Blaze.toHTMLWithData(Template.frequentlyMentionedInfectiousAgents,
           response.results))
+    return
 
+  Template.timeline.onRendered ->
     myLineChart = new Chart($("#canvas"),
     type: 'line'
     data: Meteor.data
@@ -107,6 +126,3 @@ if Meteor.isClient
           }
         }]
     })
-    return
-
-  Template.timeline.onRendered ->

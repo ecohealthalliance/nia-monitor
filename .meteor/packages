@@ -25,3 +25,5 @@ twbs:bootstrap
 fortawesome:fontawesome
 http
 momentjs:moment
+session
+iron:router

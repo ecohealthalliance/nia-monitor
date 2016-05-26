@@ -10,7 +10,6 @@ Meteor.methods(
     )
     return JSON.parse(response.content)
 
-
   'SPARQurL': () ->
     SPARQurL
 
