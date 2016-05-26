@@ -25,3 +25,7 @@ twbs:bootstrap
 fortawesome:fontawesome
 http
 momentjs:moment
+
+# For testing
+xolvio:backdoor
+xolvio:cleaner

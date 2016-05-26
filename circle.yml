@@ -1,0 +1,60 @@
+machine:
+  services:
+    - docker
+  java:
+    version: oraclejdk8
+  node:
+    version: 5.11.1 # chimp doesn't support Node 6 yet
+
+# Add some environment variables
+  environment:
+    PACKAGE_DIRS: "/home/ubuntu"
+
+dependencies:
+  cache_directories:
+    - "node_modules"
+    - "~/.npm"
+    - "~/mongodb-linux-x86_64-2.6.4"
+    - "~/.meteor"
+    - ".meteor/local/build"
+    - ".meteor/local/bundler-cache"
+    - ".meteor/local/db"
+    - ".meteor/local/isopacks"
+    - ".meteor/local/plugin-cache"
+
+  override:
+    # Cache Mongo 2.6
+    - if [[ ! -d ~/mongodb-linux-x86_64-2.6.4 ]]; then cd ~; wget http://downloads.mongodb.org/linux/mongodb-linux-x86_64-2.6.4.tgz && tar xvzf ~/mongodb-linux-x86_64-2.6.4.tgz; fi
+    - sudo /etc/init.d/mongodb stop
+    - sudo cp ~/mongodb-linux-x86_64-2.6.4/bin/* /usr/bin
+    - sudo service mongodb start
+
+    # Cache Meteor
+    - if [ -d ~/.meteor ]; then sudo ln -s ~/.meteor/meteor /usr/local/bin/meteor; fi
+    - if [ ! -e $HOME/.meteor/meteor ]; then curl https://install.meteor.com | sh; fi
+
+    # Cache npm deps
+    - npm install
+    - npm install chimp -g
+
+test:
+  override:
+    - meteor:
+        background: true
+    - chimp --ddp=http://localhost:3000 --path=tests
+
+deployment:
+  master:
+    branch: master
+    commands:
+      - meteor build /tmp/ehabuild --directory
+      - cp ./Dockerfile /tmp/ehabuild/bundle/
+      - docker build -t eha/nia-monitor /tmp/ehabuild/bundle/
+      - docker save eha/nia-monitor | gzip -9 > nia-monitor.docker.tgz
+
+general:
+  artifacts:
+    - "nia-monitor.docker.tgz"
+  branches:
+    ignore:
+      - gh-pages
