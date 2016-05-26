@@ -125,6 +125,14 @@
         <h3>{{word.value}}</h3>
         Date: {{dateTime.value}}
         <br>
+        {{#if dm}}
+        <span class="underline">
+          Months since last mention: {{months.value}}
+        </span>
+        {{else}}
+          Days since last mention: {{days.value}}
+        {{/if}}
+        <br>
         Link: <a href="{{article.value}}">{{article.value}}</a>
       </td>
     </tr>
