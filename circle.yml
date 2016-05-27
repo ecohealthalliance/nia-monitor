@@ -45,7 +45,7 @@ test:
 
 deployment:
   master:
-    branch: ci
+    branch: master
     commands:
       - meteor build /tmp/ehabuild --directory
       - cp ./Dockerfile /tmp/ehabuild/bundle/
