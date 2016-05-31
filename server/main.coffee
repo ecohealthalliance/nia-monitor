@@ -1,6 +1,4 @@
-Meteor.startup ->
-
-SPARQurL = 'http://10.0.2.230:3030/dataset'
+SPARQurL = 'http://10.0.2.151:3030/dataset'
 
 Meteor.methods(
   'SPARQLquery': (query) ->

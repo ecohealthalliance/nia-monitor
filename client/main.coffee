@@ -1,4 +1,87 @@
-if Meteor.isClient
+@rmia = new Meteor.Collection(null)
+@fmia = new Meteor.Collection(null)
+
+@rd = new Meteor.Collection(null)
+@fd = new Meteor.Collection(null)
+
+Template.main.onCreated ->
+  @autorun ->
+    $("#spinner").show()
+    rmia.remove({})
+    Meteor.call 'getRecentlyMentionedInfectiousAgents',
+    (err, response) ->
+      if err == undefined
+        for binding in response.results.bindings
+          mentionDate = moment(new Date(binding.dateTime.value))
+          today = moment(new Date())
+          binding.days = {value: today.diff(mentionDate, 'days')}
+          binding.months = {value: today.diff(mentionDate, 'months')}
+          #show days or months since last mention
+          if binding.days.value > 30
+            binding.dm = true
+          rmia.insert(binding)
+        $("#recentlyMentionedInfectiousAgentsTable > tbody").empty().append(
+          Blaze.toHTML(Template.recentlyMentionedInfectiousAgents))
+      $("#spinner").hide()
+
+    fmia.remove({})
+    Meteor.call 'getFrequentlyMentionedInfectiousAgents', (err, response) ->
+      if err == undefined
+        for binding in response.results.bindings
+          fmia.insert(binding)
+        $("#frequentlyMentionedInfectiousAgentsTable > tbody").empty().append(
+          Blaze.toHTML(Template.frequentlyMentionedInfectiousAgents))
+
+Template.recentlyMentionedInfectiousAgents.helpers
+  rmia: ->
+    return rmia.find()
+
+Template.frequentlyMentionedInfectiousAgents.helpers
+  fmia: ->
+    return fmia.find()
+
+Template.recentDescriptors.helpers
+  rd: ->
+    return rd.find()
+
+Template.frequentDescriptors.helpers
+  fd: ->
+    return fd.find()
+
+Template.recentlyMentionedInfectiousAgents.events
+  'click .recentlyMentionedInfectiousAgentsTableRow': ->
+    $("#spinner").show()
+    $('.recentlyMentionedInfectiousAgentsTableRow').removeClass('info')
+    $(this).addClass('info')
+    window.open("/detail/" + this.dataset.agentname)
+    $("#spinner").hide()
+
+
+Router.route '/', ->
+  @render 'main'
+  return
+
+Router.route '/detail/:_agentName', ->
+  @render 'detail'
+
+Template.detail.onRendered ->
+  fd.remove({})
+  Meteor.call 'getFrequentDescriptors', (err, response) ->
+    if err == undefined
+      for row in response.fd
+        fd.insert(row)
+      $("#frequentDescriptorsTable > tbody").empty().append(
+        Blaze.toHTML(Template.frequentDescriptors))
+
+  rd.remove({})
+  Meteor.call 'getRecentDescriptors', (err, response) ->
+    if err == undefined
+      for row in response.rd
+        rd.insert(row)
+      $("#recentDescriptorsTable > tbody").empty().append(
+        Blaze.toHTML(Template.recentDescriptors))
+
+Template.timeline.onRendered ->
   Meteor.data =
   labels: [
     'January'
@@ -35,93 +118,20 @@ if Meteor.isClient
     ]
   } ]
 
-  Template.body.helpers template_name: ->
-    Session.get 'templateName'
-  Template.body.events
-    'click .recentlyMentionedInfectiousAgentsTableRow': ->
-      #Session.set 'templateName', 'detail'
-      return
-
-  $('#recentlyMentionedInfectiousAgentsTable').on 'click-row.bs.table', (e,
-    row, $element) ->
-    console.log(row, $element)
-    return
-
-  $('.recentlyMentionedInfectiousAgentsTableRow').click ->
-    console.log 'row was clicked'
-    return
-
-  Router.route '/', ->
-    @render 'main'
-    return
-
-  Router.route '/detail/:_agentName', ->
-    @render 'detail'
-    $("#spinner").show()
-    Meteor.call 'getRecentDescriptors', @params._agentName,
-    (err, response) ->
-      if err == undefined
-        $("#recentDescriptorsTable > tbody").empty().append(
-          Blaze.toHTMLWithData(Template.recentDescriptors, response))
-      $("#spinner").hide()
-
-    Meteor.call 'getFrequentDescriptors', @params._agentName,
-    (err, response) ->
-      if err == undefined
-        $("#frequentDescriptorsTable > tbody").empty().append(
-          Blaze.toHTMLWithData(Template.frequentDescriptors,
-          response))
-      $("#spinner").hide()
-    return
-
-  $(document).ready ->
-    $("#spinner").show()
-    Meteor.call 'getRecentlyMentionedInfectiousAgents', (err, response) ->
-      if err == undefined
-        for binding in response.results.bindings
-          mentionDate = moment(new Date(binding.dateTime.value))
-          today = moment(new Date())
-          binding.days = {value: today.diff(mentionDate, 'days')}
-          binding.months = {value: today.diff(mentionDate, 'months')}
-          #show days or months since last mention
-          if binding.days.value > 30
-            binding.dm = true
-
-        $("#recentlyMentionedInfectiousAgentsTable > tbody").empty().append(
-          Blaze.toHTMLWithData(Template.recentlyMentionedInfectiousAgents,
-          response.results))
-
-      $('.recentlyMentionedInfectiousAgentsTableRow').click ->
-        $("#spinner").show()
-        $('.recentlyMentionedInfectiousAgentsTableRow').removeClass('info')
-        $(this).addClass('info')
-        window.open("/detail/" + this.dataset.agentname)
-        $("#spinner").hide()
-      $("#spinner").hide()
-
-    Meteor.call 'getFrequentlyMentionedInfectiousAgents', (err, response) ->
-      if err == undefined
-        $("#frequentlyMentionedInfectiousAgentsTable > tbody").empty().append(
-          Blaze.toHTMLWithData(Template.frequentlyMentionedInfectiousAgents,
-          response.results))
-    return
-
-  Template.timeline.onRendered ->
-
-    myLineChart = new Chart($("#canvas"),
-    type: 'line'
-    data: Meteor.data
-    options: xAxes: [ { display: false } ], scaleShowLabels: false, scales: {
-      yAxes: [ {
-        gridLines: {
-          lineWidth: 0,
-          color: "rgba(255,255,255,0)"
-          }
-        }]
-      xAxes: [ {
-        gridLines: {
-          lineWidth: 0,
-          color: "rgba(255,255,255,0)"
-          }
-        }]
-    })
+  myLineChart = new Chart($("#canvas"),
+  type: 'line'
+  data: Meteor.data
+  options: xAxes: [ { display: false } ], scaleShowLabels: false, scales: {
+    yAxes: [ {
+      gridLines: {
+        lineWidth: 0,
+        color: "rgba(255,255,255,0)"
+        }
+      }]
+    xAxes: [ {
+      gridLines: {
+        lineWidth: 0,
+        color: "rgba(255,255,255,0)"
+        }
+      }]
+  })
