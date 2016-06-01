@@ -20,8 +20,6 @@ Template.main.onCreated ->
           if binding.days.value > 30
             binding.dm = true
           rmia.insert(binding)
-        $("#recentlyMentionedInfectiousAgentsTable > tbody").empty().append(
-          Blaze.toHTML(Template.recentlyMentionedInfectiousAgents))
       $("#spinner").hide()
 
     fmia.remove({})
@@ -29,8 +27,6 @@ Template.main.onCreated ->
       if err == undefined
         for binding in response.results.bindings
           fmia.insert(binding)
-        $("#frequentlyMentionedInfectiousAgentsTable > tbody").empty().append(
-          Blaze.toHTML(Template.frequentlyMentionedInfectiousAgents))
 
 Template.recentlyMentionedInfectiousAgents.helpers
   rmia: ->
@@ -49,13 +45,8 @@ Template.frequentDescriptors.helpers
     return fd.find()
 
 Template.recentlyMentionedInfectiousAgents.events
-  'click .recentlyMentionedInfectiousAgentsTableRow': ->
-    $("#spinner").show()
-    $('.recentlyMentionedInfectiousAgentsTableRow').removeClass('info')
-    $(this).addClass('info')
-    window.open("/detail/" + this.dataset.agentname)
-    $("#spinner").hide()
-
+  'click .recentlyMentionedInfectiousAgentWord': ->
+    window.open("/detail/" + this.word.value)
 
 Router.route '/', ->
   @render 'main'
@@ -70,16 +61,12 @@ Template.detail.onRendered ->
     if err == undefined
       for row in response.fd
         fd.insert(row)
-      $("#frequentDescriptorsTable > tbody").empty().append(
-        Blaze.toHTML(Template.frequentDescriptors))
 
   rd.remove({})
   Meteor.call 'getRecentDescriptors', (err, response) ->
     if err == undefined
       for row in response.rd
         rd.insert(row)
-      $("#recentDescriptorsTable > tbody").empty().append(
-        Blaze.toHTML(Template.recentDescriptors))
 
 Template.timeline.onRendered ->
   Meteor.data =

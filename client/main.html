@@ -63,7 +63,7 @@
           <thead>
           </thead>
           <tbody>
-            No Data
+            {{> recentlyMentionedInfectiousAgents}}
           </tbody>
         </table>
       </div>
@@ -81,7 +81,7 @@
           <thead>
           </thead>
           <tbody>
-            No Data
+            {{> frequentlyMentionedInfectiousAgents}}
           </tbody>
         </table>
       </div>
@@ -99,7 +99,7 @@
       <div class="">
         <table id="recentDescriptorsTable" class="table table-striped">
           <tbody>
-            Select an Infectious Agent
+            {{> recentDescriptors}}
           </tbody>
         </table>
       </div>
@@ -115,7 +115,7 @@
       <div class="">
         <table id="frequentDescriptorsTable" class="table table-striped">
           <tbody>
-            Select an Infectious Agent
+            {{> frequentDescriptors}}
           </tbody>
         </table>
       </div>
@@ -147,7 +147,7 @@
     <tr>
       <td class="recentlyMentionedInfectiousAgentsTableRow"
       data-agentName="{{word.value}}">
-        <h3>{{word.value}}</h3>
+        <h3 class="recentlyMentionedInfectiousAgentWord">{{word.value}}</h3>
         Date: {{dateTime.value}}
         <br>
         {{#if dm}}
