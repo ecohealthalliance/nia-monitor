@@ -1,12 +1,6 @@
 SPARQurL = 'http://10.0.2.151:3030/dataset'
 
 Meteor.methods(
-  'SPARQLquery': (query) ->
-    response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
-      headers:
-        "Accept": "application/sparql-results+json"
-    )
-    return JSON.parse(response.content)
 
   'SPARQurL': () ->
     SPARQurL
@@ -30,7 +24,12 @@ Meteor.methods(
             ORDER BY DESC(?dateTime)
 
             LIMIT 10'
-    return Meteor.call 'SPARQLquery', query
+    response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
+      headers:
+        "Accept": "application/sparql-results+json"
+    )
+    return JSON.parse(response.content)
+
 
   'getFrequentlyMentionedInfectiousAgents': () ->
     query = "prefix anno: <http://www.eha.io/types/annotation_prop/>
@@ -47,7 +46,11 @@ Meteor.methods(
             ORDER BY DESC(?count)
             LIMIT 10
         "
-    return Meteor.call 'SPARQLquery', query
+    response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
+      headers:
+        "Accept": "application/sparql-results+json"
+    )
+    return JSON.parse(response.content)
 
 
   'getRecentDescriptors': (ia) ->
