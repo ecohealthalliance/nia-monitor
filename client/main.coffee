@@ -12,10 +12,10 @@ Template.main.onCreated ->
     (err, response) ->
       if err == undefined
         for binding in response.results.bindings
-          mentionDate = moment(new Date(binding.dateTime.value))
-          today = moment(new Date())
-          binding.days = {value: today.diff(mentionDate, 'days')}
-          binding.months = {value: today.diff(mentionDate, 'months')}
+          priorDate = moment(new Date(binding.priorDate.value))
+          currentDate = moment(new Date(binding.currentDate.value))
+          binding.days = {value: currentDate.diff(priorDate, 'days')}
+          binding.months = {value: currentDate.diff(priorDate, 'months')}
           #show days or months since last mention
           if binding.days.value > 30
             binding.dm = true

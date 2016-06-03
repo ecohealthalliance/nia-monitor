@@ -148,17 +148,17 @@
       <td class="recentlyMentionedInfectiousAgentsTableRow"
       data-agentName="{{word.value}}">
         <h3 class="recentlyMentionedInfectiousAgentWord">{{word.value}}</h3>
-        Date: {{dateTime.value}}
+        Date: {{currentDate.value}}
         <br>
         {{#if dm}}
         <span class="underline">
-          Months since last mention: {{months.value}}
+          Months since last mention: <a href="{{priorArticle.value}}" target="_blank">{{months.value}}</a>
         </span>
         {{else}}
-          Days since last mention: {{days.value}}
+          Days since last mention: <a href="{{priorArticle.value}}" target="_blank">{{days.value}}</a>
         {{/if}}
         <br>
-        Link: <a href="{{article.value}}" target="_blank">{{article.value}}</a>
+        Link: <a href="{{currentArticle.value}}" target="_blank">{{currentArticle.value}}</a>
       </td>
     </tr>
   {{/each}}

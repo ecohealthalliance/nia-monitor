@@ -1,4 +1,4 @@
-SPARQurL = 'http://10.0.2.151:3030/dataset'
+SPARQurL = 'http://10.0.2.240:3030/dataset'
 
 Meteor.methods(
 
@@ -9,21 +9,53 @@ Meteor.methods(
     JSON.parse
 
   'getRecentlyMentionedInfectiousAgents' : () ->
-    query = 'prefix anno: <http://www.eha.io/types/annotation_prop/>
+    query = 'prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+            prefix anno: <http://www.eha.io/types/annotation_prop/>
             prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
             prefix promed: <http://www.eha.io/types/promed/>
 
-            SELECT DISTINCT ?article ?word ?dateTime
+            SELECT (max(?article) as ?currentArticle) (max(?dateTime) as ?currentDate) ?word (max(?article2) as ?priorArticle) (max(?dateTime2) as ?priorDate)
             WHERE {
-             ?article promed:date ?dateTime.
-             ?phrase anno:root/anno:pos "NOUN";
-                 anno:root/rdf:label ?word.
-             ?phrase anno:source_doc ?article;
-                 }
+              ?article promed:date ?dateTime.
+              ?phrase anno:root/anno:pos "NOUN";
+                               anno:root/rdf:label ?word.
+              ?phrase anno:source_doc ?article.
 
-            ORDER BY DESC(?dateTime)
+              ?article2 promed:date ?dateTime2.
+              ?phrase2 anno:root/anno:pos "NOUN";
+                               anno:root/rdf:label ?word2.
+              ?phrase2 anno:source_doc ?article2;
+
+              filter(?dateTime > ?dateTime2 && ?article != ?article2 && ?word = ?word2)
+            }
+            GROUP BY ?word ?word2
+
+            ORDER BY DESC(?currentDate) DESC(?priorDate)
 
             LIMIT 10'
+    response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
+      headers:
+        "Accept": "application/sparql-results+json"
+    )
+    return JSON.parse(response.content)
+
+  'gitHistoricalData': (word) ->
+    query = 'prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+            prefix anno: <http://www.eha.io/types/annotation_prop/>
+            prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
+            prefix promed: <http://www.eha.io/types/promed/>
+
+            SELECT ?word ?dateTime (count(?word) as ?count)
+            WHERE {
+              ?article promed:date ?dateTime.
+              ?phrase anno:root/anno:pos "NOUN";
+                               anno:root/rdf:label ?word.
+              ?phrase anno:source_doc ?article
+
+              filter(?word = '+ word +')
+            }
+            GROUP BY ?dateTime ?word
+            ORDER BY DESC(?dateTime)'
     response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
       headers:
         "Accept": "application/sparql-results+json"
