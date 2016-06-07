@@ -6,16 +6,15 @@
   <div id="spinner" style="display:none;">
     <i id="spinnerElement" class="fa fa-spinner fa-spin"></i>
   </div>
-  <div id="header" class="col-md-12">
-    <h1>Novel Infectious Agent Monitoring</h1>
-  </div>
 </body>
 
 <template name="detail">
+  <div id="header" class="col-md-12">
+    <h1>Novel Infectious Agent Monitoring ({{_agentName}})</h1>
+  </div>
   <div class="col-md-12">
     <div class="panel panel-primary">
       <div class="panel-body">
-        <button class="fa fa-arrow-circle-left fa-4 pull-right"></button>
         <div class="col-md-6 pull-left">
           <div class="panel panel-primary">
             <div class="panel-body">
@@ -36,6 +35,9 @@
 </template>
 
 <template name="main">
+  <div id="header" class="col-md-12">
+    <h1>Novel Infectious Agent Monitoring</h1>
+  </div>
   <div class="col-md-6 pull-left">
     <div class="panel panel-primary">
       <div class="panel-body">

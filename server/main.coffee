@@ -39,7 +39,7 @@ Meteor.methods(
     )
     return JSON.parse(response.content)
 
-  'gitHistoricalData': (word) ->
+  'getHistoricalData': (word) ->    
     query = 'prefix xsd: <http://www.w3.org/2001/XMLSchema#>
             prefix anno: <http://www.eha.io/types/annotation_prop/>
             prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
@@ -52,7 +52,7 @@ Meteor.methods(
                                anno:root/rdf:label ?word.
               ?phrase anno:source_doc ?article
 
-              filter(?word = '+ word +')
+              filter(?word = "'+word+'")
             }
             GROUP BY ?dateTime ?word
             ORDER BY DESC(?dateTime)'
