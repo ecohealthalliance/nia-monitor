@@ -14,10 +14,12 @@ Meteor.methods(
       prefix anno: <http://www.eha.io/types/annotation_prop/>
       prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
       prefix promed: <http://www.eha.io/types/promed/>
+      prefix dc: <http://purl.org/dc/terms/>
       SELECT
           # For each of the most recently mentioned terms find the most recent
           # mention prior to the current mention.
-          ?word ?currentDate ?currentArticle
+          ?resolvedTerm ?currentDate ?currentArticle
+          (sample(?termLabel) as ?word)
           (max(?prevArticle) as ?priorArticle)
           (max(?prevDate) as ?priorDate)
       WHERE {
@@ -25,29 +27,31 @@ Meteor.methods(
           # Doing this as a subquery speeds up the overall query
           # by limiting items prior mentions are found for.
           {
-              SELECT ?word ?currentDate ?currentArticle
+              SELECT DISTINCT ?resolvedTerm ?termLabel ?currentDate ?currentArticle
               WHERE {
-                  ?phrase anno:root/anno:pos "NOUN"
-                      ; anno:root/rdf:label ?word
+                  ?phrase anno:category "diseases"
                       ; anno:source_doc ?currentArticle
                       ; anno:start ?start
+                      ; ^dc:relation ?resolvedTerm
                       .
+                  ?resolvedTerm rdf:label ?termLabel .
                   ?currentArticle promed:date ?currentDate .
               }
               # Sort by date, then document, then offset within the document.
               ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?start)
-              LIMIT 20
+              LIMIT 50
           }
           # Select the previous usages of the most recently mentioned terms
-          ?prev_mention anno:root/anno:pos "NOUN"
-              ; anno:root/rdf:label ?word
-              ; anno:source_doc ?prevArticle
-              .
-          ?prevArticle promed:date ?prevDate .
-          FILTER(?currentDate >= ?prevDate && ?currentArticle != ?prevArticle)
+          OPTIONAL {
+            ?prev_mention anno:source_doc ?prevArticle
+                ; ^dc:relation ?resolvedTerm
+                .
+            ?prevArticle promed:date ?prevDate .
+            FILTER(?currentDate >= ?prevDate && ?currentArticle != ?prevArticle)
+          }
       }
       # Group by the items from the inner query
-      GROUP BY ?word ?currentDate ?currentArticle
+      GROUP BY ?resolvedTerm ?currentDate ?currentArticle
       '''
     response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
       headers:

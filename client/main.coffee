@@ -12,13 +12,14 @@ Template.main.onCreated ->
     (err, response) ->
       if err == undefined
         for binding in response.results.bindings
-          priorDate = moment(new Date(binding.priorDate.value))
-          currentDate = moment(new Date(binding.currentDate.value))
-          binding.days = {value: currentDate.diff(priorDate, 'days')}
-          binding.months = {value: currentDate.diff(priorDate, 'months')}
-          #show days or months since last mention
-          if binding.days.value > 30
-            binding.dm = true
+          if binding.priorDate
+            priorDate = moment(new Date(binding.priorDate.value))
+            currentDate = moment(new Date(binding.currentDate.value))
+            binding.days = {value: currentDate.diff(priorDate, 'days')}
+            binding.months = {value: currentDate.diff(priorDate, 'months')}
+            #show days or months since last mention
+            if binding.days.value > 30
+              binding.dm = true
           rmia.insert(binding)
       $(".spinner").hide()
 
