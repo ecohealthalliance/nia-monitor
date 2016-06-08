@@ -85,15 +85,15 @@ Template.timeline.onRendered ->
     (err, response) ->
       if err == undefined
         for binding in response.results.bindings
-          binding.dateTime = moment(new Date(binding.dateTime.value))
+          binding.dateTime = moment(new Date(binding.dateTime.value)).toDate()
           tld.insert(binding)
 
       baseYear = new Date(tld.find({}, {sort: {dateTime: -1}}).fetch()[0].dateTime).getFullYear()
       ctryear = baseYear
       data = {}
       while ctryear > baseYear - 5
-        start = moment(new Date(ctryear, 0, 1))
-        end = moment(new Date(ctryear+1, 0, 1))
+        start = moment(new Date(ctryear, 0, 1)).toDate()
+        end = moment(new Date(ctryear+1, 0, 1)).toDate()
         data[ctryear] = tld.find(dateTime:
           $gte: start
           $lt: end).fetch()
