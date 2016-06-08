@@ -1,0 +1,72 @@
+template(name='detail')
+  .spinner(style='display:none;')
+    i.fa.fa-spinner.fa-spin.spinnerElement
+  #header.col-md-12
+    h1 Novel Infectious Agent Monitoring
+  .col-md-12
+    .panel.panel-primary
+      .panel-body
+        .col-md-6.pull-left
+          .panel.panel-primary
+            .panel-body
+              | {{> detailLeft}}
+        .col-md-6.pull-right
+          .panel.panel-primary
+            .panel-body
+              | {{> detailRight}}
+template(name='main')
+  .spinner
+    i.fa.fa-spinner.fa-spin.spinnerElement
+  #header.col-md-12
+    h1 Novel Infectious Agent Monitoring
+  .col-md-6.pull-left
+    .panel.panel-primary
+      .panel-body
+        | {{> left}}
+  .col-md-6.pull-right
+    .panel.panel-primary
+      .panel-body
+        | {{> right}}
+template(name='left')
+  #recentlyMentionedInfectiousAgents
+    .panel.panel-primary
+      .panel-heading
+        h4 Recently Mentioned Infectious Agents
+      div
+        table#recentlyMentionedInfectiousAgentsTable.table.table-striped
+          thead
+          tbody
+            | {{> recentlyMentionedInfectiousAgents}}
+template(name='right')
+  #frequentlyMentionedInfectiousAgents
+    .panel.panel-primary
+      .panel-heading
+        h4 Frequently Mentioned Infectious Agents
+      div
+        table#frequentlyMentionedInfectiousAgentsTable.table.table-striped
+          thead
+          tbody
+            | {{> frequentlyMentionedInfectiousAgents}}
+template(name='detailLeft')
+  | {{> timeline}}
+  br
+  #recentDescriptors
+    .panel.panel-primary
+      .panel-heading
+        h4 Recent Descriptors
+      div
+        table#recentDescriptorsTable.table.table-striped
+          tbody
+            | {{> recentDescriptors}}
+template(name='detailRight')
+  #frequentDescriptors
+    .panel.panel-primary
+      .panel-heading
+        h4 Frequent Descriptors
+      div
+        table#frequentDescriptorsTable.table.table-striped
+          tbody
+            | {{> frequentDescriptors}}
+template(name='timeline')
+  #timeline(style='width:400px height:200px')
+    canvas#canvas(width='400', height='200')
