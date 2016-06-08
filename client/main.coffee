@@ -6,7 +6,7 @@
 
 Template.main.onCreated ->
   @autorun ->
-    $("#spinner").show()
+    $(".spinner").show()
     rmia.remove({})
     Meteor.call 'getRecentlyMentionedInfectiousAgents',
     (err, response) ->
@@ -20,7 +20,7 @@ Template.main.onCreated ->
           if binding.days.value > 30
             binding.dm = true
           rmia.insert(binding)
-      $("#spinner").hide()
+      $(".spinner").hide()
 
     fmia.remove({})
     Meteor.call 'getFrequentlyMentionedInfectiousAgents', (err, response) ->
@@ -45,7 +45,7 @@ Template.frequentDescriptors.helpers
     return fd.find()
 
 Template.recentlyMentionedInfectiousAgents.events
-  'click .recentlyMentionedInfectiousAgentWord': ->
+  'click .rmiaWord': ->
     window.open("/detail/" + this.word.value)
 
 Router.route '/', ->

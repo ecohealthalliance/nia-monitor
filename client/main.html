@@ -3,8 +3,8 @@
 </head>
 
 <body>
-  <div id="spinner" style="display:none;">
-    <i id="spinnerElement" class="fa fa-spinner fa-spin"></i>
+  <div class="spinner" style="display:none;">
+    <i class="fa fa-spinner fa-spin spinnerElement"></i>
   </div>
   <div id="header" class="col-md-12">
     <h1>Novel Infectious Agent Monitoring</h1>
@@ -147,7 +147,7 @@
     <tr>
       <td class="recentlyMentionedInfectiousAgentsTableRow"
       data-agentName="{{word.value}}">
-        <h3 class="recentlyMentionedInfectiousAgentWord">{{word.value}}</h3>
+        <h3 class="rmiaWord">{{word.value}}</h3>
         Date: {{currentDate.value}}
         <br>
         {{#if dm}}
