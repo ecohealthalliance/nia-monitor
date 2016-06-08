@@ -1,4 +1,4 @@
-SPARQurL = 'http://10.0.2.240:3030/dataset'
+SPARQurL = process.env.SPARQURL || 'http://localhost:3030/dataset'
 
 Meteor.methods(
 
@@ -9,30 +9,46 @@ Meteor.methods(
     JSON.parse
 
   'getRecentlyMentionedInfectiousAgents' : () ->
-    query = 'prefix xsd: <http://www.w3.org/2001/XMLSchema#>
-            prefix anno: <http://www.eha.io/types/annotation_prop/>
-            prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
-            prefix promed: <http://www.eha.io/types/promed/>
-
-            SELECT (max(?article) as ?currentArticle) (max(?dateTime) as ?currentDate) ?word (max(?article2) as ?priorArticle) (max(?dateTime2) as ?priorDate)
-            WHERE {
-              ?article promed:date ?dateTime.
-              ?phrase anno:root/anno:pos "NOUN";
-                               anno:root/rdf:label ?word.
-              ?phrase anno:source_doc ?article.
-
-              ?article2 promed:date ?dateTime2.
-              ?phrase2 anno:root/anno:pos "NOUN";
-                               anno:root/rdf:label ?word2.
-              ?phrase2 anno:source_doc ?article2;
-
-              filter(?dateTime > ?dateTime2 && ?article != ?article2 && ?word = ?word2)
-            }
-            GROUP BY ?word ?word2
-
-            ORDER BY DESC(?currentDate) DESC(?priorDate)
-
-            LIMIT 10'
+    query = '''
+      prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+      prefix anno: <http://www.eha.io/types/annotation_prop/>
+      prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
+      prefix promed: <http://www.eha.io/types/promed/>
+      SELECT
+          # For each of the most recently mentioned terms find the most recent
+          # mention prior to the current mention.
+          ?word ?currentDate ?currentArticle
+          (max(?prevArticle) as ?priorArticle)
+          (max(?prevDate) as ?priorDate)
+      WHERE {
+          # Select the most recently mentioned terms.
+          # Doing this as a subquery speeds up the overall query
+          # by limiting items prior mentions are found for.
+          {
+              SELECT ?word ?currentDate ?currentArticle
+              WHERE {
+                  ?phrase anno:root/anno:pos "NOUN"
+                      ; anno:root/rdf:label ?word
+                      ; anno:source_doc ?currentArticle
+                      ; anno:start ?start
+                      .
+                  ?currentArticle promed:date ?currentDate .
+              }
+              # Sort by date, then document, then offset within the document.
+              ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?start)
+              LIMIT 20
+          }
+          # Select the previous usages of the most recently mentioned terms
+          ?prev_mention anno:root/anno:pos "NOUN"
+              ; anno:root/rdf:label ?word
+              ; anno:source_doc ?prevArticle
+              .
+          ?prevArticle promed:date ?prevDate .
+          FILTER(?currentDate >= ?prevDate && ?currentArticle != ?prevArticle)
+      }
+      # Group by the items from the inner query
+      GROUP BY ?word ?currentDate ?currentArticle
+      '''
     response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
       headers:
         "Accept": "application/sparql-results+json"
