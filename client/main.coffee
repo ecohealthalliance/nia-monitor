@@ -139,14 +139,28 @@ Template.timeline.onRendered ->
       myLineChart = new Chart($("#canvas"),
       type: 'line'
       data: Meteor.data
-      options: xAxes: [ { display: false } ], scaleShowLabels: false, scales: {
+      options: xAxes: [ { display: true } ], scaleShowLabels: true, scales: {
         yAxes: [ {
+          ticks: {
+            stepSize: 5
+              }
+          scaleLabel: {
+            display: true,
+            labelString: '# of ProMED Articles'
+          }
           gridLines: {
             lineWidth: 0,
             color: "rgba(255,255,255,0)"
             }
           }]
         xAxes: [ {
+          ticks: {
+            stepSize: 5
+              }
+          scaleLabel: {
+            display: true,
+            labelString: 'Year'
+          }
           gridLines: {
             lineWidth: 0,
             color: "rgba(255,255,255,0)"
