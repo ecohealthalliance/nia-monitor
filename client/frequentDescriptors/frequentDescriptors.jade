@@ -1,0 +1,9 @@
+template(name="frequentDescriptors")
+  table#frequentDescriptorsTable.table.table-striped
+    tbody
+      each frequentDescriptors
+        tr
+          td.frequentDescriptorsTableRow(data-agentname=name)
+            div.fmiaWord= name
+          td
+            =count

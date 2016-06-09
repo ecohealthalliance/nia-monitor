@@ -1,0 +1,19 @@
+template(name="recentAgents")
+  table#recentAgentsTable.table.table-striped
+    tbody
+      each recentAgents
+        tr
+          td.recentlyMentionedInfectiousAgentsTableRow(data-agentname=word.value)
+            h3.rmiaWord= word.value
+            | Date: #{currentDate.value}
+            br
+            if dm
+              span.underline
+              Months since prior mention:
+              a(href='#{priorArticle.value}', target='_blank')= months.value
+            else
+              Days since prior mention:
+                a(href='#{priorArticle.value}', target='_blank')= days.value
+              br
+              | Link:
+              a(href='#{currentArticle.value}', target='_blank')= currentArticle.value

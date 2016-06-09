@@ -1,65 +1,4 @@
-@rmia = new Meteor.Collection(null)
-@fmia = new Meteor.Collection(null)
-
-@fd = new Meteor.Collection(null)
-
 @tld = new Meteor.Collection(null)
-
-Template.main.onCreated ->
-  @autorun ->
-    $(".spinner").show()
-    rmia.remove({})
-    Meteor.call 'getRecentlyMentionedInfectiousAgents',
-    (err, response) ->
-      if err == undefined
-        for binding in response.results.bindings
-          priorDate = moment(new Date(binding.priorDate.value))
-          currentDate = moment(new Date(binding.currentDate.value))
-          binding.days = {value: currentDate.diff(priorDate, 'days')}
-          binding.months = {value: currentDate.diff(priorDate, 'months')}
-          #show days or months since last mention
-          if binding.days.value > 30
-            binding.dm = true
-          rmia.insert(binding)
-      $(".spinner").hide()
-
-    fmia.remove({})
-    Meteor.call 'getFrequentlyMentionedInfectiousAgents', (err, response) ->
-      if err == undefined
-        for binding in response.results.bindings
-          fmia.insert(binding)
-
-Template.timeline.onCreated ->
-
-
-Template.recentlyMentionedInfectiousAgents.helpers
-  rmia: ->
-    return rmia.find()
-
-Template.frequentlyMentionedInfectiousAgents.helpers
-  fmia: ->
-    return fmia.find()
-
-Template.frequentDescriptors.helpers
-  fd: ->
-    return fd.find()
-
-Template.recentlyMentionedInfectiousAgents.events
-  'click .rmiaWord': ->
-    window.open("/detail/" + this.word.value)
-
-Router.route '/', ->
-  @render 'main'
-
-Router.route '/detail/:_agentName', ->
-  @render 'detail', {'data': this.params}
-
-Template.detail.onRendered ->
-  fd.remove({})
-  Meteor.call 'getFrequentDescriptors', this.data._agentName, (err, response) ->
-    if err == undefined
-      for row in response.fd
-        fd.insert(row)
 
 Template.timeline.onRendered ->
   currentWord = this.data._agentName
@@ -83,7 +22,6 @@ Template.timeline.onRendered ->
           $gte: start
           $lt: end).fetch()
         ctryear--
-
 
       Meteor.data =
       labels: [
