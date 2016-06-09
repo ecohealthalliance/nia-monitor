@@ -1,7 +1,6 @@
 @rmia = new Meteor.Collection(null)
 @fmia = new Meteor.Collection(null)
 
-@rd = new Meteor.Collection(null)
 @fd = new Meteor.Collection(null)
 
 Template.main.onCreated ->
@@ -36,10 +35,6 @@ Template.frequentlyMentionedInfectiousAgents.helpers
   fmia: ->
     return fmia.find()
 
-Template.recentDescriptors.helpers
-  rd: ->
-    return rd.find()
-
 Template.frequentDescriptors.helpers
   fd: ->
     return fd.find()
@@ -50,7 +45,6 @@ Template.recentlyMentionedInfectiousAgents.events
 
 Router.route '/', ->
   @render 'main'
-  return
 
 Router.route '/detail/:_agentName', ->
   @render 'detail'
@@ -61,12 +55,6 @@ Template.detail.onRendered ->
     if err == undefined
       for row in response.fd
         fd.insert(row)
-
-  rd.remove({})
-  Meteor.call 'getRecentDescriptors', (err, response) ->
-    if err == undefined
-      for row in response.rd
-        rd.insert(row)
 
 Template.timeline.onRendered ->
   Meteor.data =

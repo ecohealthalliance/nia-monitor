@@ -1,16 +1,3 @@
-<template name="recentDescriptors">
-  {{#each rd}}
-    <tr>
-      <td class="recentDescriptorsTableRow" data-agentName="'+i.name+'">
-        <h3>{{name}}</h3>
-        Date: {{date}}
-        <br>
-        Link: <a href="{{link}}" target="_blank">{{linkName}}</a>
-      </td>
-    </tr>
-  {{/each}}
-</template>
-
 <template name="recentlyMentionedInfectiousAgents">
   {{#each rmia}}
     <tr>

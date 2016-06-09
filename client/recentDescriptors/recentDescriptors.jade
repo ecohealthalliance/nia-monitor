@@ -1,0 +1,11 @@
+template(name="recentDescriptors")
+  table#recentDescriptorsTable.table.table-striped
+    tbody
+      each descriptors
+        tr
+          td.recentDescriptorsTableRow(data-agentName=name)
+            h3= name
+            | Date: #{date}
+            br
+            | Link:
+            a(href="link" target="_blank")= linkName
