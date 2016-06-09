@@ -1,7 +1,6 @@
 @rmia = new Meteor.Collection(null)
 @fmia = new Meteor.Collection(null)
 
-@rd = new Meteor.Collection(null)
 @fd = new Meteor.Collection(null)
 
 @tld = new Meteor.Collection(null)
@@ -41,10 +40,6 @@ Template.frequentlyMentionedInfectiousAgents.helpers
   fmia: ->
     return fmia.find()
 
-Template.recentDescriptors.helpers
-  rd: ->
-    return rd.find()
-
 Template.frequentDescriptors.helpers
   fd: ->
     return fd.find()
@@ -55,7 +50,6 @@ Template.recentlyMentionedInfectiousAgents.events
 
 Router.route '/', ->
   @render 'main'
-  return
 
 Router.route '/detail/:_agentName', ->
   @render 'detail', {'data': this.params}
@@ -66,15 +60,6 @@ Template.detail.onRendered ->
     if err == undefined
       for row in response.fd
         fd.insert(row)
-
-  rd.remove({})
-  Meteor.call 'getRecentDescriptors', this.data._agentName, (err, response) ->
-    if err == undefined
-      for row in response.rd
-        rd.insert(row)
-
-Template.timeline.helpers ->
-  word : tld.find().fetch()[0].word.value
 
 Template.timeline.onRendered ->
   currentWord = this.data._agentName

@@ -1,0 +1,34 @@
+template(name='detail')
+  .spinner(style='display:none;')
+    i.fa.fa-spinner.fa-spin.spinnerElement
+  #header.col-md-12
+    h1 Novel Infectious Agent Monitoring
+  .col-md-12
+    .panel.panel-primary
+      .panel-body
+        .col-md-6.pull-left
+          .panel.panel-primary
+            .panel-body
+              +detailLeft
+        .col-md-6.pull-right
+          .panel.panel-primary
+            .panel-body
+              +detailRight
+template(name='detailLeft')
+  +timeline
+  br
+  #recentDescriptors
+    .panel.panel-primary
+      .panel-heading
+        h4 Recent Descriptors
+      div
+        +recentDescriptors
+template(name='detailRight')
+  #frequentDescriptors
+    .panel.panel-primary
+      .panel-heading
+        h4 Frequent Descriptors
+      div
+        table#frequentDescriptorsTable.table.table-striped
+          tbody
+            +frequentDescriptors
