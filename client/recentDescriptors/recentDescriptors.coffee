@@ -9,6 +9,7 @@ Template.recentDescriptors.onCreated ->
         throw err
       for row in response.rd
         @descriptors.insert(row)
+        
 Template.recentDescriptors.helpers
   descriptors: ->
     Template.instance().descriptors.find()

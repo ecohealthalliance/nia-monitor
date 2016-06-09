@@ -17,20 +17,14 @@ template(name='left')
       .panel-heading
         h4 Recently Mentioned Infectious Agents
       div
-        table#recentlyMentionedInfectiousAgentsTable.table.table-striped
-          thead
-          tbody
-            | {{> recentlyMentionedInfectiousAgents}}
+        +recentAgents
 template(name='right')
   #frequentlyMentionedInfectiousAgents
     .panel.panel-primary
       .panel-heading
         h4 Frequently Mentioned Infectious Agents
       div
-        table#frequentlyMentionedInfectiousAgentsTable.table.table-striped
-          thead
-          tbody
-            | {{> frequentlyMentionedInfectiousAgents}}
+        +frequentAgents
 template(name='timeline')
   #timeline(style='width:400px height:200px')
     canvas#canvas(width='400', height='200')

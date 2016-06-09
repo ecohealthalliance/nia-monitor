@@ -1,0 +1,9 @@
+template(name="frequentAgents")
+  table#frequentAgentsTable.table.table-striped
+    tbody
+      each frequentAgents
+        tr
+          td.frequentlyMentionedInfectiousAgentsTableRow(data-agentname=word.value)
+            div.fmiaWord= word.value
+          td
+            =count.value
