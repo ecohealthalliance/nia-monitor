@@ -15,7 +15,7 @@ Template.recentMentions.helpers
     Template.instance().mentions.find()
   kwic: ->
     new Spacebars.SafeString """
-      <span>...#{@phrase_text.slice(@t_start - 40 - @p_start, @t_start - @p_start)}</span>
+      <span>...#{@phrase_text.slice(Math.max(0, @t_start - 40 - @p_start), @t_start - @p_start)}</span>
       <span>
         <strong>#{@phrase_text.slice(@t_start - @p_start, @t_end - @p_start)}</strong>
         #{@phrase_text.slice(@t_end - @p_start, @t_start + 40 - @p_start)}...

@@ -113,12 +113,13 @@ Meteor.methods(
 
   'getRecentMentions': (agent) ->
     query = prefixes + """
-      SELECT ?phrase_text ?p_start ?t_start ?t_end ?source ?date
+      SELECT DISTINCT ?phrase_text ?p_start ?t_start ?t_end ?source ?date
       WHERE {
           ?phrase anno:selected-text ?phrase_text
               ; anno:start ?p_start
               ; anno:end ?p_end
               ; dep:ROOT ?noop
+              ; anno:contains ?target
               .
           {
               ?target anno:label "#{agent}"
@@ -128,11 +129,9 @@ Meteor.methods(
           } .
           ?target anno:start ?t_start
               ; anno:end ?t_end
+              ; anno:source_doc ?source
               .
-          ?phrase anno:source_doc ?source .
-          ?target anno:source_doc ?source .
           ?source pro:date ?date .
-          FILTER ( ?t_start >= ?p_start && ?t_end <= ?p_end )
       }
       ORDER BY DESC(?date) DESC(?source) ASC(?t_start)
       LIMIT 10
