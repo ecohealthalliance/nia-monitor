@@ -5,6 +5,7 @@ prefix anno: <http://www.eha.io/types/annotation_prop/>
 prefix dep: <http://www.eha.io/types/annotation_prop/dep/>
 prefix dc: <http://purl.org/dc/terms/>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
 prefix eha: <http://www.eha.io/types/>
 '''
 Meteor.methods(
@@ -20,7 +21,9 @@ Meteor.methods(
       SELECT
           # For each of the most recently mentioned terms find the most recent
           # mention prior to the current mention.
-          ?word ?currentDate ?currentArticle
+          ?resolvedTerm ?currentDate ?currentArticle
+          (sample(?termLabel) as ?word)
+          (sample(?articleRawMenions) as ?rawMentions)
           (max(?prevArticle) as ?priorArticle)
           (max(?prevDate) as ?priorDate)
       WHERE {
@@ -28,29 +31,37 @@ Meteor.methods(
           # Doing this as a subquery speeds up the overall query
           # by limiting items prior mentions are found for.
           {
-              SELECT ?word ?currentDate ?currentArticle
+              SELECT
+                ?resolvedTerm ?termLabel ?currentDate ?currentArticle
+                (min(?start) as ?firstMentionStart)
+                (group_concat(DISTINCT ?rawText; separator = "::") AS ?articleRawMenions)
               WHERE {
-                  ?phrase anno:root/anno:pos "NOUN"
-                      ; anno:root/rdfs:label ?word
+                  ?phrase anno:category "diseases"
                       ; anno:source_doc ?currentArticle
                       ; anno:start ?start
+                      ; anno:selected-text ?rawText
+                      ; ^dc:relation ?resolvedTerm
                       .
+                  ?resolvedTerm rdfs:label ?termLabel .
                   ?currentArticle pro:date ?currentDate .
               }
+              GROUP BY ?resolvedTerm ?termLabel ?currentDate ?currentArticle
               # Sort by date, then document, then offset within the document.
-              ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?start)
-              LIMIT 20
+              ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?firstMentionStart)
+              LIMIT 50
           }
           # Select the previous usages of the most recently mentioned terms
-          ?prev_mention anno:root/anno:pos "NOUN"
-              ; anno:root/rdfs:label ?word
-              ; anno:source_doc ?prevArticle
-              .
-          ?prevArticle pro:date ?prevDate .
-          FILTER(?currentDate >= ?prevDate && ?currentArticle != ?prevArticle)
+          OPTIONAL {
+            ?prev_mention anno:source_doc ?prevArticle
+                ; ^dc:relation ?resolvedTerm
+                .
+            ?prevArticle pro:date ?prevDate .
+            FILTER(?currentDate >= ?prevDate && ?currentArticle != ?prevArticle)
+          }
       }
       # Group by the items from the inner query
-      GROUP BY ?word ?currentDate ?currentArticle
+      GROUP BY ?resolvedTerm ?currentDate ?currentArticle ?firstMentionStart
+      ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?firstMentionStart)
       '''
     response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
       headers:
@@ -80,18 +91,20 @@ Meteor.methods(
 
 
   'getFrequentlyMentionedInfectiousAgents': () ->
-    query = prefixes + '''
-      SELECT ?word
-          (count(?s) as ?count)
+    query = prefixes + """
+      SELECT ?resolvedTerm
+          (sample(?termLabel) as ?word)
+          (count(?resolvedTerm) as ?count)
       WHERE {
-          ?s anno:root ?r .
-          ?r anno:pos 'NOUN' ;
-             rdfs:label ?word .
+        ?phrase anno:category "diseases"
+            ; ^dc:relation ?resolvedTerm
+            .
+        ?resolvedTerm rdfs:label ?termLabel .
       }
-      GROUP BY ?word
+      GROUP BY ?resolvedTerm
       ORDER BY DESC(?count)
-      LIMIT 10
-      '''
+      LIMIT 20
+      """
     response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
       headers:
         "Accept": "application/sparql-results+json"
