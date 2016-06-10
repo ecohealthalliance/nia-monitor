@@ -1,5 +1,14 @@
 SPARQurL = process.env.SPARQURL || 'http://localhost:3030/dataset'
-
+prefixes = '''
+prefix pro: <http://www.eha.io/types/promed/>
+prefix anno: <http://www.eha.io/types/annotation_prop/>
+prefix dep: <http://www.eha.io/types/annotation_prop/dep/>
+prefix dc: <http://purl.org/dc/terms/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
+prefix eha: <http://www.eha.io/types/>
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+'''
 Meteor.methods(
 
   'SPARQurL': () ->
@@ -9,15 +18,13 @@ Meteor.methods(
     JSON.parse
 
   'getRecentlyMentionedInfectiousAgents' : () ->
-    query = '''
-      prefix xsd: <http://www.w3.org/2001/XMLSchema#>
-      prefix anno: <http://www.eha.io/types/annotation_prop/>
-      prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
-      prefix promed: <http://www.eha.io/types/promed/>
+    query = prefixes + '''
       SELECT
           # For each of the most recently mentioned terms find the most recent
           # mention prior to the current mention.
-          ?word ?currentDate ?currentArticle
+          ?resolvedTerm ?currentDate ?currentArticle
+          (sample(?termLabel) as ?word)
+          (sample(?articleRawMenions) as ?rawMentions)
           (max(?prevArticle) as ?priorArticle)
           (max(?prevDate) as ?priorDate)
       WHERE {
@@ -25,29 +32,37 @@ Meteor.methods(
           # Doing this as a subquery speeds up the overall query
           # by limiting items prior mentions are found for.
           {
-              SELECT ?word ?currentDate ?currentArticle
+              SELECT
+                ?resolvedTerm ?termLabel ?currentDate ?currentArticle
+                (min(?start) as ?firstMentionStart)
+                (group_concat(DISTINCT ?rawText; separator = "::") AS ?articleRawMenions)
               WHERE {
-                  ?phrase anno:root/anno:pos "NOUN"
-                      ; anno:root/rdf:label ?word
+                  ?phrase anno:category "diseases"
                       ; anno:source_doc ?currentArticle
                       ; anno:start ?start
+                      ; anno:selected-text ?rawText
+                      ; ^dc:relation ?resolvedTerm
                       .
-                  ?currentArticle promed:date ?currentDate .
+                  ?resolvedTerm rdfs:label ?termLabel .
+                  ?currentArticle pro:date ?currentDate .
               }
+              GROUP BY ?resolvedTerm ?termLabel ?currentDate ?currentArticle
               # Sort by date, then document, then offset within the document.
-              ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?start)
-              LIMIT 20
+              ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?firstMentionStart)
+              LIMIT 50
           }
           # Select the previous usages of the most recently mentioned terms
-          ?prev_mention anno:root/anno:pos "NOUN"
-              ; anno:root/rdf:label ?word
-              ; anno:source_doc ?prevArticle
-              .
-          ?prevArticle promed:date ?prevDate .
-          FILTER(?currentDate >= ?prevDate && ?currentArticle != ?prevArticle)
+          OPTIONAL {
+            ?prev_mention anno:source_doc ?prevArticle
+                ; ^dc:relation ?resolvedTerm
+                .
+            ?prevArticle pro:date ?prevDate .
+            FILTER(?currentDate >= ?prevDate && ?currentArticle != ?prevArticle)
+          }
       }
       # Group by the items from the inner query
-      GROUP BY ?word ?currentDate ?currentArticle
+      GROUP BY ?resolvedTerm ?currentDate ?currentArticle ?firstMentionStart
+      ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?firstMentionStart)
       '''
     response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
       headers:
@@ -55,65 +70,110 @@ Meteor.methods(
     )
     return JSON.parse(response.content)
 
-  'getHistoricalData': (word) ->    
-    query = 'prefix xsd: <http://www.w3.org/2001/XMLSchema#>
-            prefix anno: <http://www.eha.io/types/annotation_prop/>
-            prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
-            prefix promed: <http://www.eha.io/types/promed/>
+  'getHistoricalData': (termLabel) ->
+    query = prefixes + """
+      SELECT (max(?dateTime) as ?mdt)
+      WHERE {
+        ?phrase anno:category "diseases"
+        ; anno:source_doc ?currentArticle
+        ; anno:selected-text ?rawText
+        ; ^dc:relation ?resolvedTerm
+        .
+        ?resolvedTerm rdfs:label ?termLabel .
+        ?currentArticle pro:date ?dateTime
+        filter(?termLabel = "#{termLabel}")
+      }
+      """
+    response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
+      headers:
+        "Accept": "application/sparql-results+json"
+    )
 
-            SELECT ?word ?dateTime (count(?word) as ?count)
-            WHERE {
-              ?article promed:date ?dateTime.
-              ?phrase anno:root/anno:pos "NOUN";
-                               anno:root/rdf:label ?word.
-              ?phrase anno:source_doc ?article
+    recentDate = (JSON.parse(response.content).results.bindings)[0].mdt.value
 
-              filter(?word = "'+word+'")
-            }
-            GROUP BY ?dateTime ?word
-            ORDER BY DESC(?dateTime)'
+    baseYear = moment(recentDate).year() - 5
+
+    query = prefixes + """
+      SELECT
+      (?termLabel as ?word) ?dateTime (count(?termLabel) as ?count)
+      WHERE {
+        ?phrase anno:category "diseases"
+        ; anno:source_doc ?currentArticle
+        ; anno:selected-text ?rawText
+        ; ^dc:relation ?resolvedTerm
+        .
+        ?resolvedTerm rdfs:label ?termLabel .
+        ?currentArticle pro:date ?dateTime
+        FILTER(?termLabel = "#{termLabel}")
+        FILTER (?dateTime > "#{baseYear}-01-01T00:00:00+00:01"^^xsd:dateTime)
+      }
+      GROUP BY ?dateTime ?termLabel
+      ORDER BY DESC(?dateTime)
+      """
     response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
       headers:
         "Accept": "application/sparql-results+json"
     )
     return JSON.parse(response.content)
-
 
   'getFrequentlyMentionedInfectiousAgents': () ->
-    query = "prefix anno: <http://www.eha.io/types/annotation_prop/>
-            prefix dep: <http://www.eha.io/types/annotation_prop/dep/>
-            prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
-            SELECT ?word
-                (count(?s) as ?count)
-            WHERE {
-                ?s anno:root ?r .
-                ?r anno:pos 'NOUN' ;
-                   rdf:label ?word .
-            }
-            GROUP BY ?word
-            ORDER BY DESC(?count)
-            LIMIT 10
-        "
+    query = prefixes + """
+      SELECT ?resolvedTerm
+          (sample(?termLabel) as ?word)
+          (count(?resolvedTerm) as ?count)
+      WHERE {
+        ?phrase anno:category "diseases"
+            ; ^dc:relation ?resolvedTerm
+            .
+        ?resolvedTerm rdfs:label ?termLabel .
+      }
+      GROUP BY ?resolvedTerm
+      ORDER BY DESC(?count)
+      LIMIT 20
+      """
     response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
       headers:
         "Accept": "application/sparql-results+json"
     )
     return JSON.parse(response.content)
 
-
-  'getRecentDescriptors': (ia) ->
-    #get recent descriptor for infectious agent (ia)
-    rd = {"rd":[
-      {"name":"Antibiotic-resistant"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"carbapenemases-producing"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"Descriptor 1"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"Descriptor 2"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"Descriptor 3"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"Descriptor 4"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"Descriptor 5"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      {"name":"Descriptor 6"+ia, "date":"11/11/2021", "link":"http://www.google.com", "linkName":"google"},
-      ]}
-    return rd
+  'getRecentMentions': (agent) ->
+    query = prefixes + """
+      SELECT DISTINCT ?phrase_text ?p_start ?t_start ?t_end ?source ?date
+      WHERE {
+          ?phrase anno:selected-text ?phrase_text
+              ; anno:start ?p_start
+              ; anno:end ?p_end
+              ; dep:ROOT ?noop
+              ; anno:contains ?target
+              .
+          {
+              ?target anno:label "#{agent}"
+          } UNION {
+              ?resolvedTarget dc:relation ?target
+                  ; rdfs:label "#{agent}"
+          } .
+          ?target anno:start ?t_start
+              ; anno:end ?t_end
+              ; anno:source_doc ?source
+              .
+          ?source pro:date ?date .
+      }
+      ORDER BY DESC(?date) DESC(?source) ASC(?t_start)
+      LIMIT 10
+      """
+    response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
+      headers:
+        "Accept": "application/sparql-results+json"
+    )
+    return JSON.parse(response.content).results.bindings.map (binding)->
+      result = {}
+      for key, value of binding
+        if value.datatype == "http://www.w3.org/2001/XMLSchema#integer"
+          result[key] = parseInt(value.value)
+        else
+          result[key] = value.value
+      result
 
   'getFrequentDescriptors' : (ia) ->
     #get frequent descriptors for infectious agent (ia)

@@ -7,13 +7,15 @@ template(name="recentAgents")
             h3.rmiaWord= word.value
             | Date: #{currentDate.value}
             br
-            if dm
-              span.underline
-              Months since prior mention:
-              a(href='#{priorArticle.value}', target='_blank')= months.value
+            if priorArticle
+              if dm
+                span.underline Months since prior mention:
+                  a(href='#{priorArticle.value}', target='_blank')= months.value
+              else
+                span Days since prior mention:
+                  a(href='#{priorArticle.value}', target='_blank')= days.value
+                br
+                | Link:
+                a(href='#{currentArticle.value}', target='_blank')= currentArticle.value
             else
-              Days since prior mention:
-                a(href='#{priorArticle.value}', target='_blank')= days.value
-              br
-              | Link:
-              a(href='#{currentArticle.value}', target='_blank')= currentArticle.value
+              span.no-priors No Prior Mentions

@@ -2,27 +2,27 @@ template(name='detail')
   .spinner(style='display:none;')
     i.fa.fa-spinner.fa-spin.spinnerElement
   #header.col-md-12
-    h1 Novel Infectious Agent Monitoring
+    h1 Novel Infectious Agent Monitoring (#{currentWord})
   .col-md-12
     .panel.panel-primary
       .panel-body
-        .col-md-6.pull-left
+        .col-md-7.pull-left
           .panel.panel-primary
             .panel-body
               +detailLeft
-        .col-md-6.pull-right
+        .col-md-5.pull-right
           .panel.panel-primary
             .panel-body
               +detailRight
 template(name='detailLeft')
   +timeline
   br
-  #recentDescriptors
+  #recentMentions
     .panel.panel-primary
       .panel-heading
-        h4 Recent Descriptors
+        h4 Recent Mentions
       div
-        +recentDescriptors
+        +recentMentions
 template(name='detailRight')
   #frequentDescriptors
     .panel.panel-primary

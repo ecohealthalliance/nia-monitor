@@ -1,7 +1,12 @@
 @tld = new Meteor.Collection(null)
 
-Template.timeline.onRendered ->
-  currentWord = this.data._agentName
+Template.detail.helpers
+  currentWord: -> window.currentWord
+
+Template.detail.onCreated ->
+  window.currentWord = this.data._agentName
+
+Template.timeline.onCreated ->
   @autorun ->
     $("#spinner").show()
     tld.remove({})
@@ -17,7 +22,7 @@ Template.timeline.onRendered ->
       data = {}
       while ctryear > baseYear - 5
         start = moment(new Date(ctryear, 0, 1)).toDate()
-        end = moment(new Date(ctryear+1, 0, 1)).toDate()
+        end = moment(new Date(ctryear + 1, 0, 1)).toDate()
         data[ctryear] = tld.find(dateTime:
           $gte: start
           $lt: end).fetch()
@@ -28,7 +33,7 @@ Template.timeline.onRendered ->
         baseYear-4
         baseYear-3
         baseYear-2
-        baseYear-1
+        baseYear - 1
         baseYear
       ]
       datasets: [ {
@@ -54,7 +59,7 @@ Template.timeline.onRendered ->
           data[baseYear-4].length
           data[baseYear-3].length
           data[baseYear-2].length
-          data[baseYear-1].length
+          data[baseYear - 1].length
           data[baseYear].length
         ]
       } ]
