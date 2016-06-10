@@ -64,7 +64,6 @@ Meteor.methods(
       headers:
         "Accept": "application/sparql-results+json"
     )
-    console.log response.content
     return JSON.parse(response.content)
 
   'gitHistoricalData': (word) ->
@@ -92,20 +91,24 @@ Meteor.methods(
 
 
   'getFrequentlyMentionedInfectiousAgents': () ->
-    query = "prefix anno: <http://www.eha.io/types/annotation_prop/>
-            prefix dep: <http://www.eha.io/types/annotation_prop/dep/>
-            prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
-            SELECT ?word
-                (count(?s) as ?count)
-            WHERE {
-                ?s anno:root ?r .
-                ?r anno:pos 'NOUN' ;
-                   rdf:label ?word .
-            }
-            GROUP BY ?word
-            ORDER BY DESC(?count)
-            LIMIT 10
-        "
+    query = """
+      prefix anno: <http://www.eha.io/types/annotation_prop/>
+      prefix dep: <http://www.eha.io/types/annotation_prop/dep/>
+      prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
+      prefix dc: <http://purl.org/dc/terms/>
+      SELECT ?resolvedTerm
+          (sample(?termLabel) as ?word)
+          (count(?resolvedTerm) as ?count)
+      WHERE {
+        ?phrase anno:category "diseases"
+            ; ^dc:relation ?resolvedTerm
+            .
+        ?resolvedTerm rdf:label ?termLabel .
+      }
+      GROUP BY ?resolvedTerm
+      ORDER BY DESC(?count)
+      LIMIT 20
+      """
     response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
       headers:
         "Accept": "application/sparql-results+json"
