@@ -1,0 +1,28 @@
+{
+  "name": "nia-monitor",
+  "private": true,
+  "scripts": {
+    "start": "meteor run",
+    "chimp": "chimp --ddp=http://localhost:3000 --path=tests"
+  },
+  "dependencies": {
+    "meteor-node-stubs": "~0.2.0"
+  },
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ecohealthalliance/nia-monitor.git"
+  },
+  "author": "EcoHealth Alliance",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ecohealthalliance/nia-monitor/issues"
+  },
+  "homepage": "https://github.com/ecohealthalliance/nia-monitor",
+  "devDependencies": {
+    "chimp": "0.35.0",
+    "coffee-script": "1.10.0",
+    "coffeelint": "1.15.7",
+    "eslint": "2.10.2"
+  }
+}
