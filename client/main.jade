@@ -1,0 +1,30 @@
+template(name='main')
+  .spinner
+    i.fa.fa-spinner.fa-spin.spinnerElement
+  #header.col-md-12
+    h1 Novel Infectious Agent Monitoring
+  .col-md-6.pull-left
+    .panel.panel-primary
+      .panel-body
+        | {{> left}}
+  .col-md-6.pull-right
+    .panel.panel-primary
+      .panel-body
+        | {{> right}}
+template(name='left')
+  #recentlyMentionedInfectiousAgents
+    .panel.panel-primary
+      .panel-heading
+        h4 Recently Mentioned Infectious Agents
+      div
+        +recentAgents
+template(name='right')
+  #frequentlyMentionedInfectiousAgents
+    .panel.panel-primary
+      .panel-heading
+        h4 Frequently Mentioned Infectious Agents
+      div
+        +frequentAgents
+template(name='timeline')
+  #timeline(style='width:400px height:200px')
+    canvas#canvas(width='400', height='200')
