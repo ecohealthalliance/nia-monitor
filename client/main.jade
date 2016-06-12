@@ -1,16 +1,22 @@
 template(name='main')
   .spinner
     i.fa.fa-spinner.fa-spin.spinner-element
-  #header.col-md-12
-    h1 Novel Infectious Agent Monitoring
+
+  nav.navbar.navbar-default
+    div.container-fluid
+      div.navbar-header
+        a.logo(href="/")
+
   .col-md-6.pull-left
     .panel.panel-primary
       .panel-body
-        | {{> left}}
+        +left
+
   .col-md-6.pull-right
     .panel.panel-primary
       .panel-body
-        | {{> right}}
+        +right
+
 template(name='left')
   #recentlyMentionedInfectiousAgents
     .panel.panel-primary
@@ -18,6 +24,7 @@ template(name='left')
         h4 Recently Mentioned Infectious Agents
       div
         +recentAgents
+
 template(name='right')
   #frequentlyMentionedInfectiousAgents
     .panel.panel-primary
@@ -25,6 +32,7 @@ template(name='right')
         h4 Frequently Mentioned Infectious Agents
       div
         +frequentAgents
+
 template(name='timeline')
   #timeline(style='width:400px height:200px')
     canvas#canvas(width='400', height='200')
