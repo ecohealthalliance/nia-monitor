@@ -1,5 +1,6 @@
 $primary = #FF970B
 $secondary = #0BA5FF
+$secondary-dark = darken($secondary, 40%)
 
 .rmia-word:hover
   cursor pointer
@@ -34,7 +35,7 @@ $secondary = #0BA5FF
 
 .logo
   position absolute
-  top 5px
+  top 3px
   left 50%
   height 50px
   width 420px
@@ -42,3 +43,6 @@ $secondary = #0BA5FF
   margin-left 0
   background url(images/logo.svg) no-repeat
   background-position center center
+
+.panel-default > .panel-heading
+  color $secondary-dark
