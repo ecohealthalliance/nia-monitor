@@ -177,10 +177,46 @@ Meteor.methods(
       result
 
   'getFrequentDescriptors' : (ia) ->
-    #get frequent descriptors for infectious agent (ia)
-    fd = {"fd":[
-      {"name":"Antibiotic-resistant"+ia, "count":"572"},
-      {"name":"carbapenemases-producing"+ia, "count":"541"}
-      ]}
-    return fd
+    query = prefixes + """
+      SELECT (count(?article) as ?count) ?selText
+      WHERE {
+          ?dep_rel rdf:type anno:dependency_relation .
+          VALUES ?dep_rel { dep:amod dep:nmod }
+          ?parent anno:min_contains ?target
+              ; ?dep_rel ?descriptor
+    			; anno:source_doc ?article
+              .
+          ?descriptor anno:start ?d_start
+              ; anno:end ?d_end
+    			; anno:selected-text ?rawSelText
+              .
+          ?target anno:category "diseases"
+              ; anno:start ?t_start
+              ; anno:end ?t_end
+              ; ^dc:relation ?rel
+    			.
+          	?rel rdfs:label ?termLabel
+          FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
+          FILTER(?termLabel = "#{ia}")
+          BIND(lcase(?rawSelText) as ?ranCaseSelText)
+          #remove leading and trailing whitespace, and new line characters
+          BIND(replace(?ranCaseSelText,'^ +| +$|\\n', '') AS ?selText)
+        }
+
+      group by ?selText
+      ORDER BY DESC(?count)
+      """
+    response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
+      headers:
+        "Accept": "application/sparql-results+json"
+    )
+
+    return JSON.parse(response.content).results.bindings.map (binding) ->
+      result = {}
+      for key, value of binding
+        if value.datatype == "http://www.w3.org/2001/XMLSchema#integer"
+          result[key] = parseInt(value.value)
+        else
+          result[key] = value.value
+      result
 )

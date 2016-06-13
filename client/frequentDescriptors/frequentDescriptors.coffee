@@ -6,7 +6,7 @@ Template.frequentDescriptors.onCreated ->
     Meteor.call 'getFrequentDescriptors', this.data._agentName, (err, response) =>
       if err
         throw err
-      for row in response.fd
+      for row in response
         @frequentDescriptors.insert(row)
       $(".spinner").hide()
 
