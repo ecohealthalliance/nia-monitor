@@ -14,8 +14,8 @@ template(name="recentAgents")
               else
                 span Days since prior mention:
                   a(href='#{priorArticle.value}', target='_blank')= days.value
-                br
-                | Link:
-                a(href='#{currentArticle.value}', target='_blank')= currentArticle.value
             else
               span.no-priors No Prior Mentions
+            br
+            span Link:
+              a(href='#{currentArticle.value}', target='_blank')= currentArticle.value
