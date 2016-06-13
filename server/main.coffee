@@ -120,10 +120,11 @@ Meteor.methods(
     query = prefixes + """
       SELECT ?resolvedTerm
           (sample(?termLabel) as ?word)
-          (count(?resolvedTerm) as ?count)
+          (count(DISTINCT ?article) as ?count)
       WHERE {
         ?phrase anno:category "diseases"
             ; ^dc:relation ?resolvedTerm
+            ; anno:source_doc ?article
             .
         ?resolvedTerm rdfs:label ?termLabel .
       }
