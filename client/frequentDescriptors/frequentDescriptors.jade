@@ -6,7 +6,6 @@ template(name="frequentDescriptors")
           if count
             td.frequentDescriptorsTableRow(data-agentname=name)
               div.fmia-word= selText
-            td
-              =count
+            td appears in #{count} articles
           else
             span.no-priors.col-md-12 No Frequent Descriptors
