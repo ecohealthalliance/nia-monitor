@@ -1,16 +1,13 @@
-@tld = new Meteor.Collection(null)
-
 Template.detail.helpers
-  currentWord: -> window.currentWord
-
-Template.detail.onCreated ->
-  window.currentWord = this.data._agentName
+  agent: -> Router.current().getParams()._agentName
 
 Template.timeline.onCreated ->
+  @tld = new Meteor.Collection(null)
   @autorun ->
     $("#spinner").show()
-    tld.remove({})
-    Meteor.call 'getHistoricalData', currentWord,
+    agent = Router.current().getParams()._agentName
+    @tld.find({}, reactive: false).map((d)=> @tld.remove(d))
+    Meteor.call 'getHistoricalData', agent,
     (err, response) ->
       if err == undefined
         for binding in response.results.bindings
@@ -37,7 +34,7 @@ Template.timeline.onCreated ->
         baseYear
       ]
       datasets: [ {
-        label: currentWord + ' History'
+        label: agent + ' History'
         fill: false
         lineTension: 0.1
         backgroundColor: 'rgba(75,192,192,0.4)'
