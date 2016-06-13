@@ -4,7 +4,7 @@ template(name="recentAgents")
       each recentAgents
         tr
           td.recentlyMentionedInfectiousAgentsTableRow(data-agentname=word.value)
-            h3.rmiaWord= word.value
+            h3.rmia-word= word.value
             | Date: #{currentDate.value}
             br
             if priorArticle

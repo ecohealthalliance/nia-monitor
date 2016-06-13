@@ -21,5 +21,5 @@ Template.recentAgents.helpers
     Template.instance().recentAgents.find()
 
 Template.recentAgents.events
-  'click .rmiaWord': ->
+  'click .rmia-word': ->
     window.open("/detail/" + this.word.value)

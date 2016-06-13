@@ -15,5 +15,5 @@ Template.frequentAgents.helpers
     Template.instance().frequentAgents.find()
 
 Template.frequentAgents.events
-  'click .fmiaWord': ->
+  'click .fmia-word': ->
     window.open("/detail/" + this.word.value)
