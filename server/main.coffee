@@ -7,6 +7,7 @@ prefix dc: <http://purl.org/dc/terms/>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
 prefix eha: <http://www.eha.io/types/>
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 '''
 Meteor.methods(
 
@@ -69,18 +70,44 @@ Meteor.methods(
     )
     return JSON.parse(response.content)
 
-  'gitHistoricalData': (word) ->
+  'getHistoricalData': (termLabel) ->
     query = prefixes + """
-      SELECT ?word ?dateTime (count(?word) as ?count)
+      SELECT (max(?dateTime) as ?mdt)
       WHERE {
-        ?article pro:date ?dateTime.
-        ?phrase anno:root/anno:pos "NOUN";
-                         anno:root/rdfs:label ?word.
-        ?phrase anno:source_doc ?article
-
-        filter(?word = "#{word}")
+        ?phrase anno:category "diseases"
+        ; anno:source_doc ?currentArticle
+        ; anno:selected-text ?rawText
+        ; ^dc:relation ?resolvedTerm
+        .
+        ?resolvedTerm rdfs:label ?termLabel .
+        ?currentArticle pro:date ?dateTime
+        filter(?termLabel = "#{termLabel}")
       }
-      GROUP BY ?dateTime ?word
+      """
+    response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
+      headers:
+        "Accept": "application/sparql-results+json"
+    )
+
+    recentDate = (JSON.parse(response.content).results.bindings)[0].mdt.value
+
+    baseYear = moment(recentDate).year() - 5
+
+    query = prefixes + """
+      SELECT
+      (?termLabel as ?word) ?dateTime (count(?termLabel) as ?count)
+      WHERE {
+        ?phrase anno:category "diseases"
+        ; anno:source_doc ?currentArticle
+        ; anno:selected-text ?rawText
+        ; ^dc:relation ?resolvedTerm
+        .
+        ?resolvedTerm rdfs:label ?termLabel .
+        ?currentArticle pro:date ?dateTime
+        FILTER(?termLabel = "#{termLabel}")
+        FILTER (?dateTime > "#{baseYear}-01-01T00:00:00+00:01"^^xsd:dateTime)
+      }
+      GROUP BY ?dateTime ?termLabel
       ORDER BY DESC(?dateTime)
       """
     response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
@@ -88,7 +115,6 @@ Meteor.methods(
         "Accept": "application/sparql-results+json"
     )
     return JSON.parse(response.content)
-
 
   'getFrequentlyMentionedInfectiousAgents': () ->
     query = prefixes + """

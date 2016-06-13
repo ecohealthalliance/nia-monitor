@@ -1,16 +1,17 @@
 template(name='detail')
   +header
   .col-md-12
-    .panel.panel-primary
-      .panel-body
-        .col-md-7.pull-left
-          .panel.panel-primary
-            .panel-body
-              +detailLeft
-        .col-md-5.pull-right
-          .panel.panel-primary
-            .panel-body
-              +detailRight
+    .col-md-7.pull-left
+      h3=agent
+  .col-md-12
+    .col-md-7.pull-left
+      .panel.panel-primary
+        .panel-body
+          +detailLeft
+    .col-md-5.pull-right
+      .panel.panel-primary
+        .panel-body
+          +detailRight
 template(name='detailLeft')
   +timeline
   br
