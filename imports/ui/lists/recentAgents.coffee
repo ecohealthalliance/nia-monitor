@@ -1,3 +1,5 @@
+require './recentAgents.jade'
+
 Template.recentAgents.onCreated ->
   @recentAgents = new Meteor.Collection(null)
   @autorun =>

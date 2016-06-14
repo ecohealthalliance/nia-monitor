@@ -2,7 +2,7 @@
   "name": "nia-monitor",
   "private": true,
   "scripts": {
-    "start": "meteor run",
+    "start": "meteor run --port 5000",
     "chimp": "chimp --ddp=http://localhost:3000 --path=tests"
   },
   "dependencies": {

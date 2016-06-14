@@ -1,3 +1,5 @@
+require './frequentAgents.jade'
+
 Template.frequentAgents.onCreated ->
   @frequentAgents = new Meteor.Collection(null)
   @autorun =>

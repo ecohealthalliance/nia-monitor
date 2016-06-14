@@ -1,14 +1,11 @@
-Template.detail.helpers
-  agent: ->
-    console.log Router.current().getParams()._agentName
-    Router.current().getParams()._agentName
+require './timeline.jade'
 
 Template.timeline.onCreated ->
   @tld = new Meteor.Collection(null)
   @autorun =>
     $("#spinner").show()
     agent = Router.current().getParams()._agentName
-    @tld.find({}, reactive: false).map((d)=> @tld.remove(d))
+    @tld.find({}, reactive: false).map((d) => @tld.remove(d))
     Meteor.call 'getHistoricalData', agent, (err, response) =>
       if err == undefined
         for binding in response.results.bindings
@@ -30,8 +27,8 @@ Template.timeline.onCreated ->
         type: 'bar'
         data:
           labels: [
-            baseYear-4
-            baseYear-3
+            baseYear - 4
+            baseYear - 3
             baseYear-2
             baseYear - 1
             baseYear
@@ -56,19 +53,19 @@ Template.timeline.onCreated ->
             pointRadius: 1
             pointHitRadius: 10
             data: [
-              data[baseYear-4].length
-              data[baseYear-3].length
-              data[baseYear-2].length
+              data[baseYear - 4].length
+              data[baseYear - 3].length
+              data[baseYear - 2].length
               data[baseYear - 1].length
               data[baseYear].length
             ]
           } ]
-        options: 
+        options:
           legend:
             display: false
           xAxes: [ { display: true } ],
           scaleShowLabels: true,
-          scales: 
+          scales:
             yAxes: [{
               ticks:
                 stepSize: 5
