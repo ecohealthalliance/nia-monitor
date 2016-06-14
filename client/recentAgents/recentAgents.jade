@@ -10,12 +10,12 @@ template(name="recentAgents")
             if priorArticle
               if dm
                 span.underline Months since prior mention:
-                  a(href='#{priorArticle.value}', target='_blank')= months.value
+                  a(href='#{priorArticle.value}')= months.value
               else
                 span Days since prior mention:
-                  a(href='#{priorArticle.value}', target='_blank')= days.value
+                  a(href='#{priorArticle.value}')= days.value
             else
               span.no-priors No Prior Mentions
             br
             span Link:
-              a(href='#{currentArticle.value}', target='_blank')= currentArticle.value
+              a(href='#{currentArticle.value}')= currentArticle.value

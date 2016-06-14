@@ -1,7 +1,7 @@
 Template.recentAgents.onCreated ->
   @recentAgents = new Meteor.Collection(null)
   @autorun =>
-    @recentAgents.find({}, reactive: false).map((d)=> @recentAgents.remove(d))
+    @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
     Meteor.call 'getRecentlyMentionedInfectiousAgents', (err, response) =>
       if err
         throw err
@@ -22,4 +22,4 @@ Template.recentAgents.helpers
 
 Template.recentAgents.events
   'click .rmia-word': ->
-    window.open("/detail/" + this.word.value)
+    window.location.href = "/detail/#{this.word.value}"

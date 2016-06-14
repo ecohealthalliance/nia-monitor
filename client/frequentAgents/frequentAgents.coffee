@@ -16,4 +16,4 @@ Template.frequentAgents.helpers
 
 Template.frequentAgents.events
   'click .fmia-word': ->
-    window.open("/detail/" + this.word.value)
+    window.location.href = "/detail/#{this.word.value}"
