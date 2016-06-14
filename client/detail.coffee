@@ -12,18 +12,13 @@ Template.timeline.onCreated ->
     Meteor.call 'getHistoricalData', agent, (err, response) =>
       if err == undefined
         for binding in response.results.bindings
-          binding.dateTime = moment(new Date(binding.dateTime.value)).toDate()
           @tld.insert(binding)
 
-      baseYear = new Date(@tld.find({}, {sort: {dateTime: -1}}).fetch()[0].dateTime).getFullYear()
+      baseYear = @tld.find({}, {sort: {year: -1}}).fetch()[0].year.value
       ctryear = baseYear
       data = {}
       while ctryear > baseYear - 5
-        start = moment(new Date(ctryear, 0, 1)).toDate()
-        end = moment(new Date(ctryear + 1, 0, 1)).toDate()
-        data[ctryear] = @tld.find(dateTime:
-          $gte: start
-          $lt: end).fetch()
+        data[ctryear] = @tld.find({"year.value": ctryear}).fetch()
         ctryear--
 
       myLineChart = new Chart($("#canvas"),
@@ -56,19 +51,19 @@ Template.timeline.onCreated ->
             pointRadius: 1
             pointHitRadius: 10
             data: [
-              data[baseYear-4].length
-              data[baseYear-3].length
-              data[baseYear-2].length
-              data[baseYear - 1].length
-              data[baseYear].length
+              data[baseYear-4].count
+              data[baseYear-3].count
+              data[baseYear-2].count
+              data[baseYear - 1].count
+              data[baseYear][0].count.value
             ]
           } ]
-        options: 
+        options:
           legend:
             display: false
           xAxes: [ { display: true } ],
           scaleShowLabels: true,
-          scales: 
+          scales:
             yAxes: [{
               ticks:
                 stepSize: 5

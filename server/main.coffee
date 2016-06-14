@@ -103,22 +103,33 @@ Meteor.methods(
 
     baseYear = moment(recentDate).year() - 5
 
+    # Use current year - 5 with full dataset; above query to get base year will
+    # not be needed.
+    # baseYear = moment(new Date()).year() - 5
+
+    console.log baseYear
+
     query = prefixes + """
-      SELECT
-      (?termLabel as ?word) ?dateTime (count(?termLabel) as ?count)
-      WHERE {
-        ?phrase anno:category "diseases"
-        ; anno:source_doc ?currentArticle
-        ; anno:selected-text ?rawText
-        ; ^dc:relation ?resolvedTerm
-        .
-        ?resolvedTerm rdfs:label ?termLabel .
-        ?currentArticle pro:date ?dateTime
-        FILTER(?termLabel = "#{termLabel}")
-        FILTER (?dateTime > "#{baseYear}-01-01T00:00:00+00:01"^^xsd:dateTime)
-      }
-      GROUP BY ?dateTime ?termLabel
-      ORDER BY DESC(?dateTime)
+      SELECT ?word ?year (count(?word) as ?count)
+      WHERE{
+        SELECT
+        (?termLabel as ?word) ?year
+        WHERE {
+          ?phrase anno:category "diseases"
+          ; anno:source_doc ?article
+          ; anno:selected-text ?rawText
+          ; ^dc:relation ?resolvedTerm
+          .
+          ?resolvedTerm rdfs:label ?termLabel .
+          ?article pro:date ?dateTime
+          FILTER(?termLabel = "#{termLabel}")
+          FILTER (?dateTime > "#{baseYear}-01-01T00:00:00+00:01"^^xsd:dateTime)
+    		BIND(year(?dateTime) AS ?year)
+        }
+        GROUP BY ?termLabel ?article ?year
+        ORDER BY DESC(?dateTime)
+        }
+      GROUP BY ?word ?year
       """
     response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
       headers:
@@ -127,16 +138,22 @@ Meteor.methods(
     return JSON.parse(response.content)
 
   'getFrequentlyMentionedInfectiousAgents': () ->
+    baseYear = 1991
+
+    # Use current year - 5 with full dataset
+    # baseYear = moment(new Date()).year() - 5
     query = prefixes + """
       SELECT ?resolvedTerm
           (sample(?termLabel) as ?word)
           (count(DISTINCT ?article) as ?count)
       WHERE {
         ?phrase anno:category "diseases"
-            ; ^dc:relation ?resolvedTerm
-            ; anno:source_doc ?article
-            .
-        ?resolvedTerm rdfs:label ?termLabel .
+        ; ^dc:relation ?resolvedTerm
+        ; anno:source_doc ?article
+        .
+        ?article pro:date ?dateTime.
+        ?resolvedTerm rdfs:label ?termLabel
+        FILTER (?dateTime > "#{baseYear}-01-01T00:00:00+00:01"^^xsd:dateTime)
       }
       GROUP BY ?resolvedTerm
       ORDER BY DESC(?count)
