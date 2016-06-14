@@ -3,9 +3,8 @@ template(name="frequentDescriptors")
     tbody
       each frequentDescriptors
         tr
-          if count
-            td.frequentDescriptorsTableRow(data-agentname=name)
-              div.fmia-word= selText
-            td appears in #{count} articles
-          else
-            span.no-priors.col-md-12 No Frequent Descriptors
+          td.frequentDescriptorsTableRow(data-agentname=name)
+            div.fmia-word= selText
+          td appears in #{count} articles
+      else
+        span.no-priors.col-md-12 No Frequent Descriptors

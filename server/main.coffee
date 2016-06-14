@@ -9,6 +9,16 @@ prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
 prefix eha: <http://www.eha.io/types/>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 '''
+# Convert { value, type } objects into flat objects where the value is cast to
+# the given type
+castBinding = (binding)->
+  result = {}
+  for key, value of binding
+    if value.datatype == "http://www.w3.org/2001/XMLSchema#integer"
+      result[key] = parseInt(value.value)
+    else
+      result[key] = value.value
+  result
 Meteor.methods(
 
   'SPARQurL': () ->
@@ -167,56 +177,45 @@ Meteor.methods(
       headers:
         "Accept": "application/sparql-results+json"
     )
-    return JSON.parse(response.content).results.bindings.map (binding)->
-      result = {}
-      for key, value of binding
-        if value.datatype == "http://www.w3.org/2001/XMLSchema#integer"
-          result[key] = parseInt(value.value)
-        else
-          result[key] = value.value
-      result
+    return JSON.parse(response.content).results.bindings.map(castBinding)
 
   'getFrequentDescriptors' : (ia) ->
     query = prefixes + """
-      SELECT (count(?article) as ?count) ?selText
+      SELECT
+        ?selText
+        (group_concat(DISTINCT ?article; separator = "::") AS ?articles)
+        (count(DISTINCT ?article) as ?count)
       WHERE {
           ?dep_rel rdf:type anno:dependency_relation .
           VALUES ?dep_rel { dep:amod dep:nmod }
           ?parent anno:min_contains ?target
               ; ?dep_rel ?descriptor
-    			; anno:source_doc ?article
+              ; anno:source_doc ?article
               .
           ?descriptor anno:start ?d_start
               ; anno:end ?d_end
-    			; anno:selected-text ?rawSelText
+              ; anno:selected-text ?rawSelText
+              ; anno:root/anno:pos ?pos
               .
+          FILTER (?pos NOT IN ("X", "PUNCT"))
           ?target anno:category "diseases"
               ; anno:start ?t_start
               ; anno:end ?t_end
               ; ^dc:relation ?rel
-    			.
-          	?rel rdfs:label ?termLabel
+              .
+          	?rel rdfs:label "#{ia}"
           FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
-          FILTER(?termLabel = "#{ia}")
           BIND(lcase(?rawSelText) as ?ranCaseSelText)
           #remove leading and trailing whitespace, and new line characters
           BIND(replace(?ranCaseSelText,'^ +| +$|\\n', '') AS ?selText)
-        }
-
-      group by ?selText
+      }
+      GROUP BY ?selText
+      HAVING (?count > 0)
       ORDER BY DESC(?count)
       """
     response = HTTP.call('POST', SPARQurL + '/query?query=' + encodeURIComponent(query),
       headers:
         "Accept": "application/sparql-results+json"
     )
-
-    return JSON.parse(response.content).results.bindings.map (binding) ->
-      result = {}
-      for key, value of binding
-        if value.datatype == "http://www.w3.org/2001/XMLSchema#integer"
-          result[key] = parseInt(value.value)
-        else
-          result[key] = value.value
-      result
+    return JSON.parse(response.content).results.bindings.map(castBinding)
 )
