@@ -2,6 +2,7 @@ require './recentMentions.jade'
 
 Template.recentMentions.onCreated ->
   @mentions = new Meteor.Collection(null)
+  @sources = new Meteor.Collection(null)
   @autorun =>
     agent = Router.current().getParams()._agentName
     #console.log agent
@@ -9,13 +10,22 @@ Template.recentMentions.onCreated ->
     Meteor.call 'getRecentMentions', agent, (err, response) =>
       if err
         throw err
-      #console.log response
       for row in response
+        if row.source
+          sourceId = @sources.findOne(uri: row.source)?._id
+          unless sourceId
+            sourceId = @sources.insert(
+              uri: row.source,
+              date: moment(new Date(row.date))
+            )
+          row.sourceId = sourceId
         @mentions.insert(row)
 
 Template.recentMentions.helpers
-  mentions: ->
-    Template.instance().mentions.find()
+  sources: ->
+    Template.instance().sources.find()
+  mentionsForSource: (sourceId) ->
+    Template.instance().mentions.find(sourceId: sourceId)
   kwic: ->
     new Spacebars.SafeString """
       <span>...#{@phrase_text.slice(Math.max(0, @t_start - 40 - @p_start), @t_start - @p_start)}</span>
