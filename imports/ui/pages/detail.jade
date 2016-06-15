@@ -7,8 +7,21 @@ template(name='detail')
     .col-md-7.pull-left
       .panel.panel-primary
         .panel-body
-          +detailLeft
+          +timeline
+          br
+          #recentMentions
+            .panel.panel-primary
+              .panel-heading
+                h4 Recent Mentions
+              div
+                +recentMentions
+
     .col-md-5.pull-right
       .panel.panel-primary
         .panel-body
-          +detailRight
+          #frequentDescriptors
+            .panel.panel-primary
+              .panel-heading
+                h4 Frequent Descriptors
+              div
+                +frequentDescriptors
