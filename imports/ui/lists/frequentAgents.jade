@@ -5,5 +5,5 @@ template(name="frequentAgents")
         tr
           td.frequentlyMentionedInfectiousAgentsTableRow(data-agentname=word.value)
             div.fmia-word
-              a(href="/detail/#{word.value}")= word.value
+              a(href="/detail/{{plus word.value}}")= word.value
           td appears in #{count.value} articles
