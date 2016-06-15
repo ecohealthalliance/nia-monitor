@@ -21,7 +21,3 @@ Template.recentAgents.onCreated ->
 Template.recentAgents.helpers
   recentAgents: ->
     Template.instance().recentAgents.find()
-
-Template.recentAgents.events
-  'click .rmia-word': ->
-    window.location.href = "/detail/#{this.word.value}"

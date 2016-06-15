@@ -15,7 +15,3 @@ Template.frequentAgents.onCreated ->
 Template.frequentAgents.helpers
   frequentAgents: ->
     Template.instance().frequentAgents.find()
-
-Template.frequentAgents.events
-  'click .fmia-word': ->
-    window.location.href = "/detail/#{this.word.value}"
