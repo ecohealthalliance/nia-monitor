@@ -8,26 +8,28 @@ Template.timeline.onCreated ->
   @autorun =>
     $("#spinner").show()
     agent = Router.current().getParams()._agentName
-    @tld.find({}, reactive: false).map((d)=> @tld.remove(d))
+    @tld.find({}, reactive: false).map((d) => @tld.remove(d))
     Meteor.call 'getHistoricalData', agent, (err, response) =>
       if err == undefined
         for binding in response.results.bindings
-          @tld.insert(binding)
+          data = {"year": binding.year.value, "count": binding.count.value}
+          @tld.insert(data)
 
-      baseYear = @tld.find({}, {sort: {year: -1}}).fetch()[0].year.value
+      baseYear = @tld.find({}, {sort: {year: -1}}).fetch()[0].year
       ctryear = baseYear
       data = {}
       while ctryear > baseYear - 5
-        data[ctryear] = @tld.find({"year.value": ctryear}).fetch()
+        data[ctryear] = @tld.find({"year": ctryear.toString()}).fetch()
+        if data[ctryear].length ==  0
+          data[ctryear][0] = {"year": ctryear, "count": 0}
         ctryear--
-
       myLineChart = new Chart($("#canvas"),
         type: 'bar'
         data:
           labels: [
-            baseYear-4
-            baseYear-3
-            baseYear-2
+            baseYear - 4
+            baseYear - 3
+            baseYear - 2
             baseYear - 1
             baseYear
           ]
@@ -51,11 +53,11 @@ Template.timeline.onCreated ->
             pointRadius: 1
             pointHitRadius: 10
             data: [
-              data[baseYear-4].count
-              data[baseYear-3].count
-              data[baseYear-2].count
-              data[baseYear - 1].count
-              data[baseYear][0].count.value
+              data[baseYear - 4][0].count
+              data[baseYear - 3][0].count
+              data[baseYear - 2][0].count
+              data[baseYear - 1][0].count
+              data[baseYear][0].count
             ]
           } ]
         options:
