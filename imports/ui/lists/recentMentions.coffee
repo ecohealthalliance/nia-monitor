@@ -8,7 +8,8 @@ Template.recentMentions.onCreated ->
     @mentions.find({}, reactive: false).map((d) => @mentions.remove(d))
     Meteor.call 'getRecentMentions', agent, (err, response) =>
       if err
-        throw err
+        Meteor.toastr err
+        return
       #console.log response
       for row in response
         @mentions.insert(row)

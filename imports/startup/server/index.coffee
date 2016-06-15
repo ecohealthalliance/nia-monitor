@@ -22,12 +22,13 @@ castBinding = (binding) ->
   result
 
 makeRequest = (query) ->
-  response = HTTP.call 'POST', "#{SPARQurL}/query?query=#{encodeURIComponent(query)}",
-    headers:
-      'Accept': 'application/sparql-results+json'
-  JSON.parse response.content
-
-
+  try
+    response = HTTP.call 'POST', "#{SPARQurL}/query?query=#{encodeURIComponent(query)}",
+      headers:
+        'Accept': 'application/sparql-results+json'
+    JSON.parse response.content
+  catch err
+    throw new Meteor.Error(err.response.statusCode, err.response.content)
 Meteor.methods
 
   'SPARQurL': ->
@@ -38,7 +39,7 @@ Meteor.methods
       SELECT
           # For each of the most recently mentioned terms find the most recent
           # mention prior to the current mention.
-          ?resolvedTerm ?currentDate ?currentArticle
+          resolvedTerm ?currentDate ?currentArticle
           (sample(?termLabel) as ?word)
           (sample(?articleRawMenions) as ?rawMentions)
           (max(?prevArticle) as ?priorArticle)

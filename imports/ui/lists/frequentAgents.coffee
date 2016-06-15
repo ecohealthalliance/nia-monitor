@@ -7,7 +7,8 @@ Template.frequentAgents.onCreated ->
     @frequentAgents.find({}, reactive: false).map((d) => @frequentAgents.remove(d))
     Meteor.call 'getFrequentlyMentionedInfectiousAgents', (err, response) =>
       if err
-        throw err
+        Meteor.toastr err
+        return
       for binding in response.results.bindings
         @frequentAgents.insert(binding)
       $(".spinner").hide()
