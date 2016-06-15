@@ -4,5 +4,5 @@ template(name="recentMentions")
       each mentions
         tr.recentMentionsTableRow
           td
-            a(href=source)= date
+            a(href=source) {{moment date}}
         tr.kwic #{kwic}

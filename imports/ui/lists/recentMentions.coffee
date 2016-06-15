@@ -4,14 +4,15 @@ Template.recentMentions.onCreated ->
   @mentions = new Meteor.Collection(null)
   @autorun =>
     agent = Router.current().getParams()._agentName
-    console.log agent
+    #console.log agent
     @mentions.find({}, reactive: false).map((d) => @mentions.remove(d))
     Meteor.call 'getRecentMentions', agent, (err, response) =>
       if err
         throw err
-      console.log response
+      #console.log response
       for row in response
         @mentions.insert(row)
+
 Template.recentMentions.helpers
   mentions: ->
     Template.instance().mentions.find()
