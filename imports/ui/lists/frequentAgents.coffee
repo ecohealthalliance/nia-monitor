@@ -1,3 +1,5 @@
+require './frequentAgents.jade'
+
 Template.frequentAgents.onCreated ->
   @frequentAgents = new Meteor.Collection(null)
   @autorun =>
@@ -13,7 +15,3 @@ Template.frequentAgents.onCreated ->
 Template.frequentAgents.helpers
   frequentAgents: ->
     Template.instance().frequentAgents.find()
-
-Template.frequentAgents.events
-  'click .fmia-word': ->
-    window.open("/detail/" + this.word.value)

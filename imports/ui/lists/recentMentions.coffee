@@ -1,9 +1,11 @@
+require './recentMentions.jade'
+
 Template.recentMentions.onCreated ->
   @mentions = new Meteor.Collection(null)
   @autorun =>
     agent = Router.current().getParams()._agentName
     console.log agent
-    @mentions.find({}, reactive: false).map((d)=> @mentions.remove(d))
+    @mentions.find({}, reactive: false).map((d) => @mentions.remove(d))
     Meteor.call 'getRecentMentions', agent, (err, response) =>
       if err
         throw err

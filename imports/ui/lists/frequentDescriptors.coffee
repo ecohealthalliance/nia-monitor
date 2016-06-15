@@ -1,3 +1,5 @@
+require './frequentDescriptors.jade'
+
 Template.frequentDescriptors.onCreated ->
   @frequentDescriptors = new Meteor.Collection(null)
   @autorun =>

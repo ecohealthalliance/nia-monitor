@@ -1,0 +1,27 @@
+template(name='detail')
+  +header
+  .col-md-12
+    .col-md-7.pull-left
+      h3=agent
+  .col-md-12
+    .col-md-7.pull-left
+      .panel.panel-primary
+        .panel-body
+          +timeline
+          br
+          #recentMentions
+            .panel.panel-primary
+              .panel-heading
+                h4 Recent Mentions
+              div
+                +recentMentions
+
+    .col-md-5.pull-right
+      .panel.panel-primary
+        .panel-body
+          #frequentDescriptors
+            .panel.panel-primary
+              .panel-heading
+                h4 Frequent Descriptors
+              div
+                +frequentDescriptors

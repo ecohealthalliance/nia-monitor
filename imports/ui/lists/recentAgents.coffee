@@ -1,7 +1,9 @@
+require './recentAgents.jade'
+
 Template.recentAgents.onCreated ->
   @recentAgents = new Meteor.Collection(null)
   @autorun =>
-    @recentAgents.find({}, reactive: false).map((d)=> @recentAgents.remove(d))
+    @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
     Meteor.call 'getRecentlyMentionedInfectiousAgents', (err, response) =>
       if err
         throw err
@@ -19,7 +21,3 @@ Template.recentAgents.onCreated ->
 Template.recentAgents.helpers
   recentAgents: ->
     Template.instance().recentAgents.find()
-
-Template.recentAgents.events
-  'click .rmia-word': ->
-    window.open("/detail/" + this.word.value)
