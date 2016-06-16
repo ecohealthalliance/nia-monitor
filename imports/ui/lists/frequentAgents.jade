@@ -1,9 +1,10 @@
 template(name="frequentAgents")
-  table#frequentAgentsTable.table.table-striped
-    tbody
-      each frequentAgents
-        tr
-          td.frequentlyMentionedInfectiousAgentsTableRow(data-agentname=word.value)
-            div.fmia-word
-              a(href="/detail/#{word.value}")= word.value
-          td appears in #{count.value} articles
+  .panel.panel-default
+    table#frequentAgentsTable.table.table-striped
+      tbody
+        each frequentAgents
+          tr
+            td.frequentlyMentionedInfectiousAgentsTableRow(data-agentname=word.value)
+              div.fmia-word
+                a(href="/detail/#{word.value}")= word.value
+            td appears in #{count.value} articles

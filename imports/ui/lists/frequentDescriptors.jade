@@ -7,4 +7,7 @@ template(name="frequentDescriptors")
             div.fmia-word= selText
           td appears in #{count} articles
       else
-        span.no-priors.col-md-12 No Frequent Descriptors
+        if ready
+          span.no-priors.col-md-12 No Frequent Descriptors
+        else
+          | Loading...
