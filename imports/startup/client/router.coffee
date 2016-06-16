@@ -7,6 +7,7 @@ require '../../ui/pages/detail.coffee'
 # template helpers
 require '../../ui/helpers/moment.coffee'
 require '../../ui/helpers/plus.coffee'
+require '../../ui/helpers/pluralize.coffee'
 
 # routes
 Router.route '/', ->
