@@ -5,6 +5,9 @@ template(name="frequentDescriptors")
         tr
           td.frequentDescriptorsTableRow(data-agentname=name)
             div.fmia-word= selText
-          td appears in #{count} articles
+          td appears in {{pluralize 'article' count}}
       else
-        span.no-priors.col-md-12 No Frequent Descriptors
+        if ready
+          span.no-priors.col-md-12 No Frequent Descriptors
+        else
+          | Loading...
