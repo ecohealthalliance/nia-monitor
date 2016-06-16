@@ -6,7 +6,10 @@ tick = ->
   Session.set('now', Session.get('now') + tickInterval)
 setInterval tick, tickInterval
 
+# This IIFE wrapper gets compiled only once
 talkTime = do ->
+  # Cache strings to be used as pointers instead
+  #          of being re-defined upon every call
   second = 'second'
   minute = 'minute'
   hour   = 'hour'
@@ -15,6 +18,7 @@ talkTime = do ->
   month  = 'month'
   year   = 'year'
 
+  # Define the inner function to be returned to this IIFE
   timer = (time) ->
     count = 0
     unit = second
@@ -36,6 +40,7 @@ talkTime = do ->
       unit = minute
     "#{count} #{unit}#{(if count isnt 1 then 's')}"
 
+  # Wrap the inner function to be returned
   (second) ->
     timer second
 
