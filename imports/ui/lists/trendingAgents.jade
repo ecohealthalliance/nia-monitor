@@ -1,0 +1,14 @@
+template(name="trendingAgents")
+  h4.col-md-4 Trending Infectious Agents
+  SELECT#trendingRange.col-md-6.form-control.pull-right
+    option(value="year") Year
+    option(value="month") Month
+    option(value="week") Week
+  table#trendingAgentsTable.table.table-striped
+    tbody
+      each trendingAgents
+        tr
+          td.trendingInfectiousAgentsTableRow(data-agentname=word.value)
+            div.fmia-word
+              a(href="/detail/#{word.value}")= word.value
+          td appears in {{pluralize 'article' count.value}}

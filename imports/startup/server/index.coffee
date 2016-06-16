@@ -137,6 +137,24 @@ Meteor.methods
       """
     makeRequest(query)
 
+  'getTrendingInfectiousAgents': ->
+    query = prefixes + """
+      SELECT ?resolvedTerm
+          (sample(?termLabel) as ?word)
+          (count(DISTINCT ?article) as ?count)
+      WHERE {
+        ?phrase anno:category "diseases"
+            ; ^dc:relation ?resolvedTerm
+            ; anno:source_doc ?article
+            .
+        ?resolvedTerm rdfs:label ?termLabel .
+      }
+      GROUP BY ?resolvedTerm
+      ORDER BY DESC(?count)
+      LIMIT 20
+      """
+    makeRequest(query)
+
   'getRecentMentions': (agent) ->
     query = prefixes + """
       SELECT DISTINCT ?phrase_text ?p_start ?t_start ?t_end ?source ?date
