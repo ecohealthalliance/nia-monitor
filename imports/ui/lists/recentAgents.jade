@@ -11,13 +11,13 @@ template(name="recentAgents")
               tr
                 td.recentlyMentionedInfectiousAgentsTableRow(data-agentname=word.value)
                   h4.rmia-word
-                    a(href="/detail/#{word.value}")= word.value
+                    a(href="/detail/{{plus word.value}}")= word.value
                   if priorArticle
                     if dm
                       span.underline Months since prior mention:
-                        a(href='#{priorArticle.value}')= months.value
+                        a(href=priorArticle.value)= months.value
                     else
                       span Days since prior mention:
-                        a(href='#{priorArticle.value}')= days.value
+                        a(href=priorArticle.value)= days.value
                   else
                     span.no-priors No Prior Mentions
