@@ -36,7 +36,7 @@ Template.recentAgents.helpers
   isCollapsed: (articleId) ->
     Template.instance().articles.findOne(articleId).collapsed
   recentAgentsForArticle: (articleId, limit) ->
-    options = {}
+    options = { sort: { 'days.value': 1 } }
     if limit
       options.limit = 5
     Template.instance().recentAgents.find(articleId: articleId, options)
