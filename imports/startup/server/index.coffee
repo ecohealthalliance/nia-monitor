@@ -28,7 +28,14 @@ makeRequest = (query) ->
         'Accept': 'application/sparql-results+json'
     JSON.parse response.content
   catch err
-    throw new Meteor.Error(err.response.statusCode, err.response.content)
+    if err.code
+      switch err.code
+        when "ECONNREFUSED"
+          throw new Meteor.Error(err.code, "Unable to connect to Fuseki server.")
+        else
+          throw new Meteor.Error(500, "Internal Server Error")
+    else
+      throw new Meteor.Error(err.response.statusCode, err.response.content)
 Meteor.methods
 
   'SPARQurL': ->
@@ -39,7 +46,7 @@ Meteor.methods
       SELECT
           # For each of the most recently mentioned terms find the most recent
           # mention prior to the current mention.
-          resolvedTerm ?currentDate ?currentArticle
+          ?resolvedTerm ?currentDate ?currentArticle
           (sample(?termLabel) as ?word)
           (sample(?articleRawMenions) as ?rawMentions)
           (max(?prevArticle) as ?priorArticle)
