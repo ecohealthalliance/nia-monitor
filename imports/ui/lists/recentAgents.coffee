@@ -15,6 +15,7 @@ Template.recentAgents.onCreated ->
             articleId = @articles.insert(
               uri: binding.currentArticle.value,
               date: moment(new Date(binding.currentDate.value))
+              collapsed: false
             )
           binding.articleId = articleId
         if binding.priorDate
@@ -26,9 +27,20 @@ Template.recentAgents.onCreated ->
           if binding.days.value > 30
             binding.dm = true
         @recentAgents.insert(binding)
+        if @recentAgents.find(articleId: articleId).count() is 6
+          @articles.update(articleId, { $set: { collapsed: true } })
 
 Template.recentAgents.helpers
   articles: ->
     Template.instance().articles.find()
-  recentAgentsForArticle: (articleId) ->
-    Template.instance().recentAgents.find(articleId: articleId)
+  isCollapsed: (articleId) ->
+    Template.instance().articles.findOne(articleId).collapsed
+  recentAgentsForArticle: (articleId, limit) ->
+    options = {}
+    if limit
+      options.limit = 5
+    Template.instance().recentAgents.find(articleId: articleId, options)
+
+Template.recentAgents.events
+  'click .more': (event, instance) ->
+    instance.articles.update(@_id, { $set: { collapsed: false } })
