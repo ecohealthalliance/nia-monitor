@@ -10,18 +10,14 @@ template(name='detail')
           +timeline
           br
           #recentMentions
-            .panel.panel-primary
-              .panel-heading
-                h4 Recent Mentions
-              div
-                +recentMentions
+            h4 Recent Mentions
+            .panel.panel-default
+              +recentMentions
 
     .col-md-5.pull-right
       .panel.panel-primary
         .panel-body
           #frequentDescriptors
-            .panel.panel-primary
-              .panel-heading
-                h4 Frequent Descriptors
-              div
-                +frequentDescriptors
+            h4 Frequent Descriptors
+            .panel.panel-default
+              +frequentDescriptors

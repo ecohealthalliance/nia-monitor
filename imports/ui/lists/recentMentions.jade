@@ -1,8 +1,10 @@
 template(name="recentMentions")
-  table#recentMentionsTable.table.table-striped
-    tbody
-      each mentions
-        tr.recentMentionsTableRow
-          td
-            a(href=source) {{moment date}}
-        tr.kwic #{kwic}
+  each sources
+    .panel-heading
+      h4
+        a(href=uri) {{moment date}}
+    table#recentMentionsTable.table.table-striped
+      tbody
+        each mentionsForSource _id
+          tr.recentMentionsTableRow
+            td.kwic #{kwic}
