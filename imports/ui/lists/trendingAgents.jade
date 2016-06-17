@@ -1,6 +1,6 @@
 template(name="trendingAgents")
-  h4.col-md-4 Trending Infectious Agents
-  SELECT#trendingRange.col-md-6.form-control.pull-right
+  h4.col-md-5 Infectious Agents trending in the last:
+  SELECT#trendingRange.col-md-6.form-control
     option(value="year") Year
     option(value="month") Month
     option(value="week") Week
@@ -12,3 +12,9 @@ template(name="trendingAgents")
             div.fmia-word
               a(href="/detail/#{word.value}")= word.value
           td appears in {{pluralize 'article' count.value}}
+      else
+        if ready
+          span.no-priors.col-md-12 No Trending Infectious Agents in the last
+            {{trendingRange}}.
+        else
+          | Loading...

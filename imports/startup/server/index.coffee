@@ -137,17 +137,19 @@ Meteor.methods
       """
     makeRequest(query)
 
-  'getTrendingInfectiousAgents': ->
+  'getTrendingInfectiousAgents': (date) ->
     query = prefixes + """
       SELECT ?resolvedTerm
           (sample(?termLabel) as ?word)
           (count(DISTINCT ?article) as ?count)
       WHERE {
         ?phrase anno:category "diseases"
-            ; ^dc:relation ?resolvedTerm
-            ; anno:source_doc ?article
-            .
+        ; ^dc:relation ?resolvedTerm
+        ; anno:source_doc ?article
+        .
+        ?article pro:date ?dateTime .
         ?resolvedTerm rdfs:label ?termLabel .
+        FILTER (?dateTime > "#{date}"^^xsd:dateTime)
       }
       GROUP BY ?resolvedTerm
       ORDER BY DESC(?count)
@@ -207,7 +209,7 @@ Meteor.methods
               ; anno:end ?t_end
               ; ^dc:relation ?rel
               .
-          	?rel rdfs:label "#{ia}"
+              ?rel rdfs:label "#{ia}"
           FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
           BIND(lcase(?rawSelText) as ?ranCaseSelText)
           #remove leading and trailing whitespace, and new line characters
