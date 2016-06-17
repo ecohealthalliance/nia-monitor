@@ -14,7 +14,9 @@ Template.trendingAgents.onCreated ->
     Meteor.call 'getTrendingInfectiousAgents', dateStr, (err, response) =>
       @ready.set(true)
       if err
-        throw err
+        toastr.error(err.message)
+        $(".spinner").hide()
+        return
       for binding in response.results.bindings
         @trendingAgents.insert(binding)
       $(".spinner").hide()
@@ -49,7 +51,9 @@ Template.trendingAgents.events
     Meteor.call 'getTrendingInfectiousAgents', dateStr, (err, response) =>
       template.ready.set(true)
       if err
-        throw err
+        toastr.error(err.message)
+        $(".spinner").hide()
+        return
       if response.results.bindings.length == 1
         if response.results.bindings[0].count.value == "0"
           $(".spinner").hide()
