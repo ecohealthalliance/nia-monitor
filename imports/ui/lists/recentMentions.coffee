@@ -9,7 +9,9 @@ Template.recentMentions.onCreated ->
     @mentions.find({}, reactive: false).map((d) => @mentions.remove(d))
     Meteor.call 'getRecentMentions', agent, (err, response) =>
       if err
-        throw err
+        toastr.error(err.message)
+        $(".spinner").hide()
+        return
       for row in response
         if row.source
           sourceId = @sources.findOne(uri: row.source)?._id
