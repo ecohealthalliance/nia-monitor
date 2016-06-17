@@ -22,12 +22,20 @@ castBinding = (binding) ->
   result
 
 makeRequest = (query) ->
-  response = HTTP.call 'POST', "#{SPARQurL}/query?query=#{encodeURIComponent(query)}",
-    headers:
-      'Accept': 'application/sparql-results+json'
-  JSON.parse response.content
-
-
+  try
+    response = HTTP.call 'POST', "#{SPARQurL}/query?query=#{encodeURIComponent(query)}",
+      headers:
+        'Accept': 'application/sparql-results+json'
+    JSON.parse response.content
+  catch err
+    if err.code
+      switch err.code
+        when "ECONNREFUSED"
+          throw new Meteor.Error(err.code, "Unable to connect to Fuseki server.")
+        else
+          throw new Meteor.Error(500, "Internal Server Error")
+    else
+      throw new Meteor.Error(err.response.statusCode, err.response.content)
 Meteor.methods
 
   'SPARQurL': ->
