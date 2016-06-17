@@ -15,8 +15,3 @@ toastr.options =
   'showMethod': 'fadeIn'
   'hideMethod': 'fadeOut'
   'tapToDismiss': false
-
-Meteor.toastr = (err) ->
-  toastr.error(err.message)
-  $(".spinner").hide()
-  return

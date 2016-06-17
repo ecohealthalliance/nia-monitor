@@ -7,7 +7,8 @@ Template.recentAgents.onCreated ->
     @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
     Meteor.call 'getRecentlyMentionedInfectiousAgents', (err, response) =>
       if err
-        Meteor.toastr err
+        toastr.error(err.message)
+        $(".spinner").hide()
         return
       for binding in response.results.bindings
         if binding.currentArticle.type is 'uri'

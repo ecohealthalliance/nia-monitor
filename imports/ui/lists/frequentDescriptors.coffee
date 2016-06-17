@@ -9,7 +9,9 @@ Template.frequentDescriptors.onCreated ->
     Meteor.call 'getFrequentDescriptors', this.data._agentName, (err, response) =>
       @ready.set(true)
       if err
-        Meteor.toastr err
+        toastr.error(err.message)
+        $(".spinner").hide()
+        return
       for row in response
         @frequentDescriptors.insert(row)
       $(".spinner").hide()
