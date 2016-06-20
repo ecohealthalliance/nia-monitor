@@ -1,0 +1,10 @@
+template(name="recentMentions")
+  each sources
+    .panel-heading
+      h4
+        a(href=uri) {{age date}}
+    table#recentMentionsTable.table.table-striped
+      tbody
+        each mentionsForSource _id
+          tr.recentMentionsTableRow
+            td.kwic #{kwic}

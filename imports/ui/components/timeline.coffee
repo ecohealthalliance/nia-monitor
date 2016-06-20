@@ -1,7 +1,4 @@
-Template.detail.helpers
-  agent: ->
-    console.log Router.current().getParams()._agentName
-    Router.current().getParams()._agentName
+require './timeline.jade'
 
 Template.timeline.onCreated ->
   @tld = new Meteor.Collection(null)
@@ -14,7 +11,6 @@ Template.timeline.onCreated ->
         for binding in response.results.bindings
           data = {"year": binding.year.value, "count": binding.count.value}
           @tld.insert(data)
-
       baseYear = @tld.find({}, {sort: {year: -1}}).fetch()[0].year
       ctryear = baseYear
       data = {}

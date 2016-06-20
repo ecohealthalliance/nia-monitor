@@ -1,0 +1,16 @@
+template(name='main')
+  +header
+
+  .col-md-6.pull-left
+    .panel.panel-default
+      .panel-body
+        #recentlyMentionedInfectiousAgents
+          h4 Recently Mentioned Infectious Agents
+          +recentAgents
+
+  .col-md-6.pull-right
+    .panel.panel-default
+      .panel-body
+        #frequentlyMentionedInfectiousAgents
+          h4 Frequently Mentioned Infectious Agents
+          +frequentAgents

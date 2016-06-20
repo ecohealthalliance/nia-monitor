@@ -1,3 +1,5 @@
+require './frequentAgents.jade'
+
 Template.frequentAgents.onCreated ->
   @frequentAgents = new Meteor.Collection(null)
   @autorun =>
@@ -5,7 +7,9 @@ Template.frequentAgents.onCreated ->
     @frequentAgents.find({}, reactive: false).map((d) => @frequentAgents.remove(d))
     Meteor.call 'getFrequentlyMentionedInfectiousAgents', (err, response) =>
       if err
-        throw err
+        toastr.error(err.message)
+        $(".spinner").hide()
+        return
       for binding in response.results.bindings
         @frequentAgents.insert(binding)
       $(".spinner").hide()
@@ -13,7 +17,3 @@ Template.frequentAgents.onCreated ->
 Template.frequentAgents.helpers
   frequentAgents: ->
     Template.instance().frequentAgents.find()
-
-Template.frequentAgents.events
-  'click .fmia-word': ->
-    window.open("/detail/" + this.word.value)

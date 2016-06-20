@@ -1,0 +1,23 @@
+template(name="recentAgents")
+  each articles
+    .panel.panel-default
+      .panel-heading
+        h5
+          a(href=uri) {{uri}} ● {{age date}}
+      div
+        table#recentAgentsTable.table.table-striped
+          tbody
+            each recentAgentsForArticle _id
+              tr
+                td.recentlyMentionedInfectiousAgentsTableRow(data-agentname=word.value)
+                  h4.rmia-word
+                    a(href="/detail/{{plus word.value}}")= word.value
+                  if priorArticle
+                    if dm
+                      span.underline Months since prior mention:
+                        a(href=priorArticle.value)= months.value
+                    else
+                      span Days since prior mention:
+                        a(href=priorArticle.value)= days.value
+                  else
+                    span.no-priors No Prior Mentions
