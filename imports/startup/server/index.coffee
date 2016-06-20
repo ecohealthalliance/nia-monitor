@@ -36,8 +36,11 @@ makeRequest = (query) ->
           throw new Meteor.Error(500, "Internal Server Error")
     else
       throw new Meteor.Error(err.response.statusCode, err.response.content)
-Meteor.methods
 
+escape = (text)->
+  JSON.stringify(text).slice(1,-1)
+
+Meteor.methods
   'SPARQurL': ->
     SPARQurL
 
@@ -62,13 +65,15 @@ Meteor.methods
                 (group_concat(DISTINCT ?rawText; separator = "::") AS ?articleRawMenions)
               WHERE {
                   ?phrase anno:category "diseases"
-                      ; anno:source_doc ?currentArticle
-                      ; anno:start ?start
-                      ; anno:selected-text ?rawText
-                      ; ^dc:relation ?resolvedTerm
-                      .
+                  ; anno:source_doc ?currentArticle
+                  ; anno:start ?start
+                  ; anno:selected-text ?rawText
+                  ; ^dc:relation ?resolvedTerm
+                  .
                   ?resolvedTerm rdfs:label ?termLabel .
-                  ?currentArticle pro:date ?currentDate .
+                  ?currentArticle pro:post/pro:date ?p_date .
+                  OPTIONAL { ?currentArticle  pro:date  ?a_date }
+                  BIND(coalesce(?a_date, ?p_date) AS ?currentDate)
               }
               GROUP BY ?resolvedTerm ?termLabel ?currentDate ?currentArticle
               # Sort by date, then document, then offset within the document.
@@ -78,9 +83,11 @@ Meteor.methods
           # Select the previous usages of the most recently mentioned terms
           OPTIONAL {
             ?prev_mention anno:source_doc ?prevArticle
-                ; ^dc:relation ?resolvedTerm
-                .
-            ?prevArticle pro:date ?prevDate .
+            ; ^dc:relation ?resolvedTerm
+            .
+            ?prevArticle pro:post/pro:date ?p_date .
+            OPTIONAL { ?prevArticle  pro:date  ?a_date }
+            BIND(coalesce(?a_date, ?p_date) AS ?prevDate)
             FILTER(?currentDate >= ?prevDate && ?currentArticle != ?prevArticle)
           }
       }
@@ -92,7 +99,7 @@ Meteor.methods
 
   'getHistoricalData': (termLabel) ->
     query = prefixes + """
-      SELECT (max(?dateTime) as ?mdt)
+      SELECT (max(?date) as ?mdt)
       WHERE {
         ?phrase anno:category "diseases"
         ; anno:source_doc ?currentArticle
@@ -100,8 +107,10 @@ Meteor.methods
         ; ^dc:relation ?resolvedTerm
         .
         ?resolvedTerm rdfs:label ?termLabel .
-        ?currentArticle pro:date ?dateTime
-        filter(?termLabel = "#{termLabel}")
+        ?currentArticle pro:post/pro:date ?p_date .
+        OPTIONAL { ?currentArticle  pro:date  ?a_date }
+        BIND(coalesce(?a_date, ?p_date) AS ?date)
+        filter(?termLabel = "#{escape(termLabel)}")
       }
       """
     response = makeRequest(query)
@@ -118,9 +127,11 @@ Meteor.methods
         ; ^dc:relation ?resolvedTerm
         .
         ?resolvedTerm rdfs:label ?termLabel .
-        ?currentArticle pro:date ?dateTime
-        FILTER(?termLabel = "#{termLabel}")
-        FILTER (?dateTime > "#{baseYear}-01-01T00:00:00+00:01"^^xsd:dateTime)
+        ?currentArticle pro:post/pro:date ?p_date .
+        OPTIONAL { ?currentArticle  pro:date  ?a_date }
+        BIND(coalesce(?a_date, ?p_date) AS ?dateTime)
+        FILTER(?termLabel = "#{escape(termLabel)}")
+        FILTER (?dateTime > "#{escape(baseYear)}-01-01T00:00:00+00:01"^^xsd:dateTime)
       }
       GROUP BY ?dateTime ?termLabel
       ORDER BY DESC(?dateTime)
@@ -159,14 +170,14 @@ Meteor.methods
         .
         ?article pro:date ?dateTime .
         ?resolvedTerm rdfs:label ?termLabel
-        FILTER (?dateTime > "#{date}"^^xsd:dateTime)
+        FILTER (?dateTime > "#{escape(date)}"^^xsd:dateTime)
 
     		OPTIONAL{
     			?prev_mention anno:source_doc ?article2
               ; ^dc:relation ?resolvedTerm
               .
               ?article2 pro:date ?dateTime2 .
-              FILTER (?dateTime2 > "#{date2}"^^xsd:dateTime)
+              FILTER (?dateTime2 > "#{escape(date2)}"^^xsd:dateTime)
     		}
       }
       GROUP BY ?resolvedTerm
@@ -177,25 +188,30 @@ Meteor.methods
 
   'getRecentMentions': (agent) ->
     query = prefixes + """
-      SELECT DISTINCT ?phrase_text ?p_start ?t_start ?t_end ?source ?date
+      SELECT DISTINCT
+        ?phrase_text ?p_start
+        ?t_start ?t_end
+        ?source ?date
       WHERE {
           ?phrase anno:selected-text ?phrase_text
-              ; anno:start ?p_start
-              ; anno:end ?p_end
-              ; dep:ROOT ?noop
-              ; anno:contains ?target
-              .
+          ; anno:start ?p_start
+          ; anno:end ?p_end
+          ; dep:ROOT ?noop
+          ; anno:contains ?target
+          .
           {
-              ?target anno:label "#{agent}"
+              ?target anno:label "#{escape(agent)}"
           } UNION {
               ?resolvedTarget dc:relation ?target
-                  ; rdfs:label "#{agent}"
+              ; rdfs:label "#{escape(agent)}"
           } .
           ?target anno:start ?t_start
-              ; anno:end ?t_end
-              ; anno:source_doc ?source
-              .
-          ?source pro:date ?date .
+          ; anno:end ?t_end
+          ; anno:source_doc ?source
+          .
+          ?source pro:post/pro:date ?p_date .
+          OPTIONAL { ?source  pro:date  ?a_date }
+          BIND(coalesce(?a_date, ?p_date) AS ?date)
       }
       ORDER BY DESC(?date) DESC(?source) ASC(?t_start)
       LIMIT 10
@@ -227,7 +243,7 @@ Meteor.methods
               ; anno:end ?t_end
               ; ^dc:relation ?rel
               .
-              ?rel rdfs:label "#{ia}"
+          	?rel rdfs:label "#{escape(ia)}"
           FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
           BIND(lcase(?rawSelText) as ?ranCaseSelText)
           #remove leading and trailing whitespace, and new line characters

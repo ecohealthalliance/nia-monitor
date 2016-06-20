@@ -9,9 +9,9 @@ Template.trendingAgents.onCreated ->
     @trendingAgents.find({}, reactive: false).map((d) => @trendingAgents.remove(d))
     date = moment(new Date())
     date2 = moment(new Date())
-    #TODO: subtract only 4 years from date, and 1 year from date2 with the full dataset
+    #TODO: subtract 4 years from date, and 1 year from date2 with the full dataset
     date.subtract(30, "years")
-    date2.subtract(20, "years")
+    date2.subtract(21, "years")
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr2 = date2.format("YYYY-MM-DD") + "T00:00:00+00:01"
     Meteor.call 'getTrendingInfectiousAgents', dateStr, dateStr2, (err, response) =>
