@@ -36,8 +36,11 @@ makeRequest = (query) ->
           throw new Meteor.Error(500, "Internal Server Error")
     else
       throw new Meteor.Error(err.response.statusCode, err.response.content)
-Meteor.methods
 
+escape = (text)->
+  JSON.stringify(text).slice(1,-1)
+
+Meteor.methods
   'SPARQurL': ->
     SPARQurL
 
@@ -107,7 +110,7 @@ Meteor.methods
         ?currentArticle pro:post/pro:date ?p_date .
         OPTIONAL { ?currentArticle  pro:date  ?a_date }
         BIND(coalesce(?a_date, ?p_date) AS ?date)
-        filter(?termLabel = "#{termLabel}")
+        filter(?termLabel = "#{escape(termLabel)}")
       }
       """
     response = makeRequest(query)
@@ -127,8 +130,8 @@ Meteor.methods
         ?currentArticle pro:post/pro:date ?p_date .
         OPTIONAL { ?currentArticle  pro:date  ?a_date }
         BIND(coalesce(?a_date, ?p_date) AS ?dateTime)
-        FILTER(?termLabel = "#{termLabel}")
-        FILTER (?dateTime > "#{baseYear}-01-01T00:00:00+00:01"^^xsd:dateTime)
+        FILTER(?termLabel = "#{escape(termLabel)}")
+        FILTER (?dateTime > "#{escape(baseYear)}-01-01T00:00:00+00:01"^^xsd:dateTime)
       }
       GROUP BY ?dateTime ?termLabel
       ORDER BY DESC(?dateTime)
@@ -167,10 +170,10 @@ Meteor.methods
           ; anno:contains ?target
           .
           {
-              ?target anno:label "#{agent}"
+              ?target anno:label "#{escape(agent)}"
           } UNION {
               ?resolvedTarget dc:relation ?target
-              ; rdfs:label "#{agent}"
+              ; rdfs:label "#{escape(agent)}"
           } .
           ?target anno:start ?t_start
           ; anno:end ?t_end
@@ -210,7 +213,7 @@ Meteor.methods
               ; anno:end ?t_end
               ; ^dc:relation ?rel
               .
-          	?rel rdfs:label "#{ia}"
+          	?rel rdfs:label "#{escape(ia)}"
           FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
           BIND(lcase(?rawSelText) as ?ranCaseSelText)
           #remove leading and trailing whitespace, and new line characters
