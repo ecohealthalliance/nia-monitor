@@ -145,22 +145,32 @@ Meteor.methods
       """
     makeRequest(query)
 
-  'getTrendingInfectiousAgents': (date) ->
+  'getTrendingInfectiousAgents': (date, date2) ->
     query = prefixes + """
       SELECT ?resolvedTerm
           (sample(?termLabel) as ?word)
           (count(DISTINCT ?article) as ?count)
+		      (count(DISTINCT ?article2) as ?count2)
+          ((xsd:float(?count2)/xsd:float(?count)*xsd:float(100)) AS ?result)
       WHERE {
         ?phrase anno:category "diseases"
         ; ^dc:relation ?resolvedTerm
         ; anno:source_doc ?article
         .
         ?article pro:date ?dateTime .
-        ?resolvedTerm rdfs:label ?termLabel .
+        ?resolvedTerm rdfs:label ?termLabel
         FILTER (?dateTime > "#{date}"^^xsd:dateTime)
+
+    		OPTIONAL{
+    			?prev_mention anno:source_doc ?article2
+              ; ^dc:relation ?resolvedTerm
+              .
+              ?article2 pro:date ?dateTime2 .
+              FILTER (?dateTime2 > "#{date2}"^^xsd:dateTime)
+    		}
       }
       GROUP BY ?resolvedTerm
-      ORDER BY DESC(?count)
+      ORDER BY DESC(?result)
       LIMIT 20
       """
     makeRequest(query)
