@@ -131,7 +131,7 @@ Meteor.methods
         OPTIONAL { ?currentArticle  pro:date  ?a_date }
         BIND(coalesce(?a_date, ?p_date) AS ?dateTime)
         FILTER(?termLabel = "#{escape(termLabel)}")
-        FILTER (?dateTime > "#{escape(baseYear)}-01-01T00:00:00+00:01"^^xsd:dateTime)
+        FILTER (?dateTime > "#{baseYear}-01-01T00:00:00+00:01"^^xsd:dateTime)
       }
       GROUP BY ?dateTime ?termLabel
       ORDER BY DESC(?dateTime)
@@ -213,7 +213,7 @@ Meteor.methods
               ; anno:end ?t_end
               ; ^dc:relation ?rel
               .
-          	?rel rdfs:label "#{escape(ia)}"
+          ?rel rdfs:label "#{escape(ia)}"
           FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
           BIND(lcase(?rawSelText) as ?ranCaseSelText)
           #remove leading and trailing whitespace, and new line characters
@@ -225,3 +225,63 @@ Meteor.methods
       """
     response = makeRequest(query)
     response.results.bindings.map(castBinding)
+
+@recentAgents = new Mongo.Collection 'recentAgents'
+@frequentAgents = new Mongo.Collection 'frequentAgents'
+@mentions = new Mongo.Collection 'mentions'
+@sources = new Mongo.Collection 'sources'
+@frequentDescriptors = new Mongo.Collection 'frequentDescriptors'
+@articles = new Mongo.Collection 'articles'
+
+api = new Restivus
+  useDefaultAuth: true
+  prettyJson: true
+
+api.addRoute 'frequentDescriptors/:ia',
+  get: ->
+    console.log @urlParams.ia
+    query = prefixes + """
+      SELECT
+        ?selText
+        (group_concat(DISTINCT ?article; separator = "::") AS ?articles)
+        (count(DISTINCT ?article) as ?count)
+      WHERE {
+          ?dep_rel rdf:type anno:dependency_relation .
+          VALUES ?dep_rel { dep:amod dep:nmod }
+          ?parent anno:min_contains ?target
+              ; ?dep_rel ?descriptor
+              ; anno:source_doc ?article
+              .
+          ?descriptor anno:start ?d_start
+              ; anno:end ?d_end
+              ; anno:selected-text ?rawSelText
+              ; anno:root/anno:pos ?pos
+              .
+          FILTER (?pos NOT IN ("X", "PUNCT"))
+          ?target anno:category "diseases"
+              ; anno:start ?t_start
+              ; anno:end ?t_end
+              ; ^dc:relation ?rel
+              .
+          ?rel rdfs:label "#{@urlParams.ia}"
+          FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
+          BIND(lcase(?rawSelText) as ?ranCaseSelText)
+          #remove leading and trailing whitespace, and new line characters
+          BIND(replace(?ranCaseSelText,'^ +| +$|\\n', '') AS ?selText)
+      }
+      GROUP BY ?selText
+      HAVING (?count > 0)
+      ORDER BY DESC(?count)
+      """
+    response = makeRequest(query)
+    console.log response
+    for binding in response.results.bindings
+      frequentDescriptors.insert(binding)
+    console.log frequentDescriptors.find().fetch()
+    return frequentDescriptors
+api.addCollection @recentAgents
+api.addCollection @frequentAgents
+api.addCollection @mentions
+api.addCollection @sources
+#api.addCollection @frequentDescriptors
+api.addCollection @articles
