@@ -157,7 +157,7 @@ Meteor.methods
         .
         ?article pro:date ?dateTime.
         ?resolvedTerm rdfs:label ?termLabel
-        FILTER (?dateTime > "#{baseYear}-01-01T00:00:00+00:01"^^xsd:dateTime)
+        FILTER (?dateTime > "#{escape(baseYear)}-01-01T00:00:00+00:01"^^xsd:dateTime)
       }
       GROUP BY ?resolvedTerm
       ORDER BY DESC(?count)
