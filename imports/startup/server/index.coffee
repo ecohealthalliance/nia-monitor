@@ -38,7 +38,10 @@ makeRequest = (query) ->
       throw new Meteor.Error(err.response.statusCode, err.response.content)
 
 escape = (text)->
-  JSON.stringify(text).slice(1,-1)
+  if _.isString text
+    JSON.stringify(text).slice(1,-1)
+  else
+    JSON.stringify(text)
 
 Meteor.methods
   'SPARQurL': ->
