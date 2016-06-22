@@ -12,11 +12,10 @@ Template.recentAgents.onCreated ->
         if binding.currentArticle.type is 'uri'
           articleId = @articles.findOne(uri: binding.currentArticle.value)?._id
           unless articleId
-            articleId = @articles.insert(
+            articleId = @articles.insert
               uri: binding.currentArticle.value,
               date: moment(new Date(binding.currentDate.value))
               collapsed: false
-            )
           binding.articleId = articleId
         if binding.priorDate
           priorDate = moment(new Date(binding.priorDate.value))
@@ -27,8 +26,10 @@ Template.recentAgents.onCreated ->
           if binding.days.value > 30
             binding.dm = true
         @recentAgents.insert(binding)
-        if @recentAgents.find(articleId: articleId).count() is 6
-          @articles.update(articleId, { $set: { collapsed: true } })
+      # ...
+      @articles.find().forEach (article) =>
+        if @recentAgents.find(articleId: article._id).count() > 5
+          @articles.update(article._id, { $set: { collapsed: true } })
 
 Template.recentAgents.helpers
   articles: ->
@@ -36,7 +37,7 @@ Template.recentAgents.helpers
   isCollapsed: (articleId) ->
     Template.instance().articles.findOne(articleId).collapsed
   recentAgentsForArticle: (articleId, limit) ->
-    options = { sort: { 'days.value': 1 } }
+    options = { sort: { 'days.value': -1 } }
     if limit
       options.limit = 5
     Template.instance().recentAgents.find(articleId: articleId, options)
