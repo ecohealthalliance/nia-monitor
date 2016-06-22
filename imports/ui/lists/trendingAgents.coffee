@@ -3,7 +3,7 @@ require './trendingAgents.jade'
 Template.trendingAgents.onCreated ->
   @trendingAgents = new Meteor.Collection(null)
   @ready = new ReactiveVar(false)
-  @trendingRange = "year"
+  @trendingRange = new ReactiveVar("year")
   @autorun =>
     $(".spinner").show()
     @trendingAgents.find({}, reactive: false).map((d) => @trendingAgents.remove(d))
@@ -14,7 +14,7 @@ Template.trendingAgents.onCreated ->
     date2.subtract(21, "years")
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr2 = date2.format("YYYY-MM-DD") + "T00:00:00+00:01"
-    Meteor.call 'getTrendingInfectiousAgents', dateStr, dateStr2, (err, response) =>
+    Meteor.call 'getTrendingInfectiousAgents', dateStr, dateStr2, 365, (err, response) =>
       @ready.set(true)
       if err
         toastr.error(err.message)
@@ -30,34 +30,38 @@ Template.trendingAgents.helpers
   trendingAgents: ->
     Template.instance().trendingAgents.find()
   trendingRange: ->
-    Template.instance().trendingRange
+    Template.instance().trendingRange.get()
 
 Template.trendingAgents.events
   'change #trendingRange': (event, template) ->
     template.ready.set(false)
     $(".spinner").show()
-    template.trendingRange = $("#trendingRange").val()
+    template.trendingRange.set($("#trendingRange").val())
     dateStr = ""
     dateStr2 = ""
     date = moment(new Date())
     date2 = moment(new Date())
-    switch template.trendingRange
+    days = 0
+    switch template.trendingRange.get()
       when "year"
         #TODO: subtract only 4 years from date, and 1 year from date2 with the full dataset
         date.subtract(30, 'years')
         date2.subtract(29, 'years')
+        days = 365
       when "month"
         date.subtract(4, 'months')
         date2.subtract(1, 'months')
+        days = 30
       when "week"
         date.subtract(4, 'weeks')
         date2.subtract(1, 'weeks')
+        days = 7
       else
         return
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr2 = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     template.trendingAgents.find({}, reactive: false).map((d) => template.trendingAgents.remove(d))
-    Meteor.call 'getTrendingInfectiousAgents', dateStr, dateStr2, (err, response) =>
+    Meteor.call 'getTrendingInfectiousAgents', dateStr, dateStr2, days, (err, response) =>
       template.ready.set(true)
       if err
         toastr.error(err.message)

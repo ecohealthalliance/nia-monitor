@@ -1,6 +1,6 @@
 template(name="trendingAgents")
   h4.col-md-5 Infectious Agents trending in the last:
-  SELECT#trendingRange.col-md-6.form-control
+  select#trendingRange.col-md-6.form-control
     option(value="year") Year
     option(value="month") Month
     option(value="week") Week
@@ -11,7 +11,7 @@ template(name="trendingAgents")
           td.trendingInfectiousAgentsTableRow(data-agentname=word.value)
             div.fmia-word
               a(href="/detail/#{word.value}")= word.value
-          td {{count2.value}} / {{count.value}}
+          td {{rate2.value}} / {{rate.value}}
           td trending at {{result.value}} percent
       else
         if ready

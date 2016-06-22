@@ -156,13 +156,15 @@ Meteor.methods
       """
     makeRequest(query)
 
-  'getTrendingInfectiousAgents': (date, date2) ->
+  'getTrendingInfectiousAgents': (date, date2, days) ->
     query = prefixes + """
       SELECT ?resolvedTerm
-          (sample(?termLabel) as ?word)
-          (count(DISTINCT ?article) as ?count)
-		      (count(DISTINCT ?article2) as ?count2)
-          ((xsd:float(?count2)/xsd:float(?count)*xsd:float(100)) AS ?result)
+        (sample(?termLabel) as ?word)
+        (count(DISTINCT ?article) as ?count)
+  		  (count(DISTINCT ?article2) as ?count2)
+  		  ((?count)/(xsd:float(365)) as ?rate)
+  		  ((?count2)/(xsd:float(365*4)) as ?rate2)
+  		  ((xsd:float(?rate2)/(xsd:float(?rate)))*100 AS ?result)
       WHERE {
         ?phrase anno:category "diseases"
         ; ^dc:relation ?resolvedTerm
@@ -174,10 +176,10 @@ Meteor.methods
 
     		OPTIONAL{
     			?prev_mention anno:source_doc ?article2
-              ; ^dc:relation ?resolvedTerm
-              .
-              ?article2 pro:date ?dateTime2 .
-              FILTER (?dateTime2 > "#{escape(date2)}"^^xsd:dateTime)
+          ; ^dc:relation ?resolvedTerm
+          .
+          ?article2 pro:date ?dateTime2 .
+          FILTER (?dateTime2 > "#{escape(date2)}"^^xsd:dateTime)
     		}
       }
       GROUP BY ?resolvedTerm
