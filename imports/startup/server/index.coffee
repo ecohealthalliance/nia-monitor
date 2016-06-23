@@ -37,7 +37,7 @@ makeRequest = (query) ->
     else
       throw new Meteor.Error(err.response.statusCode, err.response.content)
 
-escape = (text)->
+escape = (text) ->
   JSON.stringify(text).slice(1,-1)
 
 Meteor.methods
@@ -157,31 +157,37 @@ Meteor.methods
     makeRequest(query)
 
   'getTrendingInfectiousAgents': (date, date2, days) ->
+    console.log days + " days"
     query = prefixes + """
       SELECT ?resolvedTerm
         (sample(?termLabel) as ?word)
+		    (sample(?termLabel2) as ?word2)
         (count(DISTINCT ?article) as ?count)
-  		  (count(DISTINCT ?article2) as ?count2)
-  		  ((?count)/(xsd:float(365)) as ?rate)
-  		  ((?count2)/(xsd:float(365*4)) as ?rate2)
-  		  ((xsd:float(?rate2)/(xsd:float(?rate)))*100 AS ?result)
+		    (sample(?c2) as ?count2)
+        ((?count2)/(xsd:float(#{escape(days)}*4)) as ?rate2)
+        ((?count)/(xsd:float(#{escape(days)})) as ?rate)
+  		  ((xsd:float(?rate)/(xsd:float(?rate2))) AS ?result)
       WHERE {
         ?phrase anno:category "diseases"
         ; ^dc:relation ?resolvedTerm
         ; anno:source_doc ?article
         .
-        ?article pro:date ?dateTime .
+        ?article pro:post/pro:date ?dateTime .
         ?resolvedTerm rdfs:label ?termLabel
         FILTER (?dateTime > "#{escape(date)}"^^xsd:dateTime)
 
-    		OPTIONAL{
-    			?prev_mention anno:source_doc ?article2
-          ; ^dc:relation ?resolvedTerm
-          .
-          ?article2 pro:date ?dateTime2 .
-          FILTER (?dateTime2 > "#{escape(date2)}"^^xsd:dateTime)
-    		}
-      }
+        {SELECT (count(distinct ?article2) as ?c2) ?resolvedTerm ?termLabel2
+    	     WHERE{
+            ?prev_mention anno:source_doc ?article2
+            ; ^dc:relation ?resolvedTerm
+            .
+            ?article2 pro:post/pro:date ?dateTime2 .
+      		  ?resolvedTerm rdfs:label ?termLabel2
+            FILTER (?dateTime2 > "#{escape(date2)}"^^xsd:dateTime)
+           }
+    		   GROUP BY ?resolvedTerm ?termLabel2
+ 		      }
+        }
       GROUP BY ?resolvedTerm
       ORDER BY DESC(?result)
       LIMIT 20

@@ -10,11 +10,12 @@ Template.trendingAgents.onCreated ->
     date = moment(new Date())
     date2 = moment(new Date())
     #TODO: subtract 4 years from date, and 1 year from date2 with the full dataset
-    date.subtract(30, "years")
-    date2.subtract(21, "years")
+    date.subtract(21, "years")
+    date2.subtract(30, "years")
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr2 = date2.format("YYYY-MM-DD") + "T00:00:00+00:01"
-    Meteor.call 'getTrendingInfectiousAgents', dateStr, dateStr2, 365, (err, response) =>
+    days = "365"
+    Meteor.call 'getTrendingInfectiousAgents', dateStr, dateStr2, days, (err, response) =>
       @ready.set(true)
       if err
         toastr.error(err.message)
@@ -41,26 +42,27 @@ Template.trendingAgents.events
     dateStr2 = ""
     date = moment(new Date())
     date2 = moment(new Date())
-    days = 0
+    days = "365"
     switch template.trendingRange.get()
       when "year"
         #TODO: subtract only 4 years from date, and 1 year from date2 with the full dataset
-        date.subtract(30, 'years')
-        date2.subtract(29, 'years')
-        days = 365
+        date.subtract(29, 'years')
+        date2.subtract(30, 'years')
+        days = "365"
       when "month"
-        date.subtract(4, 'months')
-        date2.subtract(1, 'months')
-        days = 30
+        date.subtract(1, 'months')
+        date2.subtract(4, 'months')
+        days = "30"
       when "week"
-        date.subtract(4, 'weeks')
-        date2.subtract(1, 'weeks')
-        days = 7
+        date.subtract(1, 'weeks')
+        date2.subtract(4, 'weeks')
+        days = "7"
       else
         return
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
-    dateStr2 = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
+    dateStr2 = date2.format("YYYY-MM-DD") + "T00:00:00+00:01"
     template.trendingAgents.find({}, reactive: false).map((d) => template.trendingAgents.remove(d))
+    alert days
     Meteor.call 'getTrendingInfectiousAgents', dateStr, dateStr2, days, (err, response) =>
       template.ready.set(true)
       if err
