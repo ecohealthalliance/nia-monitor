@@ -38,7 +38,7 @@ talkTime = do ->
     else
       count = Math.floor(time % 60 * 60 / 60)
       unit = minute
-    "#{count} #{unit}#{(if count isnt 1 then 's')}"
+    "#{count} #{unit}#{(if count isnt 1 then 's' else '')}"
 
   # Wrap the inner function to be returned
   (second) ->

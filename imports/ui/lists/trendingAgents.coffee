@@ -62,7 +62,6 @@ Template.trendingAgents.events
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr2 = date2.format("YYYY-MM-DD") + "T00:00:00+00:01"
     template.trendingAgents.find({}, reactive: false).map((d) => template.trendingAgents.remove(d))
-    alert days
     Meteor.call 'getTrendingInfectiousAgents', dateStr, dateStr2, days, (err, response) =>
       template.ready.set(true)
       if err
