@@ -18,7 +18,8 @@ Template.recentAgents.onCreated ->
               collapsed: false
           binding.articleId = articleId
         if binding.priorDate
-          priorDate = moment(new Date(binding.priorDate.value))
+          binding.priorDate = new Date(binding.priorDate.value)
+          priorDate = moment(binding.priorDate)
           currentDate = moment(new Date(binding.currentDate.value))
           binding.days = {value: currentDate.diff(priorDate, 'days')}
           binding.months = {value: currentDate.diff(priorDate, 'months')}
@@ -37,7 +38,7 @@ Template.recentAgents.helpers
   isCollapsed: (articleId) ->
     Template.instance().articles.findOne(articleId).collapsed
   recentAgentsForArticle: (articleId, limit) ->
-    options = { sort: { 'days.value': -1 } }
+    options = { sort: { 'priorDate': 1 } }
     if limit
       options.limit = 5
     Template.instance().recentAgents.find(articleId: articleId, options)
