@@ -3,7 +3,8 @@ template(name="recentAgents")
     .panel.panel-default
       .panel-heading
         h4
-          a(href=uri) {{uri}} ● {{age date}}
+          a(href=uri) {{postSubject}}
+        p {{age date}}
       div
         table#recentAgentsTable.table.table-striped
           tbody

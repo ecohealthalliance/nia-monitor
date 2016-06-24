@@ -53,6 +53,7 @@ Meteor.methods
           # For each of the most recently mentioned terms find the most recent
           # mention prior to the current mention.
           ?resolvedTerm ?currentDate ?currentArticle
+          (sample(?p_subject) as ?postSubject)
           (sample(?termLabel) as ?word)
           (sample(?articleRawMenions) as ?rawMentions)
           (max(?prevArticle) as ?priorArticle)
@@ -83,6 +84,7 @@ Meteor.methods
               ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?firstMentionStart)
               LIMIT 50
           }
+          ?currentArticle pro:post/pro:subject_raw ?p_subject .
           # Select the previous usages of the most recently mentioned terms
           OPTIONAL {
             ?prev_mention anno:source_doc ?prevArticle
@@ -234,7 +236,8 @@ Meteor.methods
   'getRecentMentions': (agent) ->
     query = prefixes + """
       SELECT DISTINCT
-        ?phrase_text ?p_start
+        ?phrase_text
+        ?p_start ?postSubject
         ?t_start ?t_end
         ?source ?date
       WHERE {
@@ -254,7 +257,9 @@ Meteor.methods
           ; anno:end ?t_end
           ; anno:source_doc ?source
           .
-          ?source pro:post/pro:date ?p_date .
+          ?source pro:post/pro:date ?p_date
+          ; pro:post/pro:subject_raw ?postSubject
+          .
           OPTIONAL { ?source  pro:date  ?a_date }
           BIND(coalesce(?a_date, ?p_date) AS ?date)
       }
