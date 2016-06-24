@@ -213,8 +213,9 @@ Meteor.methods
         ?resolvedTerm rdfs:label ?termLabel
         FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
 
-        {SELECT (count(distinct ?article2) as ?c2) ?resolvedTerm ?termLabel2
-    	     WHERE{
+        {
+          SELECT (count(distinct ?article2) as ?c2) ?resolvedTerm ?termLabel2
+          WHERE{
             ?prev_mention anno:source_doc ?article2
             ; ^dc:relation ?resolvedTerm
             .
@@ -224,9 +225,9 @@ Meteor.methods
       		  ?resolvedTerm rdfs:label ?termLabel2
             FILTER (?dateTime2 > "#{escape(dateStr2)}"^^xsd:dateTime)
            }
-    		   GROUP BY ?resolvedTerm ?termLabel2
- 		      }
+          GROUP BY ?resolvedTerm ?termLabel2
         }
+      }
       GROUP BY ?resolvedTerm
       ORDER BY DESC(?result)
       LIMIT 20
