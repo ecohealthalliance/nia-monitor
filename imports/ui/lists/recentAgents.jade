@@ -2,12 +2,13 @@ template(name="recentAgents")
   each articles
     .panel.panel-default
       .panel-heading
-        h5
-          a(href=uri) {{uri}} ● {{age date}}
+        h4
+          a(href=uri) {{postSubject}}
+        p {{age date}}
       div
         table#recentAgentsTable.table.table-striped
           tbody
-            each recentAgentsForArticle _id
+            each recentAgentsForArticle _id collapsed
               tr
                 td.recentlyMentionedInfectiousAgentsTableRow(data-agentname=word.value)
                   h4.rmia-word
@@ -21,3 +22,6 @@ template(name="recentAgents")
                         a(href=priorArticle.value)= days.value
                   else
                     span.no-priors No Prior Mentions
+            if collapsed
+              .more
+                button(type="button").btn.btn-info Show All Infectious Agents for Article

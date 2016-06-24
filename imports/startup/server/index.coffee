@@ -101,6 +101,7 @@ getRecentlyMentionedAgentsQuery = ->
         # For each of the most recently mentioned terms find the most recent
         # mention prior to the current mention.
         ?resolvedTerm ?currentDate ?currentArticle
+        (sample(?p_subject) as ?postSubject)
         (sample(?termLabel) as ?word)
         (sample(?articleRawMenions) as ?rawMentions)
         (max(?prevArticle) as ?priorArticle)
@@ -131,6 +132,7 @@ getRecentlyMentionedAgentsQuery = ->
             ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?firstMentionStart)
             LIMIT 50
         }
+        ?currentArticle pro:post/pro:subject_raw ?p_subject .
         # Select the previous usages of the most recently mentioned terms
         OPTIONAL {
           ?prev_mention anno:source_doc ?prevArticle

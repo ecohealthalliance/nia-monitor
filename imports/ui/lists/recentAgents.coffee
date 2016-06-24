@@ -14,13 +14,15 @@ Template.recentAgents.onCreated ->
         if binding.currentArticle.type is 'uri'
           articleId = @articles.findOne(uri: binding.currentArticle.value)?._id
           unless articleId
-            articleId = @articles.insert(
-              uri: binding.currentArticle.value,
+            articleId = @articles.insert
+              uri: binding.currentArticle.value
+              postSubject: binding.postSubject.value
               date: moment(new Date(binding.currentDate.value))
-            )
+              collapsed: false
           binding.articleId = articleId
         if binding.priorDate
-          priorDate = moment(new Date(binding.priorDate.value))
+          binding.priorDate = new Date(binding.priorDate.value)
+          priorDate = moment(binding.priorDate)
           currentDate = moment(new Date(binding.currentDate.value))
           binding.days = {value: currentDate.diff(priorDate, 'days')}
           binding.months = {value: currentDate.diff(priorDate, 'months')}
@@ -28,9 +30,22 @@ Template.recentAgents.onCreated ->
           if binding.days.value > 30
             binding.dm = true
         @recentAgents.insert(binding)
+      # ...
+      @articles.find().forEach (article) =>
+        if @recentAgents.find(articleId: article._id).count() > 5
+          @articles.update(article._id, { $set: { collapsed: true } })
 
 Template.recentAgents.helpers
   articles: ->
     Template.instance().articles.find()
-  recentAgentsForArticle: (articleId) ->
-    Template.instance().recentAgents.find(articleId: articleId)
+  isCollapsed: (articleId) ->
+    Template.instance().articles.findOne(articleId).collapsed
+  recentAgentsForArticle: (articleId, limit) ->
+    options = { sort: { 'priorDate': 1 } }
+    if limit
+      options.limit = 5
+    Template.instance().recentAgents.find(articleId: articleId, options)
+
+Template.recentAgents.events
+  'click .more': (event, instance) ->
+    instance.articles.update(@_id, { $set: { collapsed: false } })

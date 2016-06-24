@@ -16,10 +16,10 @@ Template.recentMentions.onCreated ->
         if row.source
           sourceId = @sources.findOne(uri: row.source)?._id
           unless sourceId
-            sourceId = @sources.insert(
-              uri: row.source,
+            sourceId = @sources.insert
+              uri: row.source
+              postSubject: row.postSubject
               date: moment(new Date(row.date))
-            )
           row.sourceId = sourceId
         @mentions.insert(row)
 
