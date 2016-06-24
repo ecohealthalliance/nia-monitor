@@ -15,7 +15,8 @@ Template.recentAgents.onCreated ->
           articleId = @articles.findOne(uri: binding.currentArticle.value)?._id
           unless articleId
             articleId = @articles.insert
-              uri: binding.currentArticle.value,
+              uri: binding.currentArticle.value
+              postSubject: binding.postSubject.value
               date: moment(new Date(binding.currentDate.value))
               collapsed: false
           binding.articleId = articleId
