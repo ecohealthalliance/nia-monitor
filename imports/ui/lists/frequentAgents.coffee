@@ -5,13 +5,14 @@ Template.frequentAgents.onCreated ->
   @autorun =>
     $(".spinner").show()
     @frequentAgents.find({}, reactive: false).map((d) => @frequentAgents.remove(d))
-    Meteor.call 'getFrequentlyMentionedInfectiousAgents', (err, response) =>
+    HTTP.call 'get', '/api/frequentAgents', (err, response) =>
       if err
         toastr.error(err.message)
         $(".spinner").hide()
         return
-      for binding in response.results.bindings
-        @frequentAgents.insert(binding)
+      response = JSON.parse response.content
+      for row in response.data
+        @frequentAgents.insert(row)
       $(".spinner").hide()
 
 Template.frequentAgents.helpers

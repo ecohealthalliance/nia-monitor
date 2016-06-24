@@ -6,13 +6,14 @@ Template.frequentDescriptors.onCreated ->
   @autorun =>
     $(".spinner").show()
     @frequentDescriptors.find({}, reactive: false).map((d) => @frequentDescriptors.remove(d))
-    Meteor.call 'getFrequentDescriptors', this.data._agentName, (err, response) =>
+    HTTP.call 'get', '/api/frequentDescriptors/'+this.data._agentName, (err, response) =>
       @ready.set(true)
       if err
         toastr.error(err.message)
         $(".spinner").hide()
         return
-      for row in response
+      response = JSON.parse response.content
+      for row in response.data
         @frequentDescriptors.insert(row)
       $(".spinner").hide()
 

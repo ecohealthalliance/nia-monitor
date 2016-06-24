@@ -7,12 +7,13 @@ Template.recentMentions.onCreated ->
     agent = Router.current().getParams()._agentName
     #console.log agent
     @mentions.find({}, reactive: false).map((d) => @mentions.remove(d))
-    Meteor.call 'getRecentMentions', agent, (err, response) =>
+    HTTP.call 'get', '/api/recentMentions/' + agent, (err, response) =>
       if err
         toastr.error(err.message)
         $(".spinner").hide()
         return
-      for row in response
+      response = JSON.parse response.content
+      for row in response.data
         if row.source
           sourceId = @sources.findOne(uri: row.source)?._id
           unless sourceId

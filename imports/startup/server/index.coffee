@@ -10,7 +10,7 @@ prefix eha: <http://www.eha.io/types/>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 '''
 
-getFrequentDescriptorsQuery = (ia) ->
+getFrequentDescriptorsQuery = (term) ->
   return prefixes + """
   SELECT
     ?selText
@@ -34,7 +34,7 @@ getFrequentDescriptorsQuery = (ia) ->
           ; anno:end ?t_end
           ; ^dc:relation ?rel
           .
-      ?rel rdfs:label "#{escape(ia)}"
+      ?rel rdfs:label "#{escape(term)}"
       FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
       BIND(lcase(?rawSelText) as ?ranCaseSelText)
       #remove leading and trailing whitespace, and new line characters
@@ -44,7 +44,7 @@ getFrequentDescriptorsQuery = (ia) ->
   HAVING (?count > 0)
   ORDER BY DESC(?count)
   """
-getRecentMentionsQuery = (ia) ->
+getRecentMentionsQuery = (term) ->
   return prefixes + """
     SELECT DISTINCT
       ?phrase_text ?p_start
@@ -58,10 +58,10 @@ getRecentMentionsQuery = (ia) ->
         ; anno:contains ?target
         .
         {
-            ?target anno:label "#{escape(ia)}"
+            ?target anno:label "#{escape(term)}"
         } UNION {
             ?resolvedTarget dc:relation ?target
-            ; rdfs:label "#{escape(ia)}"
+            ; rdfs:label "#{escape(term)}"
         } .
         ?target anno:start ?t_start
         ; anno:end ?t_end
@@ -148,7 +148,7 @@ getRecentlyMentionedAgentsQuery = ->
     GROUP BY ?resolvedTerm ?currentDate ?currentArticle ?firstMentionStart
     ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?firstMentionStart)
     '''
-getHistoricalDataQuery = (agent) ->
+getHistoricalDataQuery = (term) ->
   query = prefixes + """
     SELECT (max(?date) as ?mdt)
     WHERE {
@@ -161,7 +161,7 @@ getHistoricalDataQuery = (agent) ->
       ?currentArticle pro:post/pro:date ?p_date .
       OPTIONAL { ?currentArticle  pro:date  ?a_date }
       BIND(coalesce(?a_date, ?p_date) AS ?date)
-      filter(?termLabel = "#{escape(agent)}")
+      filter(?termLabel = "#{escape(term)}")
     }
     """
   response = makeRequest(query)
@@ -181,7 +181,7 @@ getHistoricalDataQuery = (agent) ->
         .
         ?resolvedTerm rdfs:label ?termLabel .
         ?article pro:date ?dateTime
-        FILTER(?termLabel = "#{escape(agent)}")
+        FILTER(?termLabel = "#{escape(term)}")
         FILTER (?dateTime > "#{baseYear}-01-01T00:00:00+00:01"^^xsd:dateTime)
         BIND(year(?dateTime) AS ?year)
       }
@@ -218,39 +218,25 @@ makeRequest = (query) ->
     else
       throw new Meteor.Error(err.response.statusCode, err.response.content)
 
-escape = (text)->
+escape = (text) ->
   if _.isString text
     JSON.stringify(text).slice(1,-1)
   else
     JSON.stringify(text)
 
-Meteor.methods
-  'getRecentlyMentionedInfectiousAgents': ->
-    response = makeRequest(getRecentlyMentionedAgentsQuery())
-  'getHistoricalData': (agent) ->
-    response = makeRequest(getHistoricalDataQuery(agent))
-  'getFrequentlyMentionedInfectiousAgents': ->
-    response = makeRequest(getFrequentlyMentionedAgentsQuery())
-  'getRecentMentions': (agent) ->
-    response = makeRequest(getRecentMentionsQuery(agent))
-    response.results.bindings.map(castBinding)
-  'getFrequentDescriptors': (agent) ->
-    response = makeRequest(getFrequentDescriptorsQuery(agent))
-    response.results.bindings.map(castBinding)
-
 api = new Restivus
   useDefaultAuth: true
   prettyJson: true
 
-api.addRoute 'frequentDescriptors/:ia',
+api.addRoute 'frequentDescriptors/:term',
   get: ->
-    response = makeRequest(getFrequentDescriptorsQuery(@urlParams.ia))
-    data = {'status': 'success', 'data': response.results.bindings}
+    response = makeRequest(getFrequentDescriptorsQuery(@urlParams.term))
+    data = {'status': 'success', 'data': response.results.bindings.map(castBinding)}
     return data
-api.addRoute 'recentMentions/:ia',
+api.addRoute 'recentMentions/:term',
   get: ->
-    response = makeRequest(getRecentMentionsQuery(@urlParams.ia))
-    data = {'status': 'success', 'data': response.results.bindings}
+    response = makeRequest(getRecentMentionsQuery(@urlParams.term))
+    data = {'status': 'success', 'data': response.results.bindings.map(castBinding)}
     return data
 api.addRoute 'recentAgents',
   get: ->
@@ -260,10 +246,10 @@ api.addRoute 'recentAgents',
 api.addRoute 'frequentAgents',
   get: ->
     response = makeRequest(getFrequentlyMentionedAgentsQuery())
-    data = {'status': 'success', 'data': response.results.bindings}
+    data = {'status': 'success', 'data': response.results.bindings.map(castBinding)}
     return data
-api.addRoute 'historicalData/:ia',
+api.addRoute 'historicalData/:term',
   get: ->
-    response = makeRequest(getHistoricalDataQuery(@urlParams.ia))
-    data = {'status': 'success', 'data': response.results.bindings}
+    response = makeRequest(getHistoricalDataQuery(@urlParams.term))
+    data = {'status': 'success', 'data': response.results.bindings.map(castBinding)}
     return data
