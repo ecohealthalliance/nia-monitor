@@ -25,3 +25,9 @@ template(name="recentAgents")
             if collapsed
               .more
                 button(type="button").btn.btn-info Show All Infectious Agents for Article
+  if isLoading
+    .loading
+      i.fa.fa-spinner.fa-2x.fa-spin
+  else
+    unless theEnd
+      button(type="button").btn.btn-info.load-more-articles Load More
