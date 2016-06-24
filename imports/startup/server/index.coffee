@@ -185,7 +185,7 @@ Meteor.methods
       when "month"
         date.subtract(1, 'months')
         date2.subtract(4, 'months')
-        duration  = Math.round(moment.duration(moment(new Date()).diff(date)).asDays())
+        duration  = Math.round(moment.duration(moment(new Date()).diff(date)).asDays()).toString()
       when "week"
         date.subtract(1, 'weeks')
         date2.subtract(4, 'weeks')

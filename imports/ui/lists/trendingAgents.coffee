@@ -32,18 +32,4 @@ Template.trendingAgents.events
     template.ready.set(false)
     $(".spinner").show()
     template.trendingRange.set($("#trendingRange").val())
-    template.trendingAgents.find({}, reactive: false).map((d) => template.trendingAgents.remove(d))
-    Meteor.call 'getTrendingInfectiousAgents', template.trendingRange.get(), (err, response) =>
-      template.ready.set(true)
-      if err
-        toastr.error(err.message)
-        $(".spinner").hide()
-        return
-      if response.results.bindings.length == 1
-        if response.results.bindings[0].count.value == "0"
-          $(".spinner").hide()
-          return
-      for binding in response.results.bindings
-        template.trendingAgents.insert(binding)
-      $(".spinner").hide()
     return
