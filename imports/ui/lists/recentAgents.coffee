@@ -10,25 +10,23 @@ Template.recentAgents.onCreated ->
         toastr.error(err.message)
         $(".spinner").hide()
         return
-      response = JSON.parse response.content
-      for row in response.data
-        if row.currentArticle.type is 'uri'
-          articleId = @articles.findOne(uri: row.currentArticle.value)?._id
-          unless articleId
-            articleId = @articles.insert
-              uri: row.currentArticle.value
-              postSubject: row.postSubject.value
-              date: moment(new Date(row.currentDate.value))
-              collapsed: false
-          row.articleId = articleId
+      for row in response.data.results
+        articleId = @articles.findOne(uri: row.currentArticle)?._id
+        unless articleId
+          articleId = @articles.insert
+            uri: row.currentArticle
+            postSubject: row.postSubject
+            date: moment(new Date(row.currentDate))
+            collapsed: false
+        row.articleId = articleId
         if row.priorDate
-          row.priorDate = new Date(row.priorDate.value)
+          row.priorDate = new Date(row.priorDate)
           priorDate = moment(row.priorDate)
-          currentDate = moment(new Date(row.currentDate.value))
-          row.days = {value: currentDate.diff(priorDate, 'days')}
-          row.months = {value: currentDate.diff(priorDate, 'months')}
+          currentDate = moment(new Date(row.currentDate))
+          row.days = currentDate.diff(priorDate, 'days')
+          row.months = currentDate.diff(priorDate, 'months')
           #show days or months since last mention
-          if row.days.value > 30
+          if row.days > 30
             row.dm = true
         @recentAgents.insert(row)
       # ...

@@ -10,8 +10,7 @@ Template.frequentAgents.onCreated ->
         toastr.error(err.message)
         $(".spinner").hide()
         return
-      response = JSON.parse response.content
-      for row in response.data
+      for row in response.data.results
         @frequentAgents.insert(row)
       $(".spinner").hide()
 

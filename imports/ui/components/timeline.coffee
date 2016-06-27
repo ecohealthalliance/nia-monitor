@@ -11,8 +11,7 @@ Template.timeline.onCreated ->
         toastr.error(err.message)
         $(".spinner").hide()
         return
-      response = JSON.parse response.content
-      for row in response.data
+      for row in response.data.results
         data = {year: row.year, count: row.count}
         @tld.insert(data)
       baseYear = @tld.find({}, {sort: {year: -1}}).fetch()[0].year

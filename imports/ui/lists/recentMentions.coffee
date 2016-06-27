@@ -12,8 +12,7 @@ Template.recentMentions.onCreated ->
         toastr.error(err.message)
         $(".spinner").hide()
         return
-      response = JSON.parse response.content
-      for row in response.data
+      for row in response.data.results
         if row.source
           sourceId = @sources.findOne(uri: row.source)?._id
           unless sourceId

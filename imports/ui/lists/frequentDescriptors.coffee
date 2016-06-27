@@ -12,8 +12,7 @@ Template.frequentDescriptors.onCreated ->
         toastr.error(err.message)
         $(".spinner").hide()
         return
-      response = JSON.parse response.content
-      for row in response.data
+      for row in response.data.results
         @frequentDescriptors.insert(row)
       $(".spinner").hide()
 
