@@ -37,7 +37,7 @@ makeRequest = (query) ->
     else
       throw new Meteor.Error(err.response.statusCode, err.response.content)
 
-escape = (text)->
+escape = (text) ->
   if _.isString text
     JSON.stringify(text).slice(1,-1)
   else
@@ -166,6 +166,70 @@ Meteor.methods
       }
       GROUP BY ?resolvedTerm
       ORDER BY DESC(?count)
+      LIMIT 20
+      """
+    makeRequest(query)
+
+  'getTrendingInfectiousAgents': (range) ->
+    dateStr = ""
+    dateStr2 = ""
+    date = moment(new Date())
+    date2 = moment(new Date())
+    duration = "365"
+    switch range
+      when "year"
+        #TODO: subtract only 4 years from date, and 1 year from date2 with the full dataset
+        date.subtract(29, 'years')
+        date2.subtract(30, 'years')
+        duration = "365"
+      when "month"
+        date.subtract(1, 'months')
+        date2.subtract(4, 'months')
+        duration  = Math.round(moment.duration(moment(new Date()).diff(date)).asDays()).toString()
+      when "week"
+        date.subtract(1, 'weeks')
+        date2.subtract(4, 'weeks')
+        duration = "7"
+      else
+        return
+    dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
+    dateStr2 = date2.format("YYYY-MM-DD") + "T00:00:00+00:01"
+    query = prefixes + """
+      SELECT ?resolvedTerm
+        (sample(?termLabel) as ?word)
+        (count(DISTINCT ?article) as ?count)
+        (sample(?c2) as ?count2)
+        ((?count2)/(xsd:float(#{escape(duration)}*4)) as ?rate2)
+        ((?count)/(xsd:float(#{escape(duration)})) as ?rate)
+        ((?rate/?rate2) AS ?result)
+      WHERE {
+        ?phrase anno:category "diseases"
+        ; ^dc:relation ?resolvedTerm
+        ; anno:source_doc ?article
+        .
+        ?article pro:post/pro:date ?p_date .
+        OPTIONAL { ?article  pro:date  ?a_date }
+        BIND(coalesce(?a_date, ?p_date) AS ?dateTime)
+        ?resolvedTerm rdfs:label ?termLabel
+        FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
+
+        {
+          SELECT (count(distinct ?article2) as ?c2) ?resolvedTerm ?termLabel2
+          WHERE{
+            ?prev_mention anno:source_doc ?article2
+            ; ^dc:relation ?resolvedTerm
+            .
+            ?article2 pro:post/pro:date ?p_date2 .
+            OPTIONAL { ?article2  pro:date  ?a_date2 }
+            BIND(coalesce(?a_date2, ?p_date2) AS ?dateTime2) .
+      		  ?resolvedTerm rdfs:label ?termLabel2
+            FILTER (?dateTime2 > "#{escape(dateStr2)}"^^xsd:dateTime)
+           }
+          GROUP BY ?resolvedTerm ?termLabel2
+        }
+      }
+      GROUP BY ?resolvedTerm
+      ORDER BY DESC(?result)
       LIMIT 20
       """
     makeRequest(query)

@@ -1,0 +1,21 @@
+template(name="trendingAgents")
+  h4.col-md-5 Infectious Agents trending in the last:
+  select#trendingRange.col-md-6.form-control
+    option(value="year") Year
+    option(value="month") Month
+    option(value="week") Week
+  table#trendingAgentsTable.table.table-striped
+    tbody
+      each trendingAgents
+        tr
+          td.trendingInfectiousAgentsTableRow(data-agentname=word.value)
+            div.fmia-word
+              a(href="/detail/#{word.value}")= word.value
+          td {{rate.value}} / {{rate2.value}}
+          td trending at {{result.value}}
+      else
+        if ready
+          span.no-priors.col-md-12 No Trending Infectious Agents in the last
+            {{trendingRange}}.
+        else
+          | Loading...
