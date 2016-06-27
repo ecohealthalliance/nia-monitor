@@ -7,14 +7,14 @@ Template.trendingAgents.onCreated ->
   @autorun =>
     $(".spinner").show()
     @trendingAgents.find({}, reactive: false).map((d) => @trendingAgents.remove(d))
-    Meteor.call 'getTrendingInfectiousAgents', @trendingRange.get(), (err, response) =>
+    HTTP.get '/api/trendingAgents/' + @trendingRange.get(), (err, response) =>
       @ready.set(true)
       if err
         toastr.error(err.message)
         $(".spinner").hide()
         return
-      for binding in response.results.bindings
-        if binding.count.value == "0"
+      for binding in response.data.results
+        if binding.count == 0
           continue
         @trendingAgents.insert(binding)
       $(".spinner").hide()

@@ -5,31 +5,30 @@ Template.recentAgents.onCreated ->
   @articles = new Meteor.Collection(null)
   @autorun =>
     @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
-    Meteor.call 'getRecentlyMentionedInfectiousAgents', (err, response) =>
+    HTTP.call 'get', '/api/recentAgents', (err, response) =>
       if err
         toastr.error(err.message)
         $(".spinner").hide()
         return
-      for binding in response.results.bindings
-        if binding.currentArticle.type is 'uri'
-          articleId = @articles.findOne(uri: binding.currentArticle.value)?._id
-          unless articleId
-            articleId = @articles.insert
-              uri: binding.currentArticle.value
-              postSubject: binding.postSubject.value
-              date: moment(new Date(binding.currentDate.value))
-              collapsed: false
-          binding.articleId = articleId
-        if binding.priorDate
-          binding.priorDate = new Date(binding.priorDate.value)
-          priorDate = moment(binding.priorDate)
-          currentDate = moment(new Date(binding.currentDate.value))
-          binding.days = {value: currentDate.diff(priorDate, 'days')}
-          binding.months = {value: currentDate.diff(priorDate, 'months')}
+      for row in response.data.results
+        articleId = @articles.findOne(uri: row.currentArticle)?._id
+        unless articleId
+          articleId = @articles.insert
+            uri: row.currentArticle
+            postSubject: row.postSubject
+            date: moment(new Date(row.currentDate))
+            collapsed: false
+        row.articleId = articleId
+        if row.priorDate
+          row.priorDate = new Date(row.priorDate)
+          priorDate = moment(row.priorDate)
+          currentDate = moment(new Date(row.currentDate))
+          row.days = currentDate.diff(priorDate, 'days')
+          row.months = currentDate.diff(priorDate, 'months')
           #show days or months since last mention
-          if binding.days.value > 30
-            binding.dm = true
-        @recentAgents.insert(binding)
+          if row.days > 30
+            row.dm = true
+        @recentAgents.insert(row)
       # ...
       @articles.find().forEach (article) =>
         if @recentAgents.find(articleId: article._id).count() > 5

@@ -6,18 +6,22 @@ Template.timeline.onCreated ->
     $("#spinner").show()
     agent = Router.current().getParams()._agentName
     @tld.find({}, reactive: false).map((d) => @tld.remove(d))
-    Meteor.call 'getHistoricalData', agent, (err, response) =>
-      if err == undefined
-        for binding in response.results.bindings
-          data = {"year": binding.year.value, "count": binding.count.value}
-          @tld.insert(data)
+    HTTP.call 'get', '/api/historicalData/' + agent, (err, response) =>
+      if err
+        toastr.error(err.message)
+        $(".spinner").hide()
+        return
+      for row in response.data.results
+        data = {year: row.year, count: row.count}
+        @tld.insert(data)
       baseYear = @tld.find({}, {sort: {year: -1}}).fetch()[0].year
       ctryear = baseYear
       data = {}
+      tdata = @tld.find().fetch()
       while ctryear > baseYear - 5
-        data[ctryear] = @tld.find({"year": ctryear.toString()}).fetch()
+        data[ctryear] = @tld.find({year: ctryear}).fetch()
         if data[ctryear].length ==  0
-          data[ctryear][0] = {"year": ctryear, "count": 0}
+          data[ctryear][0] = {year: ctryear, "count": 0}
         ctryear--
       myLineChart = new Chart($("#canvas"),
         type: 'bar'

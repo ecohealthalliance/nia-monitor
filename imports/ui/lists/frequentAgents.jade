@@ -3,7 +3,7 @@ template(name="frequentAgents")
     tbody
       each frequentAgents
         tr
-          td.frequentlyMentionedInfectiousAgentsTableRow(data-agentname=word.value)
+          td.frequentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
             div.fmia-word
-              a(href="/detail/#{word.value}")= word.value
-          td appears in {{pluralize 'article' count.value}}
+              a(href="/detail/#{word}")= word
+          td appears in {{pluralize 'article' count}}

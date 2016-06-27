@@ -8,11 +8,11 @@ template(name="trendingAgents")
     tbody
       each trendingAgents
         tr
-          td.trendingInfectiousAgentsTableRow(data-agentname=word.value)
+          td.trendingInfectiousAgentsTableRow(data-agentname=word)
             div.fmia-word
-              a(href="/detail/#{word.value}")= word.value
-          td {{rate.value}} / {{rate2.value}}
-          td trending at {{result.value}}
+              a(href="/detail/#{word}")= word
+          td {{rate}} / {{rate2}}
+          td trending at {{result}}
       else
         if ready
           span.no-priors.col-md-12 No Trending Infectious Agents in the last
