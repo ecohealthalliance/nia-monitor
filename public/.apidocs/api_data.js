@@ -22,9 +22,9 @@ define({ "api": [
     "type": "",
     "url": "",
     "version": "0.0.0",
-    "filename": "./.doc/main.js",
-    "group": "C__Users_Trey_DEV_EHA_nia_monitor__doc_main_js",
-    "groupTitle": "C__Users_Trey_DEV_EHA_nia_monitor__doc_main_js",
+    "filename": "./public/.apidocs/main.js",
+    "group": "C__Users_Trey_DEV_EHA_nia_monitor_public__apidocs_main_js",
+    "groupTitle": "C__Users_Trey_DEV_EHA_nia_monitor_public__apidocs_main_js",
     "name": ""
   },
   {
@@ -73,7 +73,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "frequentDescriptors/:term",
-    "title": "Request frequent descriptors for the term",
+    "title": "{{pathFor \"frequentDescriptors\"}} Request frequent descriptors for the term",
     "name": "frequentDescriptors",
     "group": "descriptors",
     "parameter": {
