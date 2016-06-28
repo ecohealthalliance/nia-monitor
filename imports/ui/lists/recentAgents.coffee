@@ -1,6 +1,6 @@
 require './recentAgents.jade'
 
-pp = 4
+pp = 75
 
 Template.recentAgents.onCreated ->
   @recentAgents = new Meteor.Collection(null)
