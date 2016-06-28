@@ -129,6 +129,9 @@ api.addRoute 'recentMentions/:term',
 
 api.addRoute 'recentAgents',
   get: ->
+    page = @queryParams.page
+    pp = @queryParams.pp
+    offset = page * pp
     query = prefixes + """
       SELECT
           # For each of the most recently mentioned terms find the most recent
@@ -163,7 +166,8 @@ api.addRoute 'recentAgents',
               GROUP BY ?resolvedTerm ?termLabel ?currentDate ?currentArticle
               # Sort by date, then document, then offset within the document.
               ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?firstMentionStart)
-              LIMIT 50
+              LIMIT #{pp}
+              OFFSET #{offset}
           }
           ?currentArticle pro:post/pro:subject_raw ?p_subject .
           # Select the previous usages of the most recently mentioned terms
