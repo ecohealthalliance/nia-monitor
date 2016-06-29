@@ -87,6 +87,7 @@ api.addRoute 'frequentDescriptors/:term',
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
+
 api.addRoute 'recentMentions/:term',
   get: ->
     query = prefixes + """
@@ -107,6 +108,46 @@ api.addRoute 'recentMentions/:term',
           } UNION {
               ?resolvedTarget dc:relation ?target
               ; rdfs:label "#{escape(@urlParams.term)}"
+          } .
+          ?target anno:start ?t_start
+          ; anno:end ?t_end
+          ; anno:source_doc ?source
+          .
+          ?source pro:post/pro:date ?p_date
+          ; pro:post/pro:subject_raw ?postSubject
+          .
+          OPTIONAL { ?source  pro:date  ?a_date }
+          BIND(coalesce(?a_date, ?p_date) AS ?date)
+      }
+      ORDER BY DESC(?date) DESC(?source) ASC(?t_start)
+      LIMIT 10
+      """
+    response = makeRequest(query)
+    return {
+      status: "success"
+      results: response.results.bindings.map(castBinding)
+    }
+
+api.addRoute 'recentDescriptorMentions/:descriptor',
+  get: ->
+    query = prefixes + """
+      SELECT DISTINCT
+        ?phrase_text
+        ?p_start ?postSubject
+        ?t_start ?t_end
+        ?source ?date
+      WHERE {
+          ?phrase anno:selected-text ?phrase_text
+          ; anno:start ?p_start
+          ; anno:end ?p_end
+          ; dep:ROOT ?noop
+          ; anno:contains ?target
+          .
+          {
+              ?target anno:label "#{escape(@urlParams.descriptor)}"
+          } UNION {
+              ?resolvedTarget dc:relation ?target
+              ; rdfs:label "#{escape(@urlParams.descriptor)}"
           } .
           ?target anno:start ?t_start
           ; anno:end ?t_end

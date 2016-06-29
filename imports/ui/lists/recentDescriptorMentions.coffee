@@ -1,12 +1,12 @@
-require './recentMentions.jade'
+require './recentDescriptorMentions.jade'
 
-Template.recentMentions.onCreated ->
+Template.recentDescriptorMentions.onCreated ->
   @mentions = new Meteor.Collection(null)
   @sources = new Meteor.Collection(null)
   @autorun =>
-    agent = Router.current().getParams()._agentName
+    descriptor = Router.current().getParams()._descriptorName
     @mentions.find({}, reactive: false).map((d) => @mentions.remove(d))
-    HTTP.call 'get', '/api/recentMentions/' + agent, (err, response) =>
+    HTTP.call 'get', '/api/recentDescriptorMentions/' + descriptor, (err, response) =>
       if err
         toastr.error(err.message)
         $(".spinner").hide()
@@ -21,8 +21,9 @@ Template.recentMentions.onCreated ->
               date: moment(new Date(row.date))
           row.sourceId = sourceId
         @mentions.insert(row)
+      $(".spinner").hide()
 
-Template.recentMentions.helpers
+Template.recentDescriptorMentions.helpers
   sources: ->
     Template.instance().sources.find()
   mentionsForSource: (sourceId) ->
