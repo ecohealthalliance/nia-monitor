@@ -2,18 +2,20 @@ require './frequentAgents.jade'
 
 Template.frequentAgents.onCreated ->
   @frequentAgents = new Meteor.Collection(null)
+  @isLoading = new ReactiveVar(false)
   @autorun =>
-    $(".spinner").show()
     @frequentAgents.find({}, reactive: false).map((d) => @frequentAgents.remove(d))
+    @isLoading.set(true)
     HTTP.call 'get', '/api/frequentAgents', (err, response) =>
+      @isLoading.set(false)
       if err
         toastr.error(err.message)
-        $(".spinner").hide()
         return
       for row in response.data.results
         @frequentAgents.insert(row)
-      $(".spinner").hide()
 
 Template.frequentAgents.helpers
   frequentAgents: ->
     Template.instance().frequentAgents.find()
+  isLoading: ->
+    Template.instance().isLoading.get()

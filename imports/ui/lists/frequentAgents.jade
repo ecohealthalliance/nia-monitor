@@ -1,9 +1,16 @@
 template(name="frequentAgents")
-  table#frequentAgentsTable.table.table-striped
-    tbody
-      each frequentAgents
-        tr
-          td.frequentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
-            div.fmia-word
-              a(href="/detail/#{word}")= word
-          td appears in {{pluralize 'article' count}}
+  .col-md-8.col-md-offset-2
+    h4.col-md-12.iaHeader Frequently Mentioned Infectious Agents
+    .col-md-12
+      .panel.panel-default
+        table#frequentAgentsTable.table.table-striped
+          tbody
+            each frequentAgents
+              tr
+                td.frequentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
+                  div.fmia-word
+                    a(href="/detail/#{word}")= word
+                td appears in {{pluralize 'article' count}}
+            if isLoading
+              .loading.spinner-margin
+                i.fa.fa-spinner.fa-2x.fa-spin

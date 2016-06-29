@@ -18,8 +18,7 @@ Template.recentAgents.onCreated ->
     HTTP.get '/api/recentAgents', {params: {page: pageNum, pp: pp}}, (err, res) =>
       @isLoading.set(false)
       if err
-        toastr.error(err.message)
-        $(".spinner").hide()
+        toastr.error(err.message)        
         return
       unless res.data.results.length
         @theEnd.set(true)

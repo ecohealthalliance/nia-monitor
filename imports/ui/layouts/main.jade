@@ -1,22 +1,17 @@
 template(name='main')
   +header
-
-  .col-md-6.pull-left
-    .panel.panel-default
-      .panel-body
-        #recentlyMentionedInfectiousAgents
-          h4 Recently Mentioned Infectious Agents
-          +recentAgents
-
-  .col-md-6.pull-right
-    .panel.panel-default
-      .panel-body
-        #frequentlyMentionedInfectiousAgents
-          h4 Frequently Mentioned Infectious Agents
-          +frequentAgents
-    .panel.panel-default
-      .panel-body
-        #trendingInfectiousAgents          
-          +trendingAgents
-
+  ul.nav.nav-tabs
+    li.active#recentPanelTab
+      a(href='#recentPanel', data-toggle='tab') Recent
+    li#frequentPanelTab
+      a(href='#frequentPanel', data-toggle='tab') Frequent
+    li#trendingPanelTab
+      a(href='#trendingPanel', data-toggle='tab') Trending
+  .tab-content
+    #recentPanel.tab-pane.active
+      #recentlyMentionedInfectiousAgents
+    #frequentPanel.tab-pane
+      #frequentlyMentionedInfectiousAgents
+    #trendingPanel.tab-pane
+      #trendingInfectiousAgents
   .clear
