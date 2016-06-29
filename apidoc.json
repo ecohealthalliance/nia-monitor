@@ -4,12 +4,5 @@
   "description": "A datasource that provides information about infectious agents mentioned mentioned in online news feeds.",
   "title": "NIAM API",
   "url": "http://niam.eha.io/api/",
-  "sampleUrl": "http://niam.eha.io/api/",
-  "apidoc": "0.2.0",
-  "generator": {
-    "name": "apidoc",
-    "time": "2016-06-29T07:31:13.387Z",
-    "url": "http://apidocjs.com",
-    "version": "0.16.1"
-  }
+  "sampleUrl": "http://niam.eha.io/api/"
 }
