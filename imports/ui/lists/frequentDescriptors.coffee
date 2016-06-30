@@ -21,3 +21,5 @@ Template.frequentDescriptors.helpers
     Template.instance().ready.get()
   frequentDescriptors: ->
     Template.instance().frequentDescriptors.find()
+  term: ->
+    Template.instance().data._agentName

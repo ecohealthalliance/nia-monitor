@@ -47,6 +47,13 @@ api = new Restivus
   useDefaultAuth: true
   prettyJson: true
 
+###
+@api {get} frequentDescriptors/:term Request frequent descriptors for the term
+@apiName frequentDescriptors
+@apiGroup descriptors
+
+@apiParam {String} term Infectious Agent
+###
 api.addRoute 'frequentDescriptors/:term',
   get: ->
     query = prefixes + """
@@ -88,6 +95,13 @@ api.addRoute 'frequentDescriptors/:term',
       results: response.results.bindings.map(castBinding)
     }
 
+###
+@api {get} recentMentions/:term Request recent mentions for the term
+@apiName recentMentions
+@apiGroup descriptors
+
+@apiParam {String} term Infectious Agent
+###
 api.addRoute 'recentMentions/:term',
   get: ->
     query = prefixes + """
@@ -128,6 +142,13 @@ api.addRoute 'recentMentions/:term',
       results: response.results.bindings.map(castBinding)
     }
 
+###
+@api {get} recentDescriptorMentions Request descriptive phrases used for the given agent.
+@apiName recentDescriptorMentions
+@apiGroup agent
+@apiParam {String} descriptor
+@apiParam {String} [term]
+###
 api.addRoute 'recentDescriptorMentions',
   get: ->
     { term, descriptor } = @queryParams
@@ -183,6 +204,11 @@ api.addRoute 'recentDescriptorMentions',
       results: response.results.bindings.map(castBinding)
     }
 
+###
+@api {get} recentAgents Request recent Agents
+@apiName recentAgents
+@apiGroup agent
+###
 api.addRoute 'recentAgents',
   get: ->
     page = @queryParams.page
@@ -247,6 +273,11 @@ api.addRoute 'recentAgents',
       results: response.results.bindings.map(castBinding)
     }
 
+###
+@api {get} frequentAgents Request frequent agents
+@apiName frequentAgents
+@apiGroup agent
+###
 api.addRoute 'frequentAgents',
   get: ->
     baseYear = 1991
@@ -274,7 +305,12 @@ api.addRoute 'frequentAgents',
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
-
+###
+@api {get} historicalData/:term Request historical data for the term
+@apiName historicalData
+@apiGroup descriptors
+@apiParam {String} term Infectious Agent
+###
 api.addRoute 'historicalData/:term',
   get: ->
     query = prefixes + """
@@ -323,7 +359,12 @@ api.addRoute 'historicalData/:term',
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
-
+###
+@api {get} trendingAgents/:range Request trending agents in a time range (year, month, week)
+@apiName trendingAgents
+@apiGroup agent
+@apiParam {String} range (year, month, week)
+###
 api.addRoute 'trendingAgents/:range',
   get: ->
     dateStr = ""
