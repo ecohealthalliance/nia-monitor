@@ -30,10 +30,10 @@ template(name="recentAgents")
                   else
                     span.no-priors.pull-right no prior mentions
             if collapsed
-              .more
-                button(type="button").btn.btn-info Show All Infectious Agents for Article
+              .more.text-center
+                button(type="button").btn.btn-show-all-ia Show All Infectious Agents for Article
     if isLoading
-      .loading
+      .loading.spinner-margin
         i.fa.fa-spinner.fa-2x.fa-spin
     else
       unless theEnd
