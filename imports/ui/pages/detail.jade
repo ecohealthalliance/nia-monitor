@@ -1,23 +1,17 @@
 template(name='detail')
   +header
-  .col-md-12
-    .col-md-7.pull-left
-      h3=agent
-  .col-md-12
-    .col-md-7.pull-left
-      .panel.panel-primary
-        .panel-body
-          +timeline
-          br
-          #recentMentions
-            h4 Recent Mentions
-            .panel.panel-default
-              +recentMentions
-
-    .col-md-5.pull-right
-      .panel.panel-primary
-        .panel-body
-          #frequentDescriptors
-            h4 Frequent Descriptors
-            .panel.panel-default
-              +frequentDescriptors
+  h2.articleHeader.mainHeaderText #{agent}
+  ul.nav.nav-tabs.col-md-12
+    li.active#recentMentionsPanelTab
+      a(href='#recentMentionsPanel', data-toggle='tab') Recent
+    li#timelinePanelTab
+      a(href='#timelinePanel', data-toggle='tab') Timeline
+    li#frequentDescriptorsPanelTab
+      a(href='#frequentDescriptorsPanel', data-toggle='tab') Frequent
+  .tab-content
+    #recentMentionsPanel.tab-pane.active
+      #recentMentions
+    #timelinePanel.tab-pane
+      #timeline
+    #frequentDescriptorsPanel.tab-pane
+      #frequentDescriptors

@@ -1,15 +1,18 @@
 require './timeline.jade'
 
+Template.timeline.helpers
+  ready: ->
+    Template.instance().ready.get()
+
 Template.timeline.onCreated ->
+  @ready = new ReactiveVar(false)
   @tld = new Meteor.Collection(null)
   @autorun =>
-    $("#spinner").show()
     agent = Router.current().getParams()._agentName
     @tld.find({}, reactive: false).map((d) => @tld.remove(d))
     HTTP.call 'get', '/api/historicalData/' + agent, (err, response) =>
       if err
         toastr.error(err.message)
-        $(".spinner").hide()
         return
       for row in response.data.results
         data = {year: row.year, count: row.count}
@@ -87,4 +90,4 @@ Template.timeline.onCreated ->
                 color: "rgba(255,255,255,0)"
             }]
       )
-      $("#spinner").hide()
+      $("#timeLineSpinner").hide()
