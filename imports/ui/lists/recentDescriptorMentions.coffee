@@ -4,9 +4,16 @@ Template.recentDescriptorMentions.onCreated ->
   @mentions = new Meteor.Collection(null)
   @sources = new Meteor.Collection(null)
   @autorun =>
-    descriptor = Router.current().getParams()._descriptorName
+    {_descriptorName, _term} = Router.current().getParams()
+    params = {
+      descriptor: _descriptorName
+    }
+    if _term
+      params.term = _term
     @mentions.find({}, reactive: false).map((d) => @mentions.remove(d))
-    HTTP.call 'get', '/api/recentDescriptorMentions/' + descriptor, (err, response) =>
+    HTTP.call 'get', '/api/recentDescriptorMentions', {
+      params: params
+    }, (err, response) =>
       if err
         toastr.error(err.message)
         $(".spinner").hide()

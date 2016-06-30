@@ -128,8 +128,9 @@ api.addRoute 'recentMentions/:term',
       results: response.results.bindings.map(castBinding)
     }
 
-api.addRoute 'recentDescriptorMentions/:descriptor',
+api.addRoute 'recentDescriptorMentions',
   get: ->
+    { term, descriptor } = @queryParams
     query = prefixes + """
       SELECT DISTINCT
         ?phrase_text
@@ -143,16 +144,30 @@ api.addRoute 'recentDescriptorMentions/:descriptor',
           ; dep:ROOT ?noop
           ; anno:contains ?target
           .
-          {
-              ?target anno:label "#{escape(@urlParams.descriptor)}"
-          } UNION {
-              ?resolvedTarget dc:relation ?target
-              ; rdfs:label "#{escape(@urlParams.descriptor)}"
-          } .
+          #{if term then """
+            {
+                ?target anno:label "#{escape(term)}"
+            } UNION {
+                ?resolvedTarget dc:relation ?target
+                ; rdfs:label "#{escape(term)}"
+            } .
+          """ else ""}
           ?target anno:start ?t_start
           ; anno:end ?t_end
           ; anno:source_doc ?source
+          ; anno:category "diseases"
           .
+          ?dep_rel rdf:type anno:dependency_relation .
+          VALUES ?dep_rel { dep:amod dep:nmod }
+          ?parent anno:min_contains ?target
+          ; ?dep_rel ?descriptor
+          ; anno:source_doc ?source
+          .
+          ?descriptor anno:start ?d_start
+          ; anno:end ?d_end
+          ; anno:selected-text ?rawSelText
+          .
+          FILTER regex(?rawSelText, "#{escape(descriptor)}", "i")
           ?source pro:post/pro:date ?p_date
           ; pro:post/pro:subject_raw ?postSubject
           .

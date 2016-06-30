@@ -18,3 +18,5 @@ Router.route '/detail/:_agentName', ->
   @render 'detail', { data: this.params }
 Router.route '/descriptor/:_descriptorName', ->
   @render 'descriptor', { data: this.params }
+Router.route '/descriptor/:_descriptorName/:_term', ->
+  @render 'descriptor', { data: this.params }

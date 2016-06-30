@@ -5,7 +5,7 @@ template(name="frequentDescriptors")
         tr
           td.frequentDescriptorsTableRow(data-agentname=name)
             div.fmia-word
-              a(href="/descriptor/{{plus selText}}")= selText
+              a(href="/descriptor/{{plus selText}}/{{plus name}}")= selText
           td appears in {{pluralize 'article' count}}
       else
         if ready
