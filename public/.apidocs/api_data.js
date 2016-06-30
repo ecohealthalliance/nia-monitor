@@ -87,6 +87,41 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "recentDescriptorMentions",
+    "title": "Request descriptive phrases used for the given agent.",
+    "name": "recentDescriptorMentions",
+    "group": "agent",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "descriptor",
+            "description": ""
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "term",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "./imports/startup/server/index.coffee",
+    "groupTitle": "agent",
+    "sampleRequest": [
+      {
+        "url": "http://niam.eha.io/api/recentDescriptorMentions"
+      }
+    ]
+  },
+  {
+    "type": "get",
     "url": "trendingAgents/:range",
     "title": "Request trending agents in a time range (year, month, week)",
     "name": "trendingAgents",
