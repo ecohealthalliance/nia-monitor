@@ -1,0 +1,11 @@
+template(name='descriptor')
+  +header
+  .col-md-12
+    h3=agent
+  .col-md-12
+    .panel.panel-primary
+      .panel-body
+        #recentMentions
+          h4 Recent Mentions
+          .panel.panel-default
+            +recentDescriptorMentions

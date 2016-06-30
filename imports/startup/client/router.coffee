@@ -3,6 +3,7 @@ require '../../ui/layouts/main.coffee'
 
 # pages
 require '../../ui/pages/detail.coffee'
+require '../../ui/pages/descriptor.coffee'
 
 # template helpers
 require '../../ui/helpers/time.coffee'
@@ -14,4 +15,8 @@ require '../../ui/helpers/pluralize.coffee'
 Router.route '/', ->
   @render 'main'
 Router.route '/detail/:_agentName', ->
-  @render 'detail', {'data': this.params}
+  @render 'detail', { data: this.params }
+Router.route '/descriptor/:_descriptorName', ->
+  @render 'descriptor', { data: this.params }
+Router.route '/descriptor/:_descriptorName/:_term', ->
+  @render 'descriptor', { data: this.params }
