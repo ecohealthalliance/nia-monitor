@@ -1,21 +1,25 @@
 template(name="trendingAgents")
-  h4.col-md-5 Infectious Agents trending in the last:
-  select#trendingRange.col-md-6.form-control
-    option(value="year") Year
-    option(value="month") Month
-    option(value="week") Week
-  table#trendingAgentsTable.table.table-striped
-    tbody
-      each trendingAgents
-        tr
-          td.trendingInfectiousAgentsTableRow(data-agentname=word)
-            div.fmia-word
-              a(href="/detail/#{word}")= word
-          td {{rate}} / {{rate2}}
-          td trending at {{result}}
-      else
-        if ready
-          span.no-priors.col-md-12 No Trending Infectious Agents in the last
-            {{trendingRange}}.
-        else
-          | Loading...
+  .col-md-8.col-md-offset-2
+    h4.col-md-5.iaHeader Infectious Agents trending in the last:
+    select#trendingRange.col-md-7.form-control
+      option(value="year") Year
+      option(value="month") Month
+      option(value="week") Week
+    .col-md-12
+      .panel.panel-default
+        table#trendingAgentsTable.table.table-striped
+          tbody
+            each trendingAgents
+              tr
+                td.trendingInfectiousAgentsTableRow(data-agentname=word)
+                  div.fmia-word
+                    a(href="/detail/#{word}")= word
+                td {{rate}} / {{rate2}}
+                td trending at {{result}}
+            else
+              if ready
+                span.no-priors.col-md-12 No Trending Infectious Agents in the last
+                  {{trendingRange}}.
+              else
+                .loading.spinner-margin
+                  i.fa.fa-spinner.fa-2x.fa-spin

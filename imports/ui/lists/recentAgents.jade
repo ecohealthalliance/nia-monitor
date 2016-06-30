@@ -1,33 +1,35 @@
 template(name="recentAgents")
-  each articles
-    .panel.panel-default
-      .panel-heading
-        h4
-          a(href=uri) {{postSubject}}
-        p {{age date}}
-      div
-        table#recentAgentsTable.table.table-striped
-          tbody
-            each recentAgentsForArticle _id collapsed
-              tr
-                td.recentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
-                  h4.rmia-word
-                    a(href="/detail/{{plus word}}")= word
-                  if priorArticle
-                    if dm
-                      span.underline Months since prior mention:
-                        a(href=priorArticle)= months
+  .col-md-8.col-md-offset-2
+    h4 Recently Mentioned Infectious Agents
+    each articles
+      .panel.panel-default
+        .panel-heading
+          h4
+            a(href=uri) {{postSubject}}
+          p {{age date}}
+        div
+          table#recentAgentsTable.table.table-striped
+            tbody
+              each recentAgentsForArticle _id collapsed
+                tr
+                  td.recentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
+                    h4.rmia-word
+                      a(href="/detail/{{plus word}}")= word
+                    if priorArticle
+                      if dm
+                        span.underline Months since prior mention:
+                          a(href=priorArticle)= months
+                      else
+                        span Days since prior mention:
+                          a(href=priorArticle)= days
                     else
-                      span Days since prior mention:
-                        a(href=priorArticle)= days
-                  else
-                    span.no-priors No Prior Mentions
-            if collapsed
-              .more
-                button(type="button").btn.btn-info Show All Infectious Agents for Article
-  if isLoading
-    .loading
-      i.fa.fa-spinner.fa-2x.fa-spin
-  else
-    unless theEnd
-      button(type="button").btn.btn-info.load-more-articles Load More
+                      span.no-priors No Prior Mentions
+              if collapsed
+                .more
+                  button(type="button").btn.btn-info Show All Infectious Agents for Article
+    if isLoading
+      .loading
+        i.fa.fa-spinner.fa-2x.fa-spin
+    else
+      unless theEnd
+        button(type="button").btn.btn-info.load-more-articles Load More
