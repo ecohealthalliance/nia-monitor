@@ -15,18 +15,10 @@ template(name="recentAgents")
                   a(href="/detail/{{plus word}}")= word
                 td.ital
                   if priorArticle
-                    if dm
-                      span.pull-right
-                        |  &nbsp;since prior mention
-                      span.pull-right.boldrange
-                        a(href=priorArticle)= months
-                        | months
-                    else
-                      span.pull-right
-                        |  &nbsp;since prior mention
-                      span.pull-right.boldrange
-                        a(href=priorArticle)= days
-                        | days
+                    .pull-right
+                      span.boldrange {{since ../date priorDate}}
+                      span since
+                      a(href=priorArticle) prior mention
                   else
                     span.no-priors.pull-right no prior mentions
             if collapsed

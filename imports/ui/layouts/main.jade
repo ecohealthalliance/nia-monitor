@@ -1,11 +1,16 @@
 template(name='main')
   +header
-  h2.articleHeader.mainHeaderText Mentioned Infectious Agents
+  .col-md-12.headerDescriptionContainer
+    .col-md-8.col-md-offset-2.headerDescription
+      | NIAM displays the diseases mentioned in Pro MED mail posts.
+      | A disease's novelty can be assessed through its time since the previous
+      | mention and through its ranking on the trending diseases list.
+    .col-md-8.col-md-offset-2 Click on a disease to see its historical mentions.
   ul.nav.nav-tabs
     li.active#recentPanelTab
-      a(href='#recentPanel', data-toggle='tab') Recent
+      a(href='#recentPanel', data-toggle='tab') Recently Mentioned
     li#frequentPanelTab
-      a(href='#frequentPanel', data-toggle='tab') Frequent
+      a(href='#frequentPanel', data-toggle='tab') Frequently Mentioned
     li#trendingPanelTab
       a(href='#trendingPanel', data-toggle='tab') Trending
   .tab-content

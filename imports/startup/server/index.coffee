@@ -260,7 +260,7 @@ api.addRoute 'recentAgents',
             ?prevArticle pro:post/pro:date ?p_date .
             OPTIONAL { ?prevArticle  pro:date  ?a_date }
             BIND(coalesce(?a_date, ?p_date) AS ?prevDate)
-            FILTER(?currentDate >= ?prevDate && ?currentArticle != ?prevArticle)
+            FILTER(?currentDate > ?prevDate && ?currentArticle != ?prevArticle)
           }
       }
       # Group by the items from the inner query
