@@ -10,3 +10,6 @@ setInterval tick, tickInterval
 Template.registerHelper 'age', (date) ->
   Session.get('now') # triggers the reactivity every second
   moment(date).fromNow()
+
+Template.registerHelper 'since', (date, priorDate) ->
+  moment(priorDate).from(date).replace('ago', '')

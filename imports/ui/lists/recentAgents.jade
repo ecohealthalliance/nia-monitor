@@ -1,34 +1,31 @@
 template(name="recentAgents")
-  .col-md-8.col-md-offset-2
-    h4 Recently Mentioned Infectious Agents
+  .col-md-6.col-md-offset-3
     each articles
-      .panel.panel-default
-        .panel-heading
+        .col-md-8.articleHeader
           h4
-            a(href=uri) {{postSubject}}
-          p {{age date}}
-        div
-          table#recentAgentsTable.table.table-striped
-            tbody
-              each recentAgentsForArticle _id collapsed
-                tr
-                  td.recentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
-                    h4.rmia-word
-                      a(href="/detail/{{plus word}}")= word
-                    if priorArticle
-                      if dm
-                        span.underline Months since prior mention:
-                          a(href=priorArticle)= months
-                      else
-                        span Days since prior mention:
-                          a(href=priorArticle)= days
-                    else
-                      span.no-priors No Prior Mentions
-              if collapsed
-                .more
-                  button(type="button").btn.btn-info Show All Infectious Agents for Article
+            a.articleHeaderText(href=uri) {{postSubject}}
+        .col-md-4.articleHeader.ital
+          h4
+            .pull-right {{age date}}
+        table#recentAgentsTable.table
+          tbody
+            each recentAgentsForArticle _id collapsed
+              tr
+                td.recentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
+                  a(href="/detail/{{plus word}}")= word
+                td.ital
+                  if priorArticle
+                    .pull-right
+                      span.boldrange {{since ../date priorDate}}
+                      span since
+                      a(href=priorArticle) prior mention
+                  else
+                    span.no-priors.pull-right no prior mentions
+            if collapsed
+              .more.text-center
+                button(type="button").btn.btn-show-all-ia Show All Infectious Agents for Article
     if isLoading
-      .loading
+      .loading.spinner-margin
         i.fa.fa-spinner.fa-2x.fa-spin
     else
       unless theEnd

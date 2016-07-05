@@ -1,14 +1,16 @@
 template(name="frequentDescriptors")
-  table#frequentDescriptorsTable.table.table-striped
-    tbody
-      each frequentDescriptors
-        tr
-          td.frequentDescriptorsTableRow
-            div.fmia-word
-              a(href="/descriptor/{{plus selText}}/{{plus term}}")= selText
-          td appears in {{pluralize 'article' count}}
-      else
-        if ready
-          span.no-priors.col-md-12 No Frequent Descriptors
+  .col-md-6.col-md-offset-3
+    table#frequentDescriptorsTable.table.table-striped
+      tbody
+        each frequentDescriptors
+          tr
+            td.frequentDescriptorsTableRow
+              div.fmia-word
+                a(href="/descriptor/{{plus selText}}/{{plus term}}")= selText
+            td appears in {{pluralize 'article' count}}
         else
-          | Loading...
+          if ready
+            span.no-priors.col-md-12.text-center.spinner-margin No Frequent Descriptors
+          else
+            .loading.spinner-margin
+              i.fa.fa-spinner.fa-2x.fa-spin

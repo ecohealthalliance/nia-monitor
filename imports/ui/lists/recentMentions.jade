@@ -1,11 +1,18 @@
 template(name="recentMentions")
-  each sources
-    .panel-heading
-      h4
-        a(href=uri)=postSubject
-      p {{age date}}
-    table#recentMentionsTable.table.table-striped
-      tbody
-        each mentionsForSource _id
-          tr.recentMentionsTableRow
-            td.kwic #{kwic}
+  .col-md-6.col-md-offset-3
+    each sources
+      .panel-heading
+        .col-md-8.articleHeader
+          h4
+            a.articleHeaderText(href=uri)=postSubject
+        .col-md-4.articleHeader.ital
+          h4
+            .pull-right{{age date}}
+      table#recentMentionsTable.table.table-striped
+        tbody
+          each mentionsForSource _id
+            tr.recentMentionsTableRow
+              td.kwic #{kwic}
+    else
+      .loading.spinner-margin
+          i.fa.fa-spinner.fa-2x.fa-spin
