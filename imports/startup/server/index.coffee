@@ -1,4 +1,4 @@
-SPARQurL = process.env.SPARQURL || 'http://localhost:3030/dataset'
+SPARQurL = process.env.SPARQURL || 'http://localhost:3030/dataset/query'
 prefixes = '''
 prefix pro: <http://www.eha.io/types/promed/>
 prefix anno: <http://www.eha.io/types/annotation_prop/>
@@ -23,9 +23,11 @@ castBinding = (binding) ->
 
 makeRequest = (query) ->
   try
-    response = HTTP.call 'POST', "#{SPARQurL}/query?query=#{encodeURIComponent(query)}",
+    response = HTTP.post SPARQurL,
       headers:
         'Accept': 'application/sparql-results+json'
+      params:
+        query: query
     JSON.parse response.content
   catch err
     if err.code
@@ -86,8 +88,8 @@ api.addRoute 'frequentDescriptors/:term',
           BIND(replace(?ranCaseSelText,'^ +| +$|\\n', '') AS ?selText)
       }
       GROUP BY ?selText
-      HAVING (?count > 0)
-      ORDER BY DESC(?count)
+      HAVING (count(DISTINCT ?article) > 0)
+      ORDER BY DESC(count(DISTINCT ?article))
       """
     response = makeRequest(query)
     return {

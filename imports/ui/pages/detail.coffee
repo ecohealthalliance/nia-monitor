@@ -14,7 +14,7 @@ Template.detail.events
     Blaze.render(Template.timeline, $("#timeline")[0])
   'click #frequentDescriptorsPanelTab': (event, instance) ->
     $("#frequentDescriptors").empty()
-    Blaze.renderWithData(Template.frequentDescriptors, this._agentName, $("#frequentDescriptors")[0])
+    Blaze.renderWithData(Template.frequentDescriptors, this, $("#frequentDescriptors")[0])
   'click #recentMentionsPanelTab': (event, instance) ->
     $("#recentMentions").empty()
     Blaze.render(Template.recentMentions, $("#recentMentions")[0])
