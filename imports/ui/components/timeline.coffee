@@ -1,23 +1,37 @@
 require './timeline.jade'
 
 Template.timeline.helpers
+  timelineRange: ->
+    Template.instance().timelineRange.get()
   ready: ->
     Template.instance().ready.get()
 
+Template.timeline.events
+  'change #timelineRange': (event, template) ->
+    template.timelineRange.set($("#timelineRange").val())
+    alert template.timelineRange.get()
+    return
+
 Template.timeline.onCreated ->
   @ready = new ReactiveVar(false)
+  @timelineRange = new ReactiveVar('5years')
   @tld = new Meteor.Collection(null)
+  @myLineChart = new ReactiveVar(null)
   @autorun =>
     agent = Router.current().getParams()._agentName
     @tld.find({}, reactive: false).map((d) => @tld.remove(d))
-    HTTP.call 'get', '/api/historicalData/' + agent, (err, response) =>
+    HTTP.call 'get', '/api/historicalData/' + agent + '/' + @timelineRange.get(), (err, response) =>
       if err
         toastr.error(err.message)
         return
+      if @myLineChart.get() != null
+        @myLineChart.destroy()
       for row in response.data.results
         data = {year: row.year, count: row.count}
         @tld.insert(data)
       baseYear = @tld.find({}, {sort: {year: -1}}).fetch()[0].year
+      if baseYear == undefined
+        baseYear = new Date().getFullYear()
       ctryear = baseYear
       data = {}
       tdata = @tld.find().fetch()
@@ -26,7 +40,7 @@ Template.timeline.onCreated ->
         if data[ctryear].length ==  0
           data[ctryear][0] = {year: ctryear, "count": 0}
         ctryear--
-      myLineChart = new Chart($("#canvas"),
+      @myLineChart = new Chart($("#canvas"),
         type: 'bar'
         data:
           labels: [

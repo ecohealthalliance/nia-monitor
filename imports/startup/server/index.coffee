@@ -313,27 +313,25 @@ api.addRoute 'frequentAgents',
 @apiGroup descriptors
 @apiParam {String} term Infectious Agent
 ###
-api.addRoute 'historicalData/:term',
+api.addRoute 'historicalData/:term/:range',
   get: ->
-    query = prefixes + """
-      SELECT (max(?date) as ?mdt)
-      WHERE {
-        ?phrase anno:category "diseases"
-        ; anno:source_doc ?currentArticle
-        ; anno:selected-text ?rawText
-        ; ^dc:relation ?resolvedTerm
-        .
-        ?resolvedTerm rdfs:label ?termLabel .
-        ?currentArticle pro:post/pro:date ?p_date .
-        OPTIONAL { ?currentArticle  pro:date  ?a_date }
-        BIND(coalesce(?a_date, ?p_date) AS ?date)
-        filter(?termLabel = "#{escape(@urlParams.term)}")
-      }
-      """
-    response = makeRequest(query)
-    recentDate = (response.results.bindings)[0].mdt.value
-    baseYear = moment(recentDate).year() - 5
-
+    dateStr = ""
+    date = moment(new Date())
+    switch @urlParams.range
+      when "6months"
+        date.subtract(6, 'months')
+        dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
+      when "1year"
+        date.subtract(1, 'years')
+        dateStr = date.format("YYYY") + "-01-01T00:00:00+00:01"
+      when "5years"
+        date.subtract(5, 'years')
+        dateStr = date.format("YYYY") + "-01-01T00:00:00+00:01"
+      when "all"
+        date.subtract(100, 'years')
+        dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
+    console.log @urlParams.range
+    dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     query = prefixes + """
       SELECT ?word ?year (count(?word) as ?count)
       WHERE{
@@ -348,14 +346,27 @@ api.addRoute 'historicalData/:term',
           ?resolvedTerm rdfs:label ?termLabel .
           ?article pro:date ?dateTime
           FILTER(?termLabel = "#{escape(@urlParams.term)}")
-          FILTER (?dateTime > "#{escape(baseYear)}-01-01T00:00:00+00:01"^^xsd:dateTime)
-    		BIND(year(?dateTime) AS ?year)
-        }
-        GROUP BY ?termLabel ?article ?year
-        ORDER BY DESC(?dateTime)
-      }
-      GROUP BY ?word ?year
       """
+    if @urlParams.range != 'all'
+      query += """
+        FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
+        """
+    if @urlParams.range == '6months'
+      query += """
+        BIND(month(?dateTime) AS ?year)
+        """
+    else
+      query += """
+        BIND(year(?dateTime) AS ?year)
+        """
+    query+=
+    """
+      }
+      GROUP BY ?termLabel ?article ?year
+      ORDER BY DESC(?dateTime)
+    }
+    GROUP BY ?word ?year
+    """
     response = makeRequest(query)
     return {
       status: "success"
