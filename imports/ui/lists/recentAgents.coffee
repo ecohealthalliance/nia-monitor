@@ -1,60 +1,28 @@
 require './recentAgents.jade'
 
+{ articles, agents } = require '../../data/collections.coffee'
+
 pp = 75
 
-Template.recentAgents.onCreated ->
-  @recentAgents = new Meteor.Collection(null)
-  @articles = new Meteor.Collection(null)
-  @currentPageNumber = new ReactiveVar(0)
-  @isLoading = new ReactiveVar(false)
-  @theEnd = new ReactiveVar(false)
-  order = 0
-  @loadMoreArticles = =>
-    if @isLoading.get() then return
-    pageNum = @currentPageNumber.get()
-    @currentPageNumber.set(pageNum + 1)
-    # @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
-    @isLoading.set(true)
-    HTTP.get '/api/recentAgents', {params: {page: pageNum, pp: pp}}, (err, res) =>
-      @isLoading.set(false)
-      if err
-        toastr.error(err.message)        
-        return
-      unless res.data.results.length
-        @theEnd.set(true)
-        return
-      for row in res.data.results
-        articleId = @articles.findOne(uri: row.currentArticle)?._id
-        unless articleId
-          articleId = @articles.insert
-            uri: row.currentArticle
-            postSubject: row.postSubject
-            date: moment(new Date(row.currentDate))
-            collapsed: false
-            order: order++
-        row.articleId = articleId
-        if row.priorDate
-          row.priorDate = new Date(row.priorDate)
-          priorDate = moment(row.priorDate)
-          currentDate = moment(new Date(row.currentDate))
-          row.days = currentDate.diff(priorDate, 'days')
-          row.months = currentDate.diff(priorDate, 'months')
-          #show days or months since last mention
-          if row.days > 30
-            row.dm = true
-        @recentAgents.insert(row)
-      # ...
-      @articles.find().forEach (article) =>
-        if @recentAgents.find(articleId: article._id).count() > 5
-          @articles.update(article._id, { $set: { collapsed: true } })
+amountToShow = new ReactiveVar(pp)
+isLoading = new ReactiveVar(false)
+theEnd = new ReactiveVar(false)
 
+loadMoreArticles = ->
+  unless theEnd.get()
+    amountToShow.set(amountToShow.get() + pp)
+
+Template.recentAgents.onCreated ->
+  @autorun =>
+    isLoading.set(true)
+    @subscribe 'articles', amountToShow.get(), ->
+      isLoading.set(false)
 
 Template.recentAgents.onRendered ->
   prevScrollPos = window.pageYOffset
-
   infiniteScroll = (options) ->
     defaults = {
-      distance: 100
+      distance: 150 # pixels
       callback: (done) -> done()
     }
     options = _.extend(defaults, options)
@@ -66,7 +34,6 @@ Template.recentAgents.onRendered ->
       handleScroll(scroller, event)
     document.ontouchmove = (event) ->
       handleScroll(scroller, event)
-
   handleScroll = (scroller, event) ->
     if scroller.updateInitiated
       return
@@ -80,35 +47,40 @@ Template.recentAgents.onRendered ->
       scroller.options.callback ->
         scroller.updateInitiated = false
     prevScrollPos = scrollPos
-
   options = {
     distance: 50
     callback: (done) =>
       @$("button.load-more-articles").click()
       done()
   }
-
   infiniteScroll(options)
-  @loadMoreArticles()
+  loadMoreArticles()
 
 Template.recentAgents.helpers
   articles: ->
-    Template.instance().articles.find({}, {sort: {order: 1}})
+    articles.find({}, {sort: {order: 1}})
   isLoading: ->
-    Template.instance().isLoading.get()
+    isLoading.get()
   theEnd: ->
-    Template.instance().theEnd.get()
-  isCollapsed: (articleId) ->
-    Template.instance().articles.findOne(articleId).collapsed
-  recentAgentsForArticle: (articleId, limit) ->
-    options = { sort: { 'priorDate': 1 } }
-    if limit
-      options.limit = 5
-    Template.instance().recentAgents.find(articleId: articleId, options)
-
+    theEnd.get()
 
 Template.recentAgents.events
-  'click .more': (event, instance) ->
-    instance.articles.update(@_id, { $set: { collapsed: false } })
   'click .load-more-articles': (event, instance) ->
-    instance.loadMoreArticles()
+    loadMoreArticles()
+
+Template.recentAgentArticle.onCreated ->
+  @subscribe 'recentAgentsForArticle', @data._id
+  @collapsed = new ReactiveVar true
+
+Template.recentAgentArticle.helpers
+  recentAgentsForArticle: ->
+    options = { sort: { 'priorDate': 1 } }
+    if Template.instance().collapsed.get()
+      options.limit = 5
+    agents.find(articleId: Template.instance().data._id, options)
+  showMoreButton: ->
+    Template.instance().collapsed.get() && agents.find(articleId: Template.instance().data._id).count() > 5
+
+Template.recentAgentArticle.events
+  'click .more': (event, instance) ->
+    instance.collapsed.set(false)

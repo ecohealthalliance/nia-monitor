@@ -1,32 +1,47 @@
 template(name="recentAgents")
   .col-md-6.col-md-offset-3
+    .col-md-6.col-md-offset-3.text-center
+      if isLoadingUp
+        .loading.spinner-margin
+          i.fa.fa-spinner.fa-2x.fa-spin
+      else
+        if showMoreButtonUp
+          button(type="button").btn.btn-info.load-more-articles-up View More ^
+          if showLatestButton
+            button(type="button").btn.btn-info.load-latest-articles Show Latest
     each articles
-        .col-md-8.articleHeader
-          h4
-            a.articleHeaderText(href=uri) {{postSubject}}
-        .col-md-4.articleHeader.ital
-          h4
-            .pull-right {{age date}}
-        table#recentAgentsTable.table
-          tbody
-            each recentAgentsForArticle _id collapsed
-              tr
-                td.recentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
-                  a(href="/detail/{{plus word}}")= word
-                td.ital
-                  if priorArticle
-                    .pull-right
-                      span.boldrange {{since ../date priorDate}}
-                      span since
-                      a(href=priorArticle) prior mention
-                  else
-                    span.no-priors.pull-right no prior mentions
-        if collapsed
-          .more.text-center
-            button(type="button").btn.btn-show-all-ia Show All Infectious Agents for Article
-    if isLoading
-      .loading.spinner-margin
-        i.fa.fa-spinner.fa-2x.fa-spin
+      +recentAgentArticle
     else
-      unless theEnd
-        button(type="button").btn.btn-info.load-more-articles Load More
+      .col-md-6.col-md-offset-3.text-center
+        p No articles found for the period from {{fromDate}} to {{toDate}}
+    .col-md-6.col-md-offset-3.text-center
+      if isLoadingDown
+        .loading.spinner-margin
+          i.fa.fa-spinner.fa-2x.fa-spin
+      else
+          button(type="button").btn.btn-info.load-more-articles-down View More v
+
+template(name="recentAgentArticle")
+  .col-md-8.articleHeader
+    h4
+      a.articleHeaderText(href=uri) {{postSubject}}
+  .col-md-4.articleHeader.ital
+    h4
+      .pull-right {{age date}}
+  table#recentAgentsTable.table
+    tbody
+      each recentAgentsForArticle
+        tr
+          td.recentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
+            a(href="/detail/{{plus word}}")= word
+          td.ital
+            if priorArticle
+              .pull-right
+                span.boldrange {{since ../date priorDate}}
+                span since
+                a(href=priorArticle) prior mention
+            else
+              span.no-priors.pull-right no prior mentions
+      if showMoreButton
+        .more.text-center
+          button(type="button").btn.btn-show-all-ia Show All Infectious Agents for Article

@@ -53,7 +53,6 @@ api = new Restivus
 @api {get} frequentDescriptors/:term Request frequent descriptors for the term
 @apiName frequentDescriptors
 @apiGroup descriptors
-
 @apiParam {String} term Infectious Agent
 ###
 api.addRoute 'frequentDescriptors/:term',
@@ -81,7 +80,7 @@ api.addRoute 'frequentDescriptors/:term',
               ; anno:end ?t_end
               ; ^dc:relation ?rel
               .
-          	?rel rdfs:label "#{escape(@urlParams.term)}"
+          ?rel rdfs:label "#{escape(@urlParams.term)}"
           FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
           BIND(lcase(?rawSelText) as ?ranCaseSelText)
           #remove leading and trailing whitespace, and new line characters
@@ -101,7 +100,6 @@ api.addRoute 'frequentDescriptors/:term',
 @api {get} recentMentions/:term Request recent mentions for the term
 @apiName recentMentions
 @apiGroup descriptors
-
 @apiParam {String} term Infectious Agent
 ###
 api.addRoute 'recentMentions/:term',
@@ -213,8 +211,7 @@ api.addRoute 'recentDescriptorMentions',
 ###
 api.addRoute 'recentAgents',
   get: ->
-    page = @queryParams.page
-    pp = @queryParams.pp
+    { page, pp } = @queryParams
     offset = page * pp
     query = prefixes + """
       SELECT
@@ -307,6 +304,7 @@ api.addRoute 'frequentAgents',
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
+
 ###
 @api {get} historicalData/:term Request historical data for the term
 @apiName historicalData
@@ -368,6 +366,7 @@ api.addRoute 'historicalData/:term/:range',
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
+
 ###
 @api {get} trendingAgents/:range Request trending agents in a time range (year, month, week)
 @apiName trendingAgents
@@ -494,3 +493,5 @@ api.addRoute 'totalArticleCount',
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
+
+module.exports = { api, prefixes, makeRequest, castBinding, escape }
