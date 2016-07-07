@@ -323,14 +323,13 @@ api.addRoute 'historicalData/:term/:range',
         dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
       when "1year"
         date.subtract(1, 'years')
-        dateStr = date.format("YYYY") + "-01-01T00:00:00+00:01"
+        dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
       when "5years"
         date.subtract(5, 'years')
         dateStr = date.format("YYYY") + "-01-01T00:00:00+00:01"
       when "all"
         date.subtract(100, 'years')
         dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
-    console.log @urlParams.range
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     query = prefixes + """
       SELECT ?word ?year (count(?word) as ?count)
@@ -351,7 +350,7 @@ api.addRoute 'historicalData/:term/:range',
       query += """
         FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
         """
-    if @urlParams.range == '6months'
+    if @urlParams.range == '6months' || @urlParams.range == '1year'
       query += """
         BIND(month(?dateTime) AS ?year)
         """
