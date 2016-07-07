@@ -90,8 +90,7 @@ for row in data
 
 
 # Pull in new items every X minutes
-# interval = 30 * 60 * 1000
-interval = 10 * 1000
+interval = 30 * 60 * 1000
 Meteor.setInterval(->
   amount = 10
   query = prefixes + """

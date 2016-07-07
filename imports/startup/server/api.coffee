@@ -422,7 +422,6 @@ api.addRoute 'trendingAgents/:range',
             BIND(coalesce(?a_date, ?p_date) AS ?dateTime)
             ?resolvedTerm rdfs:label ?termLabel
             FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
-
             {
               SELECT (count(distinct ?article2) as ?c2) ?resolvedTerm ?termLabel2
               WHERE {
@@ -449,6 +448,7 @@ api.addRoute 'trendingAgents/:range',
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
+
 ###
 @api {get} articleCountByAnnotator
 @apiName articleCountByAnnotator
