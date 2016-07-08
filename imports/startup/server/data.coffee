@@ -21,7 +21,7 @@ order = 0
 articles.remove({})
 agents.remove({})
 
-# Populate empty collections with data from SPARQL
+console.log "Populating empty collections with data from SPARQL..."
 query = prefixes + """
   SELECT
       # For each of the most recently mentioned terms find the most recent
@@ -56,6 +56,7 @@ query = prefixes + """
           GROUP BY ?resolvedTerm ?termLabel ?currentDate ?currentArticle
           # Sort by date, then document, then offset within the document.
           ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?firstMentionStart)
+          LIMIT 100
       }
       ?currentArticle pro:post/pro:subject_raw ?p_subject .
       # Select the previous usages of the most recently mentioned terms
@@ -87,11 +88,12 @@ for row in data
   if row.priorDate
     row.priorDate = new Date(row.priorDate)
   agents.insert(row)
-
+console.log "done"
 
 # Pull in new items every X minutes
 interval = 30 * 60 * 1000
 Meteor.setInterval(->
+  console.log "Updating cache..."
   amount = 10
   query = prefixes + """
     SELECT
