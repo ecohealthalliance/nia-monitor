@@ -327,15 +327,12 @@ api.addRoute 'historicalData/:term/:range',
       when "5years"
         date.subtract(5, 'years')
         dateStr = date.format("YYYY") + "-01-01T00:00:00+00:01"
-      when "all"
-        date.subtract(100, 'years')
-        dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     query = prefixes + """
-      SELECT ?word ?year (count(?word) as ?count)
+      SELECT ?word ?timeInterval (count(?word) as ?count)
       WHERE{
         SELECT
-        (?termLabel as ?word) ?year
+        (?termLabel as ?word) ?timeInterval
         WHERE {
           ?phrase anno:category "diseases"
           ; anno:source_doc ?article
@@ -352,19 +349,19 @@ api.addRoute 'historicalData/:term/:range',
         """
     if @urlParams.range == '6months' || @urlParams.range == '1year'
       query += """
-        BIND(month(?dateTime) AS ?year)
+        BIND(month(?dateTime) AS ?timeInterval)
         """
     else
       query += """
-        BIND(year(?dateTime) AS ?year)
+        BIND(year(?dateTime) AS ?timeInterval)
         """
     query+=
     """
       }
-      GROUP BY ?termLabel ?article ?year
+      GROUP BY ?termLabel ?article ?timeInterval
       ORDER BY DESC(?dateTime)
     }
-    GROUP BY ?word ?year
+    GROUP BY ?word ?timeInterval
     """
     response = makeRequest(query)
     return {

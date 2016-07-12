@@ -27,7 +27,7 @@ Template.timeline.onCreated ->
       if myLineChart != null
         myLineChart.destroy()
       for row in response.data.results
-        data = {year: row.year, count: row.count}
+        data = {timeInterval: row.timeInterval, count: row.count}
         @tld.insert(data)
       endDate = moment(new Date())
       baseDate = null
@@ -43,12 +43,10 @@ Template.timeline.onCreated ->
           ctr = 0
           while ctr < 6
             xlabels.push monthNames[baseMonth.month() + 1]
-            tdata = @tld.find({year: baseMonth.month() + 1}).fetch()
+            tdata = @tld.find({timeInterval: baseMonth.month() + 1}).fetch()
             if tdata.length == 0
               counts.push 0
             else
-              if tdata[0].count > maxCount
-                maxCount = tdata[0].count
               counts.push tdata[0].count
             baseMonth.add(1, 'months')
             ctr++
@@ -58,12 +56,10 @@ Template.timeline.onCreated ->
           ctr = 0
           while ctr < 12
             xlabels.push monthNames[baseMonth.month() + 1]
-            tdata = @tld.find({year: baseMonth.month() + 1}).fetch()
+            tdata = @tld.find({timeInterval: baseMonth.month() + 1}).fetch()
             if tdata.length == 0
               counts.push 0
             else
-              if tdata[0].count > maxCount
-                maxCount = tdata[0].count
               counts.push tdata[0].count
             baseMonth.add(1, 'months')
             ctr++
@@ -71,38 +67,23 @@ Template.timeline.onCreated ->
           endYear = endDate.year()
           baseYear = endDate.subtract(5, 'years').year()
           while baseYear <= endYear
-            tdata = @tld.find({year: baseYear}).fetch()
+            tdata = @tld.find({timeInterval: baseYear}).fetch()
             if tdata.length == 0
               counts.push 0
             else
-              if tdata[0].count > maxCount
-                maxCount = tdata[0].count
               counts.push tdata[0].count
             xlabels.push baseYear
             baseYear++
         when "all"
-          baseYear = @tld.find({}, {sort: {year: 1}}).fetch()[0].year
+          baseYear = @tld.find({}, {sort: {timeInterval: 1}}).fetch()[0].timeInterval
           while baseYear <= endDate.year()
-            tdata = @tld.find({year: baseYear}).fetch()
+            tdata = @tld.find({timeInterval: baseYear}).fetch()
             if tdata.length == 0
               counts.push 0
             else
-              if tdata[0].count > maxCount
-                maxCount = tdata[0].count
               counts.push tdata[0].count
             xlabels.push baseYear
             baseYear++
-      stepSize = 1
-      if maxCount > 10
-        stepSize = 2
-      if maxCount > 25
-        stepSize = 5
-      if maxCount > 100
-        stepSize = 10
-      if maxCount > 1000
-        stepSize = 100
-      if maxCount > 10000
-        stepSize = 1000
       myLineChart = new Chart($("#canvas"),
         type: 'bar'
         data:
@@ -129,14 +110,13 @@ Template.timeline.onCreated ->
             data: counts
           } ]
         options:
+          showScale: false
           legend:
             display: false
-          xAxes: [ { display: true } ],
-          scaleShowLabels: true,
           scales:
             yAxes: [{
               ticks:
-                stepSize: stepSize
+                display: false
               scaleLabel:
                 display: true,
                 labelString: 'Number of Articles Mentioning ' + agent
@@ -150,6 +130,7 @@ Template.timeline.onCreated ->
               scaleLabel:
                 display: false
               gridLines:
+                display: false
                 lineWidth: 0
                 color: "rgba(255,255,255,0)"
             }]
