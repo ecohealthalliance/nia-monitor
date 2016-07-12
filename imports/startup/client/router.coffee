@@ -4,12 +4,14 @@ require '../../ui/layouts/main.coffee'
 # pages
 require '../../ui/pages/detail.coffee'
 require '../../ui/pages/descriptor.coffee'
+require '../../ui/pages/datasummary.coffee'
 
 # template helpers
 require '../../ui/helpers/time.coffee'
 require '../../ui/helpers/moment.coffee'
 require '../../ui/helpers/plus.coffee'
 require '../../ui/helpers/pluralize.coffee'
+
 
 # routes
 Router.route '/', ->
@@ -20,3 +22,5 @@ Router.route '/descriptor/:_descriptorName', ->
   @render 'descriptor', { data: this.params }
 Router.route '/descriptor/:_descriptorName/:_term', ->
   @render 'descriptor', { data: this.params }
+Router.route '/datasummary', ->
+  @render 'datasummary', { data: this.params }

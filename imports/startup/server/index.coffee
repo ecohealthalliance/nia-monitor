@@ -435,3 +435,27 @@ api.addRoute 'trendingAgents/:range',
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
+###
+@api {get} articleCount
+@apiName articleCount
+@apiGroup article
+###
+api.addRoute 'articleCount',
+  get: ->
+    query = prefixes + """
+      SELECT
+          ?annotator
+          (count(?article) AS ?articles)
+      WHERE {
+          ?article pro:post ?post .
+          OPTIONAL {
+              ?article anno:annotated_by ?annotator
+          }
+      }
+      GROUP BY ?annotator
+      """
+    response = makeRequest(query)
+    return {
+      status: "success"
+      results: response.results.bindings.map(castBinding)
+    }
