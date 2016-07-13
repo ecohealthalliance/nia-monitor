@@ -313,32 +313,26 @@ api.addRoute 'frequentAgents',
 @apiGroup descriptors
 @apiParam {String} term Infectious Agent
 ###
-api.addRoute 'historicalData/:term',
+api.addRoute 'historicalData/:term/:range',
   get: ->
+    dateStr = ""
+    date = moment(new Date())
+    switch @urlParams.range
+      when "6months"
+        date.subtract(6, 'months')
+        dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
+      when "1year"
+        date.subtract(1, 'years')
+        dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
+      when "5years"
+        date.subtract(5, 'years')
+        dateStr = date.format("YYYY") + "-01-01T00:00:00+00:01"
+    dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     query = prefixes + """
-      SELECT (max(?date) as ?mdt)
-      WHERE {
-        ?phrase anno:category "diseases"
-        ; anno:source_doc ?currentArticle
-        ; anno:selected-text ?rawText
-        ; ^dc:relation ?resolvedTerm
-        .
-        ?resolvedTerm rdfs:label ?termLabel .
-        ?currentArticle pro:post/pro:date ?p_date .
-        OPTIONAL { ?currentArticle  pro:date  ?a_date }
-        BIND(coalesce(?a_date, ?p_date) AS ?date)
-        filter(?termLabel = "#{escape(@urlParams.term)}")
-      }
-      """
-    response = makeRequest(query)
-    recentDate = (response.results.bindings)[0].mdt.value
-    baseYear = moment(recentDate).year() - 5
-
-    query = prefixes + """
-      SELECT ?word ?year (count(?word) as ?count)
+      SELECT ?word ?timeInterval (count(?word) as ?count)
       WHERE{
         SELECT
-        (?termLabel as ?word) ?year
+        (?termLabel as ?word) ?timeInterval
         WHERE {
           ?phrase anno:category "diseases"
           ; anno:source_doc ?article
@@ -348,14 +342,27 @@ api.addRoute 'historicalData/:term',
           ?resolvedTerm rdfs:label ?termLabel .
           ?article pro:date ?dateTime
           FILTER(?termLabel = "#{escape(@urlParams.term)}")
-          FILTER (?dateTime > "#{escape(baseYear)}-01-01T00:00:00+00:01"^^xsd:dateTime)
-    		BIND(year(?dateTime) AS ?year)
-        }
-        GROUP BY ?termLabel ?article ?year
-        ORDER BY DESC(?dateTime)
-      }
-      GROUP BY ?word ?year
       """
+    if @urlParams.range != 'all'
+      query += """
+        FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
+        """
+    if @urlParams.range == '6months' || @urlParams.range == '1year'
+      query += """
+        BIND(month(?dateTime) AS ?timeInterval)
+        """
+    else
+      query += """
+        BIND(year(?dateTime) AS ?timeInterval)
+        """
+    query+=
+    """
+      }
+      GROUP BY ?termLabel ?article ?timeInterval
+      ORDER BY DESC(?dateTime)
+    }
+    GROUP BY ?word ?timeInterval
+    """
     response = makeRequest(query)
     return {
       status: "success"
@@ -376,9 +383,8 @@ api.addRoute 'trendingAgents/:range',
     duration = "365"
     switch @urlParams.range
       when "year"
-        #TODO: subtract only 4 years from date, and 1 year from date2 with the full dataset
-        date.subtract(29, 'years')
-        date2.subtract(30, 'years')
+        date.subtract(1, 'years')
+        date2.subtract(4, 'years')
         duration = "365"
       when "month"
         date.subtract(1, 'months')
@@ -393,42 +399,51 @@ api.addRoute 'trendingAgents/:range',
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr2 = date2.format("YYYY-MM-DD") + "T00:00:00+00:01"
     query = prefixes + """
-      SELECT ?resolvedTerm
-        (sample(?termLabel) as ?word)
-        (count(DISTINCT ?article) as ?count)
-        (sample(?c2) as ?count2)
-        ((?count2)/(xsd:float(#{escape(duration)}*4)) as ?rate2)
-        ((?count)/(xsd:float(#{escape(duration)})) as ?rate)
-        ((?rate/?rate2) AS ?result)
+      SELECT
+        ?resolvedTerm ?word
+        ?count ?count2
+        (?count/xsd:float(#{escape(duration)}) as ?rate)
+        (?count2/xsd:float(#{escape(duration)}*4) as ?rate2)
+        (?rate/?rate2 AS ?result)
       WHERE {
-        ?phrase anno:category "diseases"
-        ; ^dc:relation ?resolvedTerm
-        ; anno:source_doc ?article
-        .
-        ?article pro:post/pro:date ?p_date .
-        OPTIONAL { ?article  pro:date  ?a_date }
-        BIND(coalesce(?a_date, ?p_date) AS ?dateTime)
-        ?resolvedTerm rdfs:label ?termLabel
-        FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
-
+        # There is an extra level of nesting here bc virtuoso doesn't allow
+        # variables bound in select statements to be used for ordering.
         {
-          SELECT (count(distinct ?article2) as ?c2) ?resolvedTerm ?termLabel2
-          WHERE{
-            ?prev_mention anno:source_doc ?article2
+          SELECT ?resolvedTerm
+            (sample(?termLabel) as ?word)
+            (count(DISTINCT ?article) as ?count)
+            (sample(?c2) as ?count2)
+          WHERE {
+            ?phrase anno:category "diseases"
             ; ^dc:relation ?resolvedTerm
+            ; anno:source_doc ?article
             .
-            ?article2 pro:post/pro:date ?p_date2 .
-            OPTIONAL { ?article2  pro:date  ?a_date2 }
-            BIND(coalesce(?a_date2, ?p_date2) AS ?dateTime2) .
-      		  ?resolvedTerm rdfs:label ?termLabel2
-            FILTER (?dateTime2 > "#{escape(dateStr2)}"^^xsd:dateTime)
-           }
-          GROUP BY ?resolvedTerm ?termLabel2
+            ?article pro:post/pro:date ?p_date .
+            OPTIONAL { ?article  pro:date  ?a_date }
+            BIND(coalesce(?a_date, ?p_date) AS ?dateTime)
+            ?resolvedTerm rdfs:label ?termLabel
+            FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
+    
+            {
+              SELECT (count(distinct ?article2) as ?c2) ?resolvedTerm ?termLabel2
+              WHERE {
+                ?prev_mention anno:source_doc ?article2
+                ; ^dc:relation ?resolvedTerm
+                .
+                ?article2 pro:post/pro:date ?p_date2 .
+                OPTIONAL { ?article2  pro:date  ?a_date2 }
+                BIND(coalesce(?a_date2, ?p_date2) AS ?dateTime2) .
+          		  ?resolvedTerm rdfs:label ?termLabel2
+                FILTER (?dateTime2 > "#{escape(dateStr2)}"^^xsd:dateTime)
+               }
+              GROUP BY ?resolvedTerm ?termLabel2
+            }
+          }
+          GROUP BY ?resolvedTerm
         }
       }
-      GROUP BY ?resolvedTerm
       ORDER BY DESC(?result)
-      LIMIT 20
+      LIMIT 50
       """
     response = makeRequest(query)
     return {

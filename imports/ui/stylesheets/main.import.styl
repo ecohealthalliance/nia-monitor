@@ -1,56 +1,30 @@
-body
-  padding-bottom 100px
-  font-family Lato,sans-serif
-  font-weight 300
-  color #373a3c
-
 .rmia-word:hover
   cursor pointer
   cursor hand
-  color blue
+  color $secondary
 
 .fmia-word:hover
   cursor pointer
   cursor hand
-  color blue
-
-.spinner
-  position fixed
-  background-color grey
-  opacity .3
-  width 100%
-  height 100%
-  z-index 99999
-
-.spinner-element
-  font-size 300px
-  position fixed
-  left 40%
-  top 30%
-  z-index 99999
-
-.spinner-margin
-  margin 40px
-
-.underline
-  text-decoration underline
-
-.panel-default > .panel-heading
-  color $secondary-dark
+  color $secondary
 
 .no-priors
   font-weight bold
-  color darkorange
+  color $primary
 
 #trendingRange
+#timelineRange
   width 100px
   margin 10px
 
 .iaHeader
   margin-top 20px
-  color darkorange
+  color $primary
+  text-align-last right
 
 .more
+  margin-top -20px
+  margin-bottom 50px
   text-align center
 
 .load-more-articles
@@ -64,65 +38,62 @@ body
 .clear
   clear both
 
-.nav-tabs > li, .nav-pills > li
-  float none
-  display inline-block
-  width 300px
-.nav-tabs
-    text-align center
-    border-bottom 3px solid darkorange
-
-.nav-tabs > li > a, .nav-tabs > li > a:hover, .nav-tabs > li > a:focus
-  color darkorange
-  background-color oldlace
-
-.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus
-  color white
-  font-weight bold
-  background-color darkorange
-
-.navbar-default
-  margin-bottom 0px
-
 .articleHeader
   font-weight bold  
 
 .articleHeaderText
-  color deepskyblue
+  color $secondary
   margin-left -10px
 
 .mainHeaderText
-  color darkorange
+  color $primary
   padding 20px
   text-align center
+  margin-top -50px
 
 .headerDescriptionContainer
-  background-color #0ba5ff
+  background-color $secondary
   color white
-  padding 20px
+  padding 50px
   line-height 1.3
   text-align center
   margin-bottom 30px
+  p
+    letter-spacing .03em
+    &:last-of-type
+      margin-bottom 0
 
 .headerDescription
   line-height 1.3
   font-size 1.6em
   margin-bottom 1em
 
-.ital
-  font-style italic
-
-.table td
-  border-top 1px solid lightgrey
-  border-bottom 1px solid lightgrey
-  padding 20px
-
 .boldrange
   font-weight bold
 
 .btn-show-all-ia
-  border 1px solid mediumaquamarine
-  background-color white
-  color mediumaquamarine
-  border-top none
-  margin-left 65%
+  border 1px solid $positive
+  border-top-left-radius 0
+  border-top-right-radius 0
+  border-top  0
+  background none
+  color $positive
+  padding .75em 5em
+  margin 0 auto
+  &:hover
+    background lighten(@color, 90%)
+    color darken(@color, 40%)
+  &:active
+  &:active:focus
+  &:focus
+    background lighten(@color, 75%)
+    color darken(@color, 40%)
+    box-shadow none
+    outline 0
+
+
+#timelineDiv
+  width 100%
+
+.chartjs-hidden-iframe
+  position relative
