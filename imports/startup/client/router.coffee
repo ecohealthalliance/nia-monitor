@@ -4,6 +4,7 @@ require '../../ui/layouts/main.coffee'
 # pages
 require '../../ui/pages/detail.coffee'
 require '../../ui/pages/descriptor.coffee'
+require '../../ui/pages/about.jade'
 
 # template helpers
 require '../../ui/helpers/time.coffee'
@@ -20,3 +21,5 @@ Router.route '/descriptor/:_descriptorName', ->
   @render 'descriptor', { data: this.params }
 Router.route '/descriptor/:_descriptorName/:_term', ->
   @render 'descriptor', { data: this.params }
+Router.route '/about', ->
+  @render 'about'
