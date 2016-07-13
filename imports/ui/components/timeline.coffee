@@ -92,7 +92,7 @@ Template.timeline.onCreated ->
             label: 'Articles'
             fill: false
             lineTension: 0.1
-            backgroundColor: 'deepskyblue'
+            backgroundColor: 'rgb(11, 165, 255)'
             borderColor: 'rgba(75,192,192,1)'
             borderCapStyle: 'butt'
             borderDash: []
@@ -117,9 +117,6 @@ Template.timeline.onCreated ->
             yAxes: [{
               ticks:
                 display: false
-              scaleLabel:
-                display: true,
-                labelString: 'Number of Articles Mentioning ' + agent
               gridLines:
                 lineWidth: 0,
                 color: "rgba(255,255,255,0)"
