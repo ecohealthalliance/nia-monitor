@@ -1,4 +1,46 @@
 template(name="about")
   +header
-  .container-fluid
-    h2 About
+  .about
+    .container-fluid.about--intro-content
+      h2.description-heading.col-md-8.col-md-offset-2 NIAM displays the diseases mentioned in ProMED mail posts.
+      p.col-md-6.col-md-offset-3.page-description.main
+        | It indicates a disease's novelty by measuring the time since the prior mention.
+        | Diseases with no prior mentions or prior mentions within several years are considered novel.
+        | The application allows users to delve into historical data about how
+        | and when each disease was mentioned.
+
+    .about--detail-wide
+      .detail-text
+        h4 For instance...
+        p
+          | The detail page shows a timeline of mentions by year and descriptors
+          | associated with diseases, like "antibiotic-resistant".
+          | Upsurges in the frequencies at which common diseases
+          | are mentioned are tracked through the trending infectious agent panel.
+      .detail-image
+        img(src="images/about/graph.svg")
+
+    h3 NIAM API
+    .about--detail-centered
+      .detail-text
+        p
+          | Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          | Sed haec nihil sane ad rem; Quamquam id quidem, infinitum est in hac urbe;
+          | Tollenda est atque extrahenda radicitus. Hoc Hieronymus summum bonum esse dixit.
+      a.btn.btn-primary.btn-allcaps(href="/.apidocs/index.html") Goto API
+
+    h3 Acknowledgements
+    .about--detail-wide.acknowledgements
+      .acknowledgement
+        a(href="//ecohealthalliance.org")
+          img(src="images/logos/eha-logo.svg")
+      .acknowledgement
+        a(href="//www.dtra.mil/")
+          img.square(src="images/logos/dtra-logo.svg")
+      .acknowledgement
+        a(href="//www.promedmail.org/")
+          img(src="images/logos/promed-logo.svg")
+
+    .about--detail-centered
+      p Need more info?
+      a.btn.btn-default.btn-mail(href="mailto:info@ecohealthalliance.org?subject=Question about NIAM") Email us
