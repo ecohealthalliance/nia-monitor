@@ -1,46 +1,98 @@
 require './timeline.jade'
 
 Template.timeline.helpers
+  timelineRange: ->
+    Template.instance().timelineRange.get()
   ready: ->
     Template.instance().ready.get()
 
+Template.timeline.events
+  'change #timelineRange': (event, template) ->
+    template.timelineRange.set($("#timelineRange").val())
+    return
+
+myLineChart = null
+
 Template.timeline.onCreated ->
   @ready = new ReactiveVar(false)
+  @timelineRange = new ReactiveVar('5years')
   @tld = new Meteor.Collection(null)
   @autorun =>
     agent = Router.current().getParams()._agentName
     @tld.find({}, reactive: false).map((d) => @tld.remove(d))
-    HTTP.call 'get', '/api/historicalData/' + agent, (err, response) =>
+    HTTP.call 'get', '/api/historicalData/' + agent + '/' + @timelineRange.get(), (err, response) =>
       if err
         toastr.error(err.message)
         return
+      if myLineChart != null
+        myLineChart.destroy()
       for row in response.data.results
-        data = {year: row.year, count: row.count}
+        data = {timeInterval: row.timeInterval, count: row.count}
         @tld.insert(data)
-      baseYear = @tld.find({}, {sort: {year: -1}}).fetch()[0].year
-      ctryear = baseYear
-      data = {}
-      tdata = @tld.find().fetch()
-      while ctryear > baseYear - 5
-        data[ctryear] = @tld.find({year: ctryear}).fetch()
-        if data[ctryear].length ==  0
-          data[ctryear][0] = {year: ctryear, "count": 0}
-        ctryear--
+      endDate = moment(new Date())
+      baseDate = null
+      ymMax = moment(new Date()).year()
+      monthNames = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+      xlabels = []
+      counts = []
+      maxCount = 0
+      switch @timelineRange.get()
+        when "6months"
+          endMonth = endDate.month() + 1
+          baseMonth = endDate.subtract(5, 'months')
+          ctr = 0
+          while ctr < 6
+            xlabels.push monthNames[baseMonth.month() + 1]
+            tdata = @tld.find({timeInterval: baseMonth.month() + 1}).fetch()
+            if tdata.length == 0
+              counts.push 0
+            else
+              counts.push tdata[0].count
+            baseMonth.add(1, 'months')
+            ctr++
+        when "1year"
+          endMonth = endDate.month() + 1
+          baseMonth = endDate.subtract(11, 'months')
+          ctr = 0
+          while ctr < 12
+            xlabels.push monthNames[baseMonth.month() + 1]
+            tdata = @tld.find({timeInterval: baseMonth.month() + 1}).fetch()
+            if tdata.length == 0
+              counts.push 0
+            else
+              counts.push tdata[0].count
+            baseMonth.add(1, 'months')
+            ctr++
+        when "5years"
+          endYear = endDate.year()
+          baseYear = endDate.subtract(5, 'years').year()
+          while baseYear <= endYear
+            tdata = @tld.find({timeInterval: baseYear}).fetch()
+            if tdata.length == 0
+              counts.push 0
+            else
+              counts.push tdata[0].count
+            xlabels.push baseYear
+            baseYear++
+        when "all"
+          baseYear = @tld.find({}, {sort: {timeInterval: 1}}).fetch()[0].timeInterval
+          while baseYear <= endDate.year()
+            tdata = @tld.find({timeInterval: baseYear}).fetch()
+            if tdata.length == 0
+              counts.push 0
+            else
+              counts.push tdata[0].count
+            xlabels.push baseYear
+            baseYear++
       myLineChart = new Chart($("#canvas"),
         type: 'bar'
         data:
-          labels: [
-            baseYear - 4
-            baseYear - 3
-            baseYear - 2
-            baseYear - 1
-            baseYear
-          ]
+          labels: xlabels
           datasets: [{
             label: 'Articles'
             fill: false
             lineTension: 0.1
-            backgroundColor: 'rgba(75,192,192,0.4)'
+            backgroundColor: 'rgb(11, 165, 255)'
             borderColor: 'rgba(75,192,192,1)'
             borderCapStyle: 'butt'
             borderDash: []
@@ -55,26 +107,16 @@ Template.timeline.onCreated ->
             pointHoverBorderWidth: 2
             pointRadius: 1
             pointHitRadius: 10
-            data: [
-              data[baseYear - 4][0].count
-              data[baseYear - 3][0].count
-              data[baseYear - 2][0].count
-              data[baseYear - 1][0].count
-              data[baseYear][0].count
-            ]
+            data: counts
           } ]
         options:
+          showScale: false
           legend:
             display: false
-          xAxes: [ { display: true } ],
-          scaleShowLabels: true,
           scales:
             yAxes: [{
               ticks:
-                stepSize: 5
-              scaleLabel:
-                display: true,
-                labelString: 'Number of Articles Mentioning ' + agent
+                display: false
               gridLines:
                 lineWidth: 0,
                 color: "rgba(255,255,255,0)"
@@ -83,9 +125,9 @@ Template.timeline.onCreated ->
               ticks:
                 stepSize: 5
               scaleLabel:
-                display: true
-                labelString: 'Year'
+                display: false
               gridLines:
+                display: false
                 lineWidth: 0
                 color: "rgba(255,255,255,0)"
             }]
