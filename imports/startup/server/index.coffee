@@ -445,7 +445,7 @@ api.addRoute 'articleCount',
     query = prefixes + """
       SELECT
           ?annotator
-          (count(?article) AS ?articles)
+          (count(?article) AS ?articleCount)
       WHERE {
           ?article pro:post ?post .
           OPTIONAL {

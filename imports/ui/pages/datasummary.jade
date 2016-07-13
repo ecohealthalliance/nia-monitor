@@ -1,9 +1,14 @@
 template(name='datasummary')
+  +header
+  h2.mainHeaderText Database Summary Statistics
   .col-md-6.col-md-offset-3
     #dataSummaryDiv(style='padding-top: 50px;')
       table#articlesTable.table
         tbody
+          th Annotator
+          th Articles
           each articles
             tr
-              td.ital {{annotator}}
-              td.ital {{articles}}
+              td.ital
+                a(href=annotator) {{annotator}}
+              td.ital {{articleCount}}
