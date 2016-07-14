@@ -4,11 +4,8 @@ require '../../ui/layouts/main.coffee'
 # pages
 require '../../ui/pages/detail.coffee'
 require '../../ui/pages/descriptor.coffee'
-<<<<<<< HEAD
 require '../../ui/pages/datasummary.coffee'
-=======
 require '../../ui/pages/about.jade'
->>>>>>> master
 
 # template helpers
 require '../../ui/helpers/time.coffee'
