@@ -423,7 +423,7 @@ api.addRoute 'trendingAgents/:range',
             BIND(coalesce(?a_date, ?p_date) AS ?dateTime)
             ?resolvedTerm rdfs:label ?termLabel
             FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
-    
+
             {
               SELECT (count(distinct ?article2) as ?c2) ?resolvedTerm ?termLabel2
               WHERE {
@@ -451,11 +451,11 @@ api.addRoute 'trendingAgents/:range',
       results: response.results.bindings.map(castBinding)
     }
 ###
-@api {get} articleCount
-@apiName articleCount
+@api {get} articleCountByAnnotator
+@apiName articleCountByAnnotator
 @apiGroup article
 ###
-api.addRoute 'articleCount',
+api.addRoute 'articleCountByAnnotator',
   get: ->
     query = prefixes + """
       SELECT
@@ -468,6 +468,26 @@ api.addRoute 'articleCount',
           }
       }
       GROUP BY ?annotator
+      """
+    response = makeRequest(query)
+    return {
+      status: "success"
+      results: response.results.bindings.map(castBinding)
+    }
+
+###
+@api {get} totalArticleCount
+@apiName totalArticleCount
+@apiGroup article
+###
+api.addRoute 'totalArticleCount',
+  get: ->
+    query = prefixes + """
+      SELECT
+          (count(?article) AS ?articleCount)
+      WHERE {
+          ?article pro:post ?post
+      }
       """
     response = makeRequest(query)
     return {
