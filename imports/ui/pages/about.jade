@@ -2,21 +2,20 @@ template(name="about")
   +header
   .about
     .container-fluid.about--intro-content
-      h2.description-heading.col-md-8.col-md-offset-2 NIAM displays the diseases mentioned in ProMED mail posts.
-      p.col-md-6.col-md-offset-3.page-description.main
+      .description-heading NIAM displays the diseases mentioned in ProMED-mail posts.
+      .page-description
         | It indicates a disease's novelty by measuring the time since the prior mention.
-        | Diseases with no prior mentions or prior mentions within several years are considered novel.
-        | The application allows users to delve into historical data about how
-        | and when each disease was mentioned.
+        | Diseases with no prior mentions or no prior mentions within several years are considered novel.
+
 
     .about--detail-wide
       .detail-text
-        h4 For instance...
-        p
-          | The detail page shows a timeline of mentions by year and descriptors
-          | associated with diseases, like "antibiotic-resistant".
-          | Upsurges in the frequencies at which common diseases
-          | are mentioned are tracked through the trending infectious agent panel.
+        | The application allows users to delve into historical data about how
+        | and when each disease was mentioned.
+        | For instance, the detail page shows a timeline of mentions by year and descriptors
+        | associated with diseases, like "antibiotic-resistant".
+        | Upsurges in the frequencies at which common diseases
+        | are mentioned are tracked through the trending infectious agent panel.
       .detail-image
         img(src="images/about/graph.svg")
 
@@ -24,9 +23,8 @@ template(name="about")
     .about--detail-centered
       .detail-text
         p
-          | Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          | Sed haec nihil sane ad rem; Quamquam id quidem, infinitum est in hac urbe;
-          | Tollenda est atque extrahenda radicitus. Hoc Hieronymus summum bonum esse dixit.
+          | Other applications can use NIAM's disease mention data by
+          | connecting to its API.
       a.btn.btn-primary.btn-allcaps(href="/.apidocs/index.html") Goto API
 
     h3 Acknowledgements
@@ -43,4 +41,7 @@ template(name="about")
 
     .about--detail-centered
       p Need more info?
-      a.btn.btn-default.btn-mail(href="mailto:info@ecohealthalliance.org?subject=Question about NIAM") Email us
+      a.btn.btn-default.btn-mail(href="mailto:tech@ecohealthalliance.org?subject=Question about NIAM") Email us
+
+    .about--detail-centered
+      a(href="/datasummary") Database summary stats

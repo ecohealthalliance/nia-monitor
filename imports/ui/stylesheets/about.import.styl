@@ -12,6 +12,9 @@
   padding-top 4em
   padding-bottom 4em
   text-align center
+  font-size 1.25em
+  color darken($d-gray, 30%)
+  max-width 33em
 
 .about--detail-centered
 .about--detail-wide
@@ -27,24 +30,17 @@
   flex-direction row
   .detail-text
     flex 1
+    margin 0 0 1em 0
+    background lighten($primary, 50%)
+    letter-spacing $letter-spacing
+    display inline-block
+    padding 2em
+    padding-left 15%
+    color $body-text
+    text-align left
     p
       padding-left 15%
       padding-right 4em
-    h4
-      margin 0 0 1em 0
-      background lighten($primary, 50%)
-      letter-spacing $letter-spacing
-      display inline-block
-      padding .5em 8em
-      padding-left 15%
-      padding-right 2em
-      padding-top .5em
-      padding-bottom .5em
-      font-size 1.25em
-      font-weight 500
-      color $body-text
-      text-align left
-
 .about--detail-centered
   max-width 50%
   margin-left auto
