@@ -1,0 +1,87 @@
+.about
+  h3
+    margin 0 auto 1em auto
+    color $primary
+    font-weight 800
+    letter-spacing $letter-spacing
+    text-align center
+    font-size 2.25em
+    text-transform uppercase
+
+.about--intro-content
+  padding-top 4em
+  padding-bottom 4em
+  text-align center
+  font-size 1.25em
+  color darken($d-gray, 30%)
+  max-width 33em
+
+.about--detail-centered
+.about--detail-wide
+  margin-bottom 10em
+  .detail-text
+    font-size 1.25em
+    color darken($d-gray, 30%)
+
+.about--detail-wide
+  display flex
+  align-items center
+  justify-content center
+  flex-direction row
+  .detail-text
+    flex 1
+    margin 0 0 1em 0
+    background lighten($primary, 50%)
+    letter-spacing $letter-spacing
+    display inline-block
+    padding 2em
+    padding-left 15%
+    color $body-text
+    text-align left
+    p
+      padding-left 15%
+      padding-right 4em
+.about--detail-centered
+  max-width 50%
+  margin-left auto
+  margin-right auto
+  text-align center
+  .detail-text
+    margin-bottom 2em
+  .btn
+    padding-right 5em
+    padding-left 5em
+
+.detail-image
+  flex 1
+  min-width 40%
+
+.acknowledgements
+  margin-left 20%
+  margin-right 20%
+
+.acknowledgement
+  flex 1
+  text-align center
+  margin 1em
+  img
+    padding 1em
+    max-width 100%
+  .square
+    max-width 60%
+
+
+@media (max-width:800px)
+  .about--detail-wide
+      flex-direction column
+
+  .about--detail-centered
+  .about--detail-wide
+    margin-bottom 5em
+
+  .detail-image
+    min-width 100%
+    margin-top 1em
+
+  .about--detail-centered
+    max-width 95%

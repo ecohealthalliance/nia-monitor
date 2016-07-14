@@ -1,6 +1,10 @@
 template(name='header')
+  link(href='http://fonts.googleapis.com/css?family=Lato:300,400&subset=latin,latin-ext', rel='stylesheet', type='text/css')
   nav.navbar.navbar-default
     div.container-fluid
-      div.navbar-header
-        a.logo(href="/")
-          h1 Novel Infectious Agent Monitor
+      div.col-md-6.col-md-offset-3
+        div.col-md-6
+          a(href="/")
+            img.logo(src="images/logo.svg" alt="Go to W3Schools!")
+        div.col-md-6
+          a.about.aboutText(href="/about") About

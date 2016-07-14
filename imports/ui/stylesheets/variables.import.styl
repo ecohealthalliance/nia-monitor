@@ -1,14 +1,18 @@
-$primary        = rgba(255, 151, 11, 1)
-$primary-light  = rgba(255, 244, 230, 1)
-$primary-dark   = darken($primary, 40%)
-$secondary      = rgba(11, 165, 255, 1)
-$secondary-dark = darken($secondary, 40%)
+$pole = 40%
+
+$primary         = rgba(255, 151, 11, 1)
+$primary-light   = rgba(255, 244, 230, 1)
+$primary-dark    = darken($primary, $pole)
+$secondary       = rgba(11, 165, 255, 1)
+$secondary-dark  = darken($secondary, $pole)
+$secondary-light = lighten($secondary, $pole)
 
 $positive       = rgba(111, 210, 168, 1)
 $negative       = rgba(255, 124, 75, 1)
 
 $conform = $positive
-$delete = $negative
+$delete  = $negative
+$warning = rgba(242, 173, 64, 1)
 
 $link-colors = {
   link: $positive
@@ -24,3 +28,12 @@ $m-gray      = #CCC
 $white-trans = rgba(255,255,255,.7)
 
 $body-text   = $dd-gray
+
+$border-gray          = #DDD
+$border-primary       = lighten($primary-light, 70%)
+$border-primary-l     = lighten($border-primary, 20%)
+$border-primary-d     = darken($border-primary, 20%)
+$border-secondary     = lighten($secondary-light, 70%)
+$border-secondary-l   = lighten($border-secondary, 20%)
+$border-secondary-d   = darken($border-secondary, 20%)
+$highlight-color      = lighten($primary-light, 70%)
