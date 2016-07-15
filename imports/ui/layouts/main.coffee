@@ -1,6 +1,7 @@
 require './header.jade'
 require './main.jade'
 
+require '../components/datacheck.coffee'
 require '../lists/recentAgents.coffee'
 require '../lists/frequentAgents.coffee'
 require '../lists/trendingAgents.coffee'
