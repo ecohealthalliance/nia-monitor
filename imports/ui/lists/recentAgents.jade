@@ -21,6 +21,7 @@ template(name="recentAgents")
       else
           button(type="button").btn.btn-info.load-more-articles-down View More v
 
+
 template(name="recentAgentArticle")
   .col-md-8.articleHeader
     h4
@@ -42,6 +43,6 @@ template(name="recentAgentArticle")
                 a(href=priorArticle) prior mention
             else
               span.no-priors.pull-right no prior mentions
-      if showMoreButton
+      if expandable
         .more.text-center
           button(type="button").btn.btn-show-all-ia Show All Infectious Agents for Article

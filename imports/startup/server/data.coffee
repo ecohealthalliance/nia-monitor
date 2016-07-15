@@ -2,11 +2,25 @@
 { articles, agents } = require '../../data/collections.coffee'
 
 
-Meteor.publish 'articles', (amountToShow) ->
+Meteor.publish 'articles', (monthsToShow, skipMonths) ->
+  startingDate = new Date()
+  oldestDate = new Date()
+  if skipMonths > 0
+    startingDate.setMonth startingDate.getMonth() - skipMonths
+  oldestDate.setMonth startingDate.getMonth() - monthsToShow
+
+  startingDate.setDate 0
+  oldestDate.setDate 0
+
   articles.find(
-    {},
     {
-      limit: amountToShow
+      date: {
+        $lte: startingDate,
+        $gte: oldestDate
+      }
+    },
+    {
+      limit: 30
       sort: { order: 1 }
     }
   )
@@ -77,7 +91,7 @@ articles.remove({})
 agents.remove({})
 
 console.log "Populating empty collections with data from SPARQL..."
-query = buildQuery(100)
+query = buildQuery(1000)
 response = makeRequest(query)
 data = response.results.bindings.map(castBinding)
 for row in data
