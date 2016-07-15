@@ -1,11 +1,12 @@
 template(name='timeline')
   .col-md-10.col-md-offset-1
-    h4.col-md-2.iaHeader Timeline range:
-    select#timelineRange.col-md-10.form-control
-      option(value="6months") 6 Months
-      option(value="1year") 1 Year
-      option( selected, value="5years") 5 Years
-      option(value="all") All Time
+    .col-md-12.col-s-8.col-xs-12
+      h4.iaHeader.pull-left Timeline range:
+      select#timelineRange.col-md-8.col-sm-10.col-xs-8.form-control
+        option(value="6months") 6 Months
+        option(value="1year") 1 Year
+        option( selected, value="5years") 5 Years
+        option(value="all") All Time
     #timeLineSpinner.loading.spinner-margin
         i.fa.fa-spinner.fa-2x.fa-spin
     #timelineDiv
