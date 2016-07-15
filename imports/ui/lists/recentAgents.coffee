@@ -1,72 +1,61 @@
 require './recentAgents.jade'
 
-pp = 75
+{ articles, agents } = require '../../data/collections.coffee'
+
+# Maximum amount of months to be visible at one given time
+maxVisibleMonths = 3
+
+skipMonths = new ReactiveVar(Number(sessionStorage.getItem 'skipMonths') or 0)
+monthsToShow = new ReactiveVar(Number(sessionStorage.getItem 'monthsToShow') or 1)
+
+isLoadingUp = new ReactiveVar(false)
+isLoadingDown = new ReactiveVar(false)
+
+# 0 = default, -1 = up, +1 = down
+lastScrollDirection = 0
+
+loadMoreArticlesUp = ->
+  if skipMonths.get() > 0
+    isLoadingUp.set(true)
+    amount = skipMonths.get() - 1
+    skipMonths.set(amount)
+    sessionStorage.setItem('skipMonths', amount)
+loadMoreArticlesDown = ->
+  if monthsToShow.get() >= maxVisibleMonths
+    amount = skipMonths.get() + 1
+    skipMonths.set(amount)
+    sessionStorage.setItem('skipMonths', amount)
+  else
+    amount = monthsToShow.get() + 1
+    monthsToShow.set(amount)
+    sessionStorage.setItem('monthsToShow', amount)
+  isLoadingDown.set(true)
 
 Template.recentAgents.onCreated ->
-  @recentAgents = new Meteor.Collection(null)
-  @articles = new Meteor.Collection(null)
-  @currentPageNumber = new ReactiveVar(0)
-  @isLoading = new ReactiveVar(false)
-  @theEnd = new ReactiveVar(false)
-  order = 0
-  @loadMoreArticles = =>
-    if @isLoading.get() then return
-    pageNum = @currentPageNumber.get()
-    @currentPageNumber.set(pageNum + 1)
-    # @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
-    @isLoading.set(true)
-    HTTP.get '/api/recentAgents', {params: {page: pageNum, pp: pp}}, (err, res) =>
-      @isLoading.set(false)
-      if err
-        toastr.error(err.message)        
-        return
-      unless res.data.results.length
-        @theEnd.set(true)
-        return
-      for row in res.data.results
-        articleId = @articles.findOne(uri: row.currentArticle)?._id
-        unless articleId
-          articleId = @articles.insert
-            uri: row.currentArticle
-            postSubject: row.postSubject
-            date: moment(new Date(row.currentDate))
-            collapsed: false
-            order: order++
-        row.articleId = articleId
-        if row.priorDate
-          row.priorDate = new Date(row.priorDate)
-          priorDate = moment(row.priorDate)
-          currentDate = moment(new Date(row.currentDate))
-          row.days = currentDate.diff(priorDate, 'days')
-          row.months = currentDate.diff(priorDate, 'months')
-          #show days or months since last mention
-          if row.days > 30
-            row.dm = true
-        @recentAgents.insert(row)
-      # ...
-      @articles.find().forEach (article) =>
-        if @recentAgents.find(articleId: article._id).count() > 5
-          @articles.update(article._id, { $set: { collapsed: true } })
-
+  mutex = false
+  @autorun =>
+    @subscribe 'articles', monthsToShow.get(), skipMonths.get(), ->
+      isLoadingUp.set(false)
+      isLoadingDown.set(false)
+      if lastScrollDirection < 0
+        scrollTo scrollX, 275
 
 Template.recentAgents.onRendered ->
   prevScrollPos = window.pageYOffset
-
-  infiniteScroll = (options) ->
+  initInfiniteScroll = (options) ->
     defaults = {
-      distance: 100
+      distance: 150
       callback: (done) -> done()
     }
     options = _.extend(defaults, options)
     scroller = {
-      options: options,
+      options: options
       updateInitiated: false
     }
     window.onscroll = (event) ->
       handleScroll(scroller, event)
     document.ontouchmove = (event) ->
       handleScroll(scroller, event)
-
   handleScroll = (scroller, event) ->
     if scroller.updateInitiated
       return
@@ -75,40 +64,97 @@ Template.recentAgents.onRendered ->
       return
     pageHeight = document.documentElement.scrollHeight
     clientHeight = document.documentElement.clientHeight
-    if pageHeight - (scrollPos + clientHeight) < scroller.options.distance
-      scroller.updateInitiated = true
-      scroller.options.callback ->
-        scroller.updateInitiated = false
+    # Ignore scrolling if page is not overflowing the browser view by much
+    if pageHeight - clientHeight < scroller.options.distance * 2
+      return
+    # Handle scrolling
+    if scrollPos > prevScrollPos # scroll down
+      lastScrollDirection = 1
+      if pageHeight - (scrollPos + clientHeight) < scroller.options.distance
+        if prevScrollPos > pageHeight - (scrollPos + clientHeight)
+          console.log "down"
+          scroller.updateInitiated = true
+          scroller.options.callback ->
+            scroller.updateInitiated = false
+    else # scroll up
+      lastScrollDirection = -1
+      if scrollPos < scroller.options.distance
+        if prevScrollPos > scroller.options.distance
+          console.log "up"
+          scroller.updateInitiated = true
+          scroller.options.callbackUp ->
+            scroller.updateInitiated = false
     prevScrollPos = scrollPos
-
   options = {
-    distance: 50
+    distance: 250
     callback: (done) =>
-      @$("button.load-more-articles").click()
+      unless @mutex
+        @$("button.load-more-articles-down").click()
+        @mutex = true
+        setTimeout(=>
+          @mutex = false
+        , 300)
+      done()
+    callbackUp: (done) =>
+      unless @mutex
+        @$("button.load-more-articles-up").click()
+        @mutex = true
+        setTimeout(=>
+          @mutex = false
+        , 300)
       done()
   }
-
-  infiniteScroll(options)
-  @loadMoreArticles()
+  initInfiniteScroll(options)
 
 Template.recentAgents.helpers
   articles: ->
-    Template.instance().articles.find({}, {sort: {order: 1}})
-  isLoading: ->
-    Template.instance().isLoading.get()
-  theEnd: ->
-    Template.instance().theEnd.get()
-  isCollapsed: (articleId) ->
-    Template.instance().articles.findOne(articleId).collapsed
-  recentAgentsForArticle: (articleId, limit) ->
-    options = { sort: { 'priorDate': 1 } }
-    if limit
-      options.limit = 5
-    Template.instance().recentAgents.find(articleId: articleId, options)
-
+    articles.find({}, {sort: {order: 1}})
+  fromDate: ->
+    startingDate = new Date()
+    oldestDate = new Date()
+    if skipMonths.get() > 0
+      startingDate.setMonth startingDate.getMonth() - skipMonths.get()
+    oldestDate.setMonth( (startingDate.getFullYear() - oldestDate.getFullYear()) * 12 )
+    oldestDate.setMonth( startingDate.getMonth() - monthsToShow.get() )
+    moment(oldestDate).format('MMM YYYY')
+  toDate: ->
+    startingDate = new Date()
+    if skipMonths.get() > 0
+      startingDate.setMonth startingDate.getMonth() - skipMonths.get()
+    moment(startingDate).format('MMM YYYY')
+  isLoadingUp: ->
+    isLoadingUp.get()
+  isLoadingDown: ->
+    isLoadingDown.get()
+  showMoreButtonUp: ->
+    skipMonths.get() > 0
+  showMoreButtonDown: ->
+    true
+  showLatestButton: ->
+    skipMonths.get() > 1
 
 Template.recentAgents.events
+  'click .load-more-articles-up': (event, instance) ->
+    loadMoreArticlesUp()
+  'click .load-more-articles-down': (event, instance) ->
+    loadMoreArticlesDown()
+  'click .load-latest-articles': (event, instance) ->
+    skipMonths.set(0)
+    sessionStorage.setItem('skipMonths', 0)
+
+Template.recentAgentArticle.onCreated ->
+  @subscribe 'recentAgentsForArticle', @data._id
+  @collapsed = new ReactiveVar true
+
+Template.recentAgentArticle.helpers
+  recentAgentsForArticle: ->
+    options = { sort: { 'priorDate': 1 } }
+    if Template.instance().collapsed.get()
+      options.limit = 5
+    agents.find(articleId: Template.instance().data._id, options)
+  expandable: ->
+    Template.instance().collapsed.get() && agents.find(articleId: Template.instance().data._id).count() > 5
+
+Template.recentAgentArticle.events
   'click .more': (event, instance) ->
-    instance.articles.update(@_id, { $set: { collapsed: false } })
-  'click .load-more-articles': (event, instance) ->
-    instance.loadMoreArticles()
+    instance.collapsed.set(false)

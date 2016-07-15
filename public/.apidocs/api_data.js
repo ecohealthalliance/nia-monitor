@@ -62,7 +62,7 @@ define({ "api": [
     "name": "frequentAgents",
     "group": "agent",
     "version": "0.0.0",
-    "filename": "./imports/startup/server/index.coffee",
+    "filename": "./imports/startup/server/api.coffee",
     "groupTitle": "agent",
     "sampleRequest": [
       {
@@ -77,7 +77,7 @@ define({ "api": [
     "name": "recentAgents",
     "group": "agent",
     "version": "0.0.0",
-    "filename": "./imports/startup/server/index.coffee",
+    "filename": "./imports/startup/server/api.coffee",
     "groupTitle": "agent",
     "sampleRequest": [
       {
@@ -112,7 +112,7 @@ define({ "api": [
       }
     },
     "version": "0.0.0",
-    "filename": "./imports/startup/server/index.coffee",
+    "filename": "./imports/startup/server/api.coffee",
     "groupTitle": "agent",
     "sampleRequest": [
       {
@@ -140,7 +140,7 @@ define({ "api": [
       }
     },
     "version": "0.0.0",
-    "filename": "./imports/startup/server/index.coffee",
+    "filename": "./imports/startup/server/api.coffee",
     "groupTitle": "agent",
     "sampleRequest": [
       {
@@ -168,7 +168,7 @@ define({ "api": [
       }
     },
     "version": "0.0.0",
-    "filename": "./imports/startup/server/index.coffee",
+    "filename": "./imports/startup/server/api.coffee",
     "groupTitle": "descriptors",
     "sampleRequest": [
       {
@@ -196,7 +196,7 @@ define({ "api": [
       }
     },
     "version": "0.0.0",
-    "filename": "./imports/startup/server/index.coffee",
+    "filename": "./imports/startup/server/api.coffee",
     "groupTitle": "descriptors",
     "sampleRequest": [
       {
@@ -224,7 +224,7 @@ define({ "api": [
       }
     },
     "version": "0.0.0",
-    "filename": "./imports/startup/server/index.coffee",
+    "filename": "./imports/startup/server/api.coffee",
     "groupTitle": "descriptors",
     "sampleRequest": [
       {
