@@ -1,10 +1,11 @@
 template(name="trendingAgents")
   .col-md-6.col-md-offset-3
-    h4.col-md-5.iaHeader Infectious Agents trending in the last:
-    select#trendingRange.col-md-7.form-control
-      option(value="year") Year
-      option(value="month") Month
-      option(value="week") Week
+    .col-md-12.col-s-8.col-xs-12
+      h4.iaHeader.pull-left Infectious Agents trending in the last:
+      select#trendingRange.form-control
+        option(value="year") Year
+        option(value="month") Month
+        option(value="week") Week
     .col-md-12
       table#trendingAgentsTable.table
         tbody

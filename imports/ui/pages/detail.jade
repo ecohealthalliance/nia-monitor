@@ -4,9 +4,9 @@ template(name='detail')
   hr.col-md-12.hr-padding
   h2.col-md-12.articleHeader.mainHeaderText Articles mentioning #{agent}
   ul.nav.nav-tabs.col-md-12
-    li.active#recentMentionsPanelTab
+    li.col-md-2.col-xs-12.active#recentMentionsPanelTab
       a(href='#recentMentionsPanel', data-toggle='tab') Recent Mentions
-    li#frequentDescriptorsPanelTab
+    li#frequentDescriptorsPanelTab.col-md-2.col-xs-12
       a(href='#frequentDescriptorsPanel', data-toggle='tab') Frequent Descriptors
   .tab-content
     #recentMentionsPanel.tab-pane.active
