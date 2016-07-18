@@ -402,9 +402,7 @@ api.addRoute 'trendingAgents/:range',
       SELECT
         ?resolvedTerm ?word
         ?count ?count2
-        (?count/xsd:float(#{escape(duration)}) as ?rate)
-        (?count2/xsd:float(#{escape(duration)}*4) as ?rate2)
-        (?rate/?rate2 AS ?result)
+        ?result
       WHERE {
         # There is an extra level of nesting here bc virtuoso doesn't allow
         # variables bound in select statements to be used for ordering.
@@ -423,7 +421,6 @@ api.addRoute 'trendingAgents/:range',
             BIND(coalesce(?a_date, ?p_date) AS ?dateTime)
             ?resolvedTerm rdfs:label ?termLabel
             FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
-
             {
               SELECT (count(distinct ?article2) as ?c2) ?resolvedTerm ?termLabel2
               WHERE {
@@ -441,6 +438,10 @@ api.addRoute 'trendingAgents/:range',
           }
           GROUP BY ?resolvedTerm
         }
+        BIND(?count/xsd:float(#{escape(duration)}) as ?rate)
+        BIND(?count2/xsd:float(#{escape(duration)}*4) as ?rate2)
+        BIND(?rate - ?rate2 AS ?result)
+        FILTER(?result > 0)
       }
       ORDER BY DESC(?result)
       LIMIT 50

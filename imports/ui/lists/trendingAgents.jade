@@ -14,9 +14,8 @@ template(name="trendingAgents")
               td.trendingInfectiousAgentsTableRow(data-agentname=word)
                 div.fmia-word
                   a(href="/detail/#{word}")= word
-              td.ital {{rate}} / {{rate2}}
               td.ital
-                div.pull-right trending at {{result}}
+                div.pull-right(style="color:white;") {{result}}
           else
             if ready
               span.no-priors.col-md-12 No Trending Infectious Agents in the last
