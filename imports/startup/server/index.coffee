@@ -1,4 +1,4 @@
-SPARQurL = process.env.SPARQURL || 'http://localhost:3030/dataset/query'
+SPARQurL = process.env.SPARQURL || 'http://10.0.2.119:3030/dataset/query'
 prefixes = '''
 prefix pro: <http://www.eha.io/types/promed/>
 prefix anno: <http://www.eha.io/types/annotation_prop/>

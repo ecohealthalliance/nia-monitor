@@ -3,7 +3,9 @@ require './recentDescriptorMentions.jade'
 Template.recentDescriptorMentions.onCreated ->
   @mentions = new Meteor.Collection(null)
   @sources = new Meteor.Collection(null)
+  @ready = new ReactiveVar(false)
   @autorun =>
+    @ready.set(false)
     {_descriptorName, _term} = Router.current().getParams()
     params = {
       descriptor: _descriptorName
@@ -14,6 +16,7 @@ Template.recentDescriptorMentions.onCreated ->
     HTTP.call 'get', '/api/recentDescriptorMentions', {
       params: params
     }, (err, response) =>
+      @ready.set(true)
       if err
         toastr.error(err.message)
         $(".spinner").hide()
@@ -31,6 +34,8 @@ Template.recentDescriptorMentions.onCreated ->
       $(".spinner").hide()
 
 Template.recentDescriptorMentions.helpers
+  ready: ->
+    Template.instance().ready.get()
   sources: ->
     Template.instance().sources.find()
   mentionsForSource: (sourceId) ->
