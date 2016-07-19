@@ -6,15 +6,10 @@ require '../lists/recentAgents.coffee'
 require '../lists/frequentAgents.coffee'
 require '../lists/trendingAgents.coffee'
 
-Template.main.onCreated ->
-  if Session.get('showDesc') == undefined
-    Session.set('showDesc', true)
-
-Template.main.helpers
-  showDesc: ->
-    Session.get('showDesc')
-
 Template.main.onRendered ->
+  if localStorage.getItem('showAppDesc') != "false"
+    $(".appDescriptionContainer").show()
+
   Blaze.render(Template.recentAgents, $("#recentlyMentionedInfectiousAgents")[0])
 
 Template.main.events
@@ -27,6 +22,9 @@ Template.main.events
   'click #trendingPanelTab': (event, instance) ->
     $("#trendingInfectiousAgents").empty()
     Blaze.render(Template.trendingAgents, $("#trendingInfectiousAgents")[0])
-  'click #closeHeader': (event, instance) ->
-    $(".headerDescriptionContainer").hide()
-    Session.set('showDesc', false)
+  'click #hideAppDesc': (event, instance) ->
+    $(".appDescriptionContainer").hide()
+    localStorage.setItem('showAppDesc', false)
+  'click #showAppDesc': (event, instance) ->
+    $(".appDescriptionContainer").show()
+    localStorage.setItem('showAppDesc', true)

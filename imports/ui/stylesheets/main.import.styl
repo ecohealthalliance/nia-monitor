@@ -65,7 +65,7 @@
 .description-heading
   font-weight 700
 
-.headerDescriptionContainer
+.appDescriptionContainer
   background-color $secondary
   color white
   padding 50px
@@ -129,3 +129,25 @@
 
 .mainContent
   margin-top 30px
+
+#hideAppDesc
+  cursor pointer
+  margin-right -30px
+  margin-top -30px
+  float right
+
+#showAppDesc
+  cursor pointer
+  position relative
+  height 0px
+  float right
+  top 20px
+  right 20px
+  z-index 99998
+
+.fa-question-circle
+  color: grey
+
+.appDescriptionContainer
+  z-index 99999
+  display none
