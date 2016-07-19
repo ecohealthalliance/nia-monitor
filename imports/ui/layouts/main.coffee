@@ -6,11 +6,13 @@ require '../lists/recentAgents.coffee'
 require '../lists/frequentAgents.coffee'
 require '../lists/trendingAgents.coffee'
 
-showDesc = new ReactiveVar(true)
+Template.main.onCreated ->
+  if Session.get('showDesc') == undefined
+    Session.set('showDesc', true)
 
 Template.main.helpers
   showDesc: ->
-    showDesc.get()
+    Session.get('showDesc')
 
 Template.main.onRendered ->
   Blaze.render(Template.recentAgents, $("#recentlyMentionedInfectiousAgents")[0])
@@ -27,4 +29,4 @@ Template.main.events
     Blaze.render(Template.trendingAgents, $("#trendingInfectiousAgents")[0])
   'click #closeHeader': (event, instance) ->
     $(".headerDescriptionContainer").hide()
-    showDesc.set(false)
+    Session.set('showDesc', false)
