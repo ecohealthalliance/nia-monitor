@@ -1,18 +1,21 @@
 template(name='main')
   +header
-  .col-md-12.headerDescriptionContainer
+  i#showAppDesc.fa.fa-question-circle.fa-2x
+  .col-md-12.appDescriptionContainer
+    i#hideAppDesc.fa.fa-times.fa-2x
     p.col-md-6.col-md-offset-3.headerDescription
       | NIAM displays the diseases mentioned in ProMED-mail posts.
       | A disease's novelty can be assessed through its time since the previous
       | mention and through its ranking on the trending diseases list.
     p.col-md-8.col-md-offset-2 Click on a disease to see its historical mentions.
-  .col-md-12.col-sm-12.col-xs-12
+
+  .col-md-12.col-sm-12.col-xs-12.mainContent
     ul.nav.nav-tabs
-      li.col-md-2.col-sm-8.col-xs-12.active#recentPanelTab
+      li.col-md-2.col-sm-8.col-xs-10.active#recentPanelTab
         a(href='#recentPanel', data-toggle='tab') Recently Mentioned
-      li.col-md-2.col-sm-8.col-xs-12#frequentPanelTab
+      li.col-md-2.col-sm-8.col-xs-10#frequentPanelTab
         a(href='#frequentPanel', data-toggle='tab') Frequently Mentioned
-      li.col-md-2.col-sm-8.col-xs-12#trendingPanelTab
+      li.col-md-2.col-sm-8.col-xs-10#trendingPanelTab
         a(href='#trendingPanel', data-toggle='tab') Trending
     .tab-content
       #recentPanel.tab-pane.active
