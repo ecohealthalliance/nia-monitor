@@ -18,7 +18,7 @@ Template.recentAgents.onCreated ->
     HTTP.get '/api/recentAgents', {params: {page: pageNum, pp: pp}}, (err, res) =>
       @isLoading.set(false)
       if err
-        toastr.error(err.message)        
+        toastr.error(err.message)
         return
       unless res.data.results.length
         @theEnd.set(true)
@@ -112,3 +112,13 @@ Template.recentAgents.events
     instance.articles.update(@_id, { $set: { collapsed: false } })
   'click .load-more-articles': (event, instance) ->
     instance.loadMoreArticles()
+  'click .proMedLink': (event, template) ->
+    if this.uri != undefined
+      $('#proMedIFrame').attr('src', this.uri)
+      $('#proMedURL').attr('href', this.uri)
+      $('#proMedURL').text(this.uri)
+    else
+      $('#proMedIFrame').attr('src', this.priorArticle)
+      $('#proMedURL').attr('href', this.priorArticle)
+      $('#proMedURL').text(this.priorArticle)
+    $('#proMedModal').modal("show")

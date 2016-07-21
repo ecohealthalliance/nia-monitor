@@ -34,3 +34,16 @@ Template.recentMentions.helpers
         #{@phrase_text.slice(@t_end - @p_start, @t_start + 40 - @p_start)}...
       </span>
       """
+
+Template.recentMentions.events
+  'click .proMedLink': (event, template) ->
+    if this.uri != undefined
+      $('#proMedIFrame').attr('src', this.uri)
+      $('#proMedURL').attr('href', this.uri)
+      $('#proMedURL').text(this.uri)
+    else
+      $('#proMedIFrame').attr('src', this.priorArticle)
+      $('#proMedURL').attr('href', this.priorArticle)
+      $('#proMedURL').text(this.priorArticle)
+    $('#proMedModal').modal("show")
+    $('#proMedIFrame').highlight(this.word)

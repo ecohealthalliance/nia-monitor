@@ -8,3 +8,13 @@ template(name='header')
             img.logo(src="/images/logo.svg" alt="Novel Infectious Agent Monitor")
         div.col-md-6
           a.about.aboutText(href="/about") About
+
+  #proMedModal.modal.fade(role='dialog')
+    .modal-dialog.modal-lg(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal') ×
+          h3
+            a#proMedURL
+        .modal-body
+          iframe#proMedIFrame

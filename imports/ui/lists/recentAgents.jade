@@ -3,7 +3,7 @@ template(name="recentAgents")
     each articles
         .col-md-8.col-xs-7.articleHeader
           h4
-            a.articleHeaderText(href=uri) {{postSubject}}
+            a.proMedLink.articleHeaderText(href="#" uri=uri) {{postSubject}}
         .col-md-4.col-xs-5.articleHeader.ital
           h4
             .pull-right {{age date}}
@@ -18,7 +18,7 @@ template(name="recentAgents")
                     .pull-right
                       span.boldrange {{since ../date priorDate}}
                       span since
-                      a(href=priorArticle) prior mention
+                      a.proMedLink(href="#" uri=priorArticle) prior mention
                   else
                     span.no-priors.pull-right no prior mentions
         if collapsed

@@ -2,7 +2,7 @@ template(name="recentDescriptorMentions")
   each sources
     .panel-heading
       h4
-        a(href=uri)=postSubject
+        a.proMedLink(href="#" uri=uri)=postSubject
       p {{age date}}
     table#recentMentionsTable.table.table-striped
       tbody
