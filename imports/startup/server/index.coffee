@@ -61,7 +61,6 @@ api.addRoute 'frequentDescriptors/:term',
     query = prefixes + """
       SELECT
         ?selText
-        (group_concat(DISTINCT ?article; separator = "::") AS ?articles)
         (count(DISTINCT ?article) as ?count)
       WHERE {
           ?dep_rel rdf:type anno:dependency_relation .
