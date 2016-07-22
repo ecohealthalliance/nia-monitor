@@ -46,4 +46,3 @@ Template.recentMentions.events
       $('#proMedURL').attr('href', this.priorArticle)
       $('#proMedURL').text(this.priorArticle)
     $('#proMedModal').modal("show")
-    $('#proMedIFrame').highlight(this.word)
