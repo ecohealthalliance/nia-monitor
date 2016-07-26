@@ -2,7 +2,7 @@
   "name": "nia-monitor",
   "private": true,
   "scripts": {
-    "start": "meteor run --port 5000",
+    "start": "meteor run --port 5000 --settings settings-dev.json",
     "chimp": "chimp --ddp=http://localhost:3000 --path=tests",
     "docs": "apidoc -o public/.apidocs -e node_modules -e meteor"
   },
