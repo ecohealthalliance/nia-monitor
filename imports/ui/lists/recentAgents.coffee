@@ -24,28 +24,28 @@ Template.recentAgents.onCreated ->
         @theEnd.set(true)
         return
       for row in res.data.results
-        articleId = @articles.findOne(uri: row.currentArticle)?._id
-        unless articleId
-          articleId = @articles.insert
-            uri: row.currentArticle
+        postId = @articles.findOne(uri: row.post)?._id
+        unless postId
+          postId = @articles.insert
+            uri: row.post
             postSubject: row.postSubject
-            date: moment(new Date(row.currentDate))
+            date: moment(new Date(row.postDate))
             collapsed: false
             order: order++
-        row.articleId = articleId
-        if row.priorDate
-          row.priorDate = new Date(row.priorDate)
-          priorDate = moment(row.priorDate)
-          currentDate = moment(new Date(row.currentDate))
-          row.days = currentDate.diff(priorDate, 'days')
-          row.months = currentDate.diff(priorDate, 'months')
+        row.postId = postId
+        if row.priorPostDate
+          row.priorDate = new Date(row.priorPostDate)
+          priorDate = moment(row.priorPostDate)
+          currentDate = moment(new Date(row.postDate))
+          row.days = postDate.diff(priorPostDate, 'days')
+          row.months = postDate.diff(priorPostDate, 'months')
           #show days or months since last mention
           if row.days > 30
             row.dm = true
         @recentAgents.insert(row)
       # ...
       @articles.find().forEach (article) =>
-        if @recentAgents.find(articleId: article._id).count() > 5
+        if @recentAgents.find(postId: article._id).count() > 5
           @articles.update(article._id, { $set: { collapsed: true } })
 
 
@@ -92,19 +92,19 @@ Template.recentAgents.onRendered ->
   @loadMoreArticles()
 
 Template.recentAgents.helpers
-  articles: ->
+  post: ->
     Template.instance().articles.find({}, {sort: {order: 1}})
   isLoading: ->
     Template.instance().isLoading.get()
   theEnd: ->
     Template.instance().theEnd.get()
-  isCollapsed: (articleId) ->
-    Template.instance().articles.findOne(articleId).collapsed
-  recentAgentsForArticle: (articleId, limit) ->
+  isCollapsed: (postId) ->
+    Template.instance().articles.findOne(postId).collapsed
+  recentAgentsForPost: (postId, limit) ->
     options = { sort: { 'priorDate': 1 } }
     if limit
       options.limit = 5
-    Template.instance().recentAgents.find(articleId: articleId, options)
+    Template.instance().recentAgents.find(postId: postId, options)
 
 
 Template.recentAgents.events
