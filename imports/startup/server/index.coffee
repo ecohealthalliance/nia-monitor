@@ -67,12 +67,8 @@ api.addRoute 'frequentDescriptors/:term',
           VALUES ?dep_rel { dep:amod dep:nmod }
           ?parent anno:min_contains ?target
               ; ?dep_rel ?descriptor
-              ; anno:source_doc ?source
-              .
-  		  ?source pro:post/pro:date ?p_date
-          ; pro:post/pro:subject_raw ?postSubject
-          ; pro:post ?post
-          .
+              ; anno:source_doc ?source.
+          ?source pro:post ?post.
           ?descriptor anno:start ?d_start
               ; anno:end ?d_end
               ; anno:selected-text ?rawSelText
@@ -165,7 +161,7 @@ api.addRoute 'recentDescriptorMentions',
         ?p_start ?postSubject
         ?t_start ?t_end
         (?p_date as ?date)
-		    ?post
+        ?post
       WHERE {
           ?phrase anno:selected-text ?phrase_text
           ; anno:start ?p_start
@@ -201,6 +197,7 @@ api.addRoute 'recentDescriptorMentions',
           ; pro:post/pro:subject_raw ?postSubject
           ; pro:post ?post
           .
+          FILTER regex(?rawSelText, "#{escape(descriptor)}", "i")
 
       }
       ORDER BY DESC(?date) DESC(?post) ASC(?t_start)
