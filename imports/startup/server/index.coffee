@@ -91,8 +91,8 @@ api.addRoute 'frequentDescriptors/:term',
           BIND(replace(?ranCaseSelText,'^ +| +$|\\n', '') AS ?selText)
       }
       GROUP BY ?selText
-      HAVING (count(DISTINCT ?source) > 0)
-      ORDER BY DESC(count(DISTINCT ?source))
+      HAVING (count(DISTINCT ?post) > 0)
+      ORDER BY DESC(count(DISTINCT ?post))
       """
     response = makeRequest(query)
     return {
@@ -250,9 +250,8 @@ api.addRoute 'recentAgents',
                   .
                   ?resolvedTerm rdfs:label ?termLabel .
                   ?source pro:post/pro:date ?postDate
-      				; pro:post/pro:subject_raw ?postSubject.
-      			  ?source pro:post ?post
-
+                  ; pro:post/pro:subject_raw ?postSubject.
+                  ?source pro:post ?post
               }
               GROUP BY ?resolvedTerm ?termLabel ?postDate ?post ?postSubject
               # Sort by date, then document, then offset within the document.
@@ -266,7 +265,7 @@ api.addRoute 'recentAgents',
             ; ^dc:relation ?resolvedTerm
             .
             ?prevSource pro:post/pro:date ?prevPostDate .
-    		?prevSource pro:post ?prevPost
+            ?prevSource pro:post ?prevPost
             FILTER(?postDate > ?prevPostDate && ?post != ?prevPost)
           }
       }
@@ -297,9 +296,8 @@ api.addRoute 'frequentAgents',
       WHERE {
         ?phrase anno:category "diseases"
         ; ^dc:relation ?resolvedTerm
-        ; anno:source_doc ?source
-        .
-  		  ?source pro:post ?post.
+        ; anno:source_doc ?source.
+        ?source pro:post ?post.
         ?source pro:date ?dateTime.
         ?resolvedTerm rdfs:label ?termLabel
         FILTER (?dateTime > "#{escape(baseYear)}-01-01T00:00:00+00:01"^^xsd:dateTime)
