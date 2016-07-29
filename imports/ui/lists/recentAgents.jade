@@ -1,10 +1,10 @@
 template(name="recentAgents")
   .col-md-6.col-md-offset-3
     each post
-        .col-md-8.col-xs-7.articleHeader
+        .col-md-8.col-xs-7.postHeader
           h4
-            a.proMedLink.articleHeaderText(href="#" uri=uri) {{postSubject}}
-        .col-md-4.col-xs-5.articleHeader.ital
+            a.proMedLink.postHeaderText(href="#" uri=uri) {{postSubject}}
+        .col-md-4.col-xs-5.postHeader.ital
           h4
             .pull-right {{age postDate}}
         table#recentAgentsTable.table
@@ -29,4 +29,4 @@ template(name="recentAgents")
         i.fa.fa-spinner.fa-2x.fa-spin
     else
       unless theEnd
-        button(type="button").btn.btn-info.load-more-articles Load More
+        button(type="button").btn.btn-info.load-more-posts Load More

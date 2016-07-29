@@ -226,11 +226,12 @@ api.addRoute 'recentAgents',
       SELECT
           # For each of the most recently mentioned terms find the most recent
           # mention prior to the current mention.
-          ?resolvedTerm ?postDate ?post ?postSubject
+          ?resolvedTerm ?postDate ?post
+          ?postSubject
           (sample(?termLabel) as ?word)
-          (sample(?sourceRawMenions) as ?rawMentions)
-          (max(?priorpost) as ?priorPost)
-          (max(?priorpostdate) as ?priorPostDate)
+          (sample(?articleRawMenions) as ?rawMentions)
+          (max(?prevPost) as ?priorPost)
+          (max(?prevPostDate) as ?priorPostDate)
       WHERE {
           # Select the most recently mentioned terms.
           # Doing this as a subquery speeds up the overall query
@@ -239,34 +240,34 @@ api.addRoute 'recentAgents',
               SELECT
                 ?resolvedTerm ?termLabel ?postDate ?post ?postSubject
                 (min(?start) as ?firstMentionStart)
-                (group_concat(DISTINCT ?rawText; separator = "::") AS ?sourceRawMenions)
+                (group_concat(DISTINCT ?rawText; separator = "::") AS ?articleRawMenions)
               WHERE {
                   ?phrase anno:category "diseases"
-                  ; anno:source_doc ?currentSource
+                  ; anno:source_doc ?source
                   ; anno:start ?start
                   ; anno:selected-text ?rawText
                   ; ^dc:relation ?resolvedTerm
                   .
                   ?resolvedTerm rdfs:label ?termLabel .
-                  ?currentSource pro:post/pro:date ?postDate
-          				; pro:post/pro:subject_raw ?postSubject
-          				; pro:post ?post
+                  ?source pro:post/pro:date ?postDate
+      				; pro:post/pro:subject_raw ?postSubject.
+      			  ?source pro:post ?post
+
               }
-              GROUP BY ?resolvedTerm ?termLabel ?postDate ?currentSource ?post ?postSubject
+              GROUP BY ?resolvedTerm ?termLabel ?postDate ?post ?postSubject
               # Sort by date, then document, then offset within the document.
               ORDER BY DESC(?postDate) DESC(?post) ASC(?firstMentionStart)
               LIMIT #{pp}
               OFFSET #{offset}
           }
-          ?currentSource pro:post/pro:subject_raw ?p_subject .
           # Select the previous usages of the most recently mentioned terms
           OPTIONAL {
             ?prev_mention anno:source_doc ?prevSource
             ; ^dc:relation ?resolvedTerm
             .
-            ?prevSource pro:post/pro:date ?priorpostdate
-    		    ; pro:post ?priorpost
-            FILTER(?postDate > ?priorpostdate && ?post != ?priorpost)
+            ?prevSource pro:post/pro:date ?prevPostDate .
+    		?prevSource pro:post ?prevPost
+            FILTER(?postDate > ?prevPostDate && ?post != ?prevPost)
           }
       }
       # Group by the items from the inner query
