@@ -9,6 +9,7 @@ prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
 prefix eha: <http://www.eha.io/types/>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 '''
+excludedAgents = "'viral infectious disease','disease by infectious agent','hypersensitivity reaction type I disease','exanthem','aortic valve stenosis','proliferative diabetic retinopathy'"
 
 # Convert { value, type } objects into flat objects where the value is cast to
 # the given type
@@ -247,6 +248,7 @@ api.addRoute 'recentAgents',
                   ?source pro:post/pro:date ?postDate
                   ; pro:post/pro:subject_raw ?postSubject.
                   ?source pro:post ?post
+                  FILTER(?termLabel not in (#{excludedAgents}))
               }
               GROUP BY ?resolvedTerm ?termLabel ?postDate ?post ?postSubject
               # Sort by date, then document, then offset within the document.
@@ -296,6 +298,7 @@ api.addRoute 'frequentAgents',
         ?source pro:date ?dateTime.
         ?resolvedTerm rdfs:label ?termLabel
         FILTER (?dateTime > "#{escape(baseYear)}-01-01T00:00:00+00:01"^^xsd:dateTime)
+        FILTER(?termLabel not in (#{excludedAgents}))
       }
       GROUP BY ?resolvedTerm
       ORDER BY DESC(?count)
@@ -421,6 +424,7 @@ api.addRoute 'trendingAgents/:range',
 
             ?resolvedTerm rdfs:label ?termLabel
             FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
+            FILTER(?termLabel not in (#{excludedAgents}))
             {
               SELECT (count(distinct ?post2) as ?c2) ?resolvedTerm ?termLabel2
               WHERE {
@@ -431,6 +435,7 @@ api.addRoute 'trendingAgents/:range',
                 ?source2 pro:post/pro:date ?dateTime2 .
           		  ?resolvedTerm rdfs:label ?termLabel2
                 FILTER (?dateTime2 > "#{escape(dateStr2)}"^^xsd:dateTime)
+                FILTER(?termLabel2 not in (#{excludedAgents}))
                }
               GROUP BY ?resolvedTerm ?termLabel2
             }
