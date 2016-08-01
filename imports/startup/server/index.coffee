@@ -66,24 +66,24 @@ api.addRoute 'frequentDescriptors/:term',
           ?dep_rel rdf:type anno:dependency_relation .
           VALUES ?dep_rel { dep:amod dep:nmod }
           ?parent anno:min_contains ?target
-              ; ?dep_rel ?descriptor
-              ; anno:source_doc ?source.
-          ?source pro:post ?post.
+          ; ?dep_rel ?descriptor
+          ; anno:source_doc/pro:post ?post
+          .
           ?descriptor anno:start ?d_start
-              ; anno:end ?d_end
-              ; anno:selected-text ?rawSelText
-              ; anno:root/anno:pos ?pos
-              .
+          ; anno:end ?d_end
+          ; anno:selected-text ?rawSelText
+          ; anno:root/anno:pos ?pos
+          .
           FILTER (?pos NOT IN ("X", "PUNCT"))
           ?target anno:category "diseases"
-              ; anno:start ?t_start
-              ; anno:end ?t_end
-              ; ^dc:relation ?rel
-              .
-
-          	?rel rdfs:label "#{escape(@urlParams.term)}"
+          ; anno:start ?t_start
+          ; anno:end ?t_end
+          ; ^dc:relation ?rel
+          .
+        	?rel rdfs:label "#{escape(@urlParams.term)}"
           FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
           BIND(lcase(?rawSelText) as ?ranCaseSelText)
+          #remove leading and trailing whitespace, and new line characters
           BIND(replace(?ranCaseSelText,'^ +| +$|\\n', '') AS ?selText)
       }
       GROUP BY ?selText
@@ -160,7 +160,7 @@ api.addRoute 'recentDescriptorMentions',
         ?phrase_text
         ?p_start ?postSubject
         ?t_start ?t_end
-        (?p_date as ?date)
+        ?date
         ?post
       WHERE {
           ?phrase anno:selected-text ?phrase_text
@@ -192,13 +192,11 @@ api.addRoute 'recentDescriptorMentions',
           ; anno:end ?d_end
           ; anno:selected-text ?rawSelText
           .
-
-          ?source pro:post/pro:date ?p_date
-          ; pro:post/pro:subject_raw ?postSubject
-          ; pro:post ?post
+          ?source pro:post ?post .
+          ?post pro:date ?date
+          ; pro:subject_raw ?postSubject
           .
           FILTER regex(?rawSelText, "#{escape(descriptor)}", "i")
-
       }
       ORDER BY DESC(?date) DESC(?post) ASC(?t_start)
       LIMIT 10
@@ -226,7 +224,7 @@ api.addRoute 'recentAgents',
           ?resolvedTerm ?postDate ?post
           ?postSubject
           (sample(?termLabel) as ?word)
-          (sample(?articleRawMenions) as ?rawMentions)
+          #(sample(?articleRawMenions) as ?rawMentions)
           (max(?prevPost) as ?priorPost)
           (max(?prevPostDate) as ?priorPostDate)
       WHERE {

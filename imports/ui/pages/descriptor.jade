@@ -3,6 +3,8 @@ template(name='descriptor')
 
   h2.col-md-12.articleHeader.descriptorHeaderText
     | Descriptor: #{descriptorName}
+    if term
+      | , Term: #{term}
   .col-md-12
     .panel.panel-primary
       .panel-body
