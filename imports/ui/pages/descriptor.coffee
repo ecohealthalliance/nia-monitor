@@ -4,10 +4,11 @@ require './descriptor.jade'
 
 Template.descriptor.onCreated ->
   @ready = new ReactiveVar(false)
-  @descriptor = Router.current().getParams()._descriptorName
 
 Template.descriptor.helpers
   descriptorName: ->
     Router.current().getParams()._descriptorName
+  term: ->
+    Router.current().getParams()._term
   ready: ->
     Template.instance().ready.get()

@@ -61,34 +61,34 @@ api.addRoute 'frequentDescriptors/:term',
     query = prefixes + """
       SELECT
         ?selText
-        (count(DISTINCT ?article) as ?count)
+        (count(DISTINCT ?post) as ?count)
       WHERE {
           ?dep_rel rdf:type anno:dependency_relation .
           VALUES ?dep_rel { dep:amod dep:nmod }
           ?parent anno:min_contains ?target
-              ; ?dep_rel ?descriptor
-              ; anno:source_doc ?article
-              .
+          ; ?dep_rel ?descriptor
+          ; anno:source_doc/pro:post ?post
+          .
           ?descriptor anno:start ?d_start
-              ; anno:end ?d_end
-              ; anno:selected-text ?rawSelText
-              ; anno:root/anno:pos ?pos
-              .
+          ; anno:end ?d_end
+          ; anno:selected-text ?rawSelText
+          ; anno:root/anno:pos ?pos
+          .
           FILTER (?pos NOT IN ("X", "PUNCT"))
           ?target anno:category "diseases"
-              ; anno:start ?t_start
-              ; anno:end ?t_end
-              ; ^dc:relation ?rel
-              .
-          	?rel rdfs:label "#{escape(@urlParams.term)}"
+          ; anno:start ?t_start
+          ; anno:end ?t_end
+          ; ^dc:relation ?rel
+          .
+        	?rel rdfs:label "#{escape(@urlParams.term)}"
           FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
           BIND(lcase(?rawSelText) as ?ranCaseSelText)
           #remove leading and trailing whitespace, and new line characters
           BIND(replace(?ranCaseSelText,'^ +| +$|\\n', '') AS ?selText)
       }
       GROUP BY ?selText
-      HAVING (count(DISTINCT ?article) > 0)
-      ORDER BY DESC(count(DISTINCT ?article))
+      HAVING (count(DISTINCT ?post) > 0)
+      ORDER BY DESC(count(DISTINCT ?post))
       """
     response = makeRequest(query)
     return {
@@ -111,6 +111,7 @@ api.addRoute 'recentMentions/:term',
         ?p_start ?postSubject
         ?t_start ?t_end
         ?source ?date
+        ?post
       WHERE {
           ?phrase anno:selected-text ?phrase_text
           ; anno:start ?p_start
@@ -130,6 +131,7 @@ api.addRoute 'recentMentions/:term',
           .
           ?source pro:post/pro:date ?p_date
           ; pro:post/pro:subject_raw ?postSubject
+          ; pro:post ?post
           .
           OPTIONAL { ?source  pro:date  ?a_date }
           BIND(coalesce(?a_date, ?p_date) AS ?date)
@@ -158,7 +160,8 @@ api.addRoute 'recentDescriptorMentions',
         ?phrase_text
         ?p_start ?postSubject
         ?t_start ?t_end
-        ?source ?date
+        ?date
+        ?post
       WHERE {
           ?phrase anno:selected-text ?phrase_text
           ; anno:start ?p_start
@@ -189,14 +192,13 @@ api.addRoute 'recentDescriptorMentions',
           ; anno:end ?d_end
           ; anno:selected-text ?rawSelText
           .
-          FILTER regex(?rawSelText, "#{escape(descriptor)}", "i")
-          ?source pro:post/pro:date ?p_date
-          ; pro:post/pro:subject_raw ?postSubject
+          ?source pro:post ?post .
+          ?post pro:date ?date
+          ; pro:subject_raw ?postSubject
           .
-          OPTIONAL { ?source  pro:date  ?a_date }
-          BIND(coalesce(?a_date, ?p_date) AS ?date)
+          FILTER regex(?rawSelText, "#{escape(descriptor)}", "i")
       }
-      ORDER BY DESC(?date) DESC(?source) ASC(?t_start)
+      ORDER BY DESC(?date) DESC(?post) ASC(?t_start)
       LIMIT 10
       """
     response = makeRequest(query)
@@ -219,54 +221,52 @@ api.addRoute 'recentAgents',
       SELECT
           # For each of the most recently mentioned terms find the most recent
           # mention prior to the current mention.
-          ?resolvedTerm ?currentDate ?currentArticle
-          (sample(?p_subject) as ?postSubject)
+          ?resolvedTerm ?postDate ?post
+          ?postSubject
           (sample(?termLabel) as ?word)
-          (sample(?articleRawMenions) as ?rawMentions)
-          (max(?prevArticle) as ?priorArticle)
-          (max(?prevDate) as ?priorDate)
+          #(sample(?articleRawMenions) as ?rawMentions)
+          (max(?prevPost) as ?priorPost)
+          (max(?prevPostDate) as ?priorPostDate)
       WHERE {
           # Select the most recently mentioned terms.
           # Doing this as a subquery speeds up the overall query
           # by limiting items prior mentions are found for.
           {
               SELECT
-                ?resolvedTerm ?termLabel ?currentDate ?currentArticle
+                ?resolvedTerm ?termLabel ?postDate ?post ?postSubject
                 (min(?start) as ?firstMentionStart)
                 (group_concat(DISTINCT ?rawText; separator = "::") AS ?articleRawMenions)
               WHERE {
                   ?phrase anno:category "diseases"
-                  ; anno:source_doc ?currentArticle
+                  ; anno:source_doc ?source
                   ; anno:start ?start
                   ; anno:selected-text ?rawText
                   ; ^dc:relation ?resolvedTerm
                   .
                   ?resolvedTerm rdfs:label ?termLabel .
-                  ?currentArticle pro:post/pro:date ?p_date .
-                  OPTIONAL { ?currentArticle  pro:date  ?a_date }
-                  BIND(coalesce(?a_date, ?p_date) AS ?currentDate)
+                  ?source pro:post/pro:date ?postDate
+                  ; pro:post/pro:subject_raw ?postSubject.
+                  ?source pro:post ?post
               }
-              GROUP BY ?resolvedTerm ?termLabel ?currentDate ?currentArticle
+              GROUP BY ?resolvedTerm ?termLabel ?postDate ?post ?postSubject
               # Sort by date, then document, then offset within the document.
-              ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?firstMentionStart)
+              ORDER BY DESC(?postDate) DESC(?post) ASC(?firstMentionStart)
               LIMIT #{pp}
               OFFSET #{offset}
           }
-          ?currentArticle pro:post/pro:subject_raw ?p_subject .
           # Select the previous usages of the most recently mentioned terms
           OPTIONAL {
-            ?prev_mention anno:source_doc ?prevArticle
+            ?prev_mention anno:source_doc ?prevSource
             ; ^dc:relation ?resolvedTerm
             .
-            ?prevArticle pro:post/pro:date ?p_date .
-            OPTIONAL { ?prevArticle  pro:date  ?a_date }
-            BIND(coalesce(?a_date, ?p_date) AS ?prevDate)
-            FILTER(?currentDate > ?prevDate && ?currentArticle != ?prevArticle)
+            ?prevSource pro:post/pro:date ?prevPostDate .
+            ?prevSource pro:post ?prevPost
+            FILTER(?postDate > ?prevPostDate && ?post != ?prevPost)
           }
       }
       # Group by the items from the inner query
-      GROUP BY ?resolvedTerm ?currentDate ?currentArticle ?firstMentionStart
-      ORDER BY DESC(?currentDate) DESC(?currentArticle) ASC(?firstMentionStart)
+      GROUP BY ?resolvedTerm ?postDate ?post ?postSubject ?firstMentionStart
+      ORDER BY DESC(?postDate) DESC(?post) ASC(?firstMentionStart)
       """
     response = makeRequest(query)
     return {
@@ -287,13 +287,13 @@ api.addRoute 'frequentAgents',
     query = prefixes + """
       SELECT ?resolvedTerm
           (sample(?termLabel) as ?word)
-          (count(DISTINCT ?article) as ?count)
+          (count(DISTINCT ?post) as ?count)
       WHERE {
         ?phrase anno:category "diseases"
         ; ^dc:relation ?resolvedTerm
-        ; anno:source_doc ?article
-        .
-        ?article pro:date ?dateTime.
+        ; anno:source_doc ?source.
+        ?source pro:post ?post.
+        ?source pro:date ?dateTime.
         ?resolvedTerm rdfs:label ?termLabel
         FILTER (?dateTime > "#{escape(baseYear)}-01-01T00:00:00+00:01"^^xsd:dateTime)
       }
@@ -334,12 +334,13 @@ api.addRoute 'historicalData/:term/:range',
         (?termLabel as ?word) ?timeInterval
         WHERE {
           ?phrase anno:category "diseases"
-          ; anno:source_doc ?article
+          ; anno:source_doc ?source
           ; anno:selected-text ?rawText
           ; ^dc:relation ?resolvedTerm
           .
           ?resolvedTerm rdfs:label ?termLabel .
-          ?article pro:date ?dateTime
+          ?source pro:post ?post.
+          ?source pro:date ?dateTime
           FILTER(?termLabel = "#{escape(@urlParams.term)}")
       """
     if @urlParams.range != 'all'
@@ -357,7 +358,7 @@ api.addRoute 'historicalData/:term/:range',
     query+=
     """
       }
-      GROUP BY ?termLabel ?article ?timeInterval
+      GROUP BY ?termLabel ?post ?timeInterval
       ORDER BY DESC(?dateTime)
     }
     GROUP BY ?word ?timeInterval
@@ -408,27 +409,26 @@ api.addRoute 'trendingAgents/:range',
         {
           SELECT ?resolvedTerm
             (sample(?termLabel) as ?word)
-            (count(DISTINCT ?article) as ?count)
+            (count(DISTINCT ?post) as ?count)
             (sample(?c2) as ?count2)
           WHERE {
             ?phrase anno:category "diseases"
             ; ^dc:relation ?resolvedTerm
-            ; anno:source_doc ?article
+            ; anno:source_doc ?source
             .
-            ?article pro:post/pro:date ?p_date .
-            OPTIONAL { ?article  pro:date  ?a_date }
-            BIND(coalesce(?a_date, ?p_date) AS ?dateTime)
+            ?source pro:post ?post.
+            ?source pro:post/pro:date ?dateTime .
+
             ?resolvedTerm rdfs:label ?termLabel
             FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
             {
-              SELECT (count(distinct ?article2) as ?c2) ?resolvedTerm ?termLabel2
+              SELECT (count(distinct ?post2) as ?c2) ?resolvedTerm ?termLabel2
               WHERE {
-                ?prev_mention anno:source_doc ?article2
+                ?prev_mention anno:source_doc ?source2
                 ; ^dc:relation ?resolvedTerm
                 .
-                ?article2 pro:post/pro:date ?p_date2 .
-                OPTIONAL { ?article2  pro:date  ?a_date2 }
-                BIND(coalesce(?a_date2, ?p_date2) AS ?dateTime2) .
+                ?source2 pro:post ?post2 .
+                ?source2 pro:post/pro:date ?dateTime2 .
           		  ?resolvedTerm rdfs:label ?termLabel2
                 FILTER (?dateTime2 > "#{escape(dateStr2)}"^^xsd:dateTime)
                }
@@ -451,16 +451,16 @@ api.addRoute 'trendingAgents/:range',
       results: response.results.bindings.map(castBinding)
     }
 ###
-@api {get} articleCountByAnnotator
-@apiName articleCountByAnnotator
-@apiGroup article
+@api {get} postCountByAnnotator
+@apiName postCountByAnnotator
+@apiGroup post
 ###
-api.addRoute 'articleCountByAnnotator',
+api.addRoute 'postCountByAnnotator',
   get: ->
     query = prefixes + """
       SELECT
           ?annotator
-          (count(?article) AS ?articleCount)
+          (count(distinct ?post) AS ?postCount)
       WHERE {
           ?article pro:post ?post .
           OPTIONAL {
@@ -476,17 +476,26 @@ api.addRoute 'articleCountByAnnotator',
     }
 
 ###
-@api {get} totalArticleCount
-@apiName totalArticleCount
-@apiGroup article
+@api {get} totalPostCount
+@apiName totalPostCount
+@apiGroup post
 ###
-api.addRoute 'totalArticleCount',
+api.addRoute 'totalPostCount',
   get: ->
     query = prefixes + """
       SELECT
-          (count(?article) AS ?articleCount)
+          (sum(?count) AS ?postCount)
       WHERE {
-          ?article pro:post ?post
+          SELECT
+              ?annotator
+              (count(distinct ?post) AS ?count)
+          WHERE {
+              ?article pro:post ?post .
+              OPTIONAL {
+                  ?article anno:annotated_by ?annotator
+              }
+          }
+          GROUP BY ?annotator
       }
       """
     response = makeRequest(query)

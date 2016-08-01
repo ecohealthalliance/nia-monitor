@@ -22,11 +22,11 @@ Template.recentDescriptorMentions.onCreated ->
         $(".spinner").hide()
         return
       for row in response.data.results
-        if row.source
-          sourceId = @sources.findOne(uri: row.source)?._id
+        if row.post
+          sourceId = @sources.findOne(uri: row.post)?._id
           unless sourceId
             sourceId = @sources.insert
-              uri: row.source
+              uri: row.post
               postSubject: row.postSubject
               date: moment(new Date(row.date))
           row.sourceId = sourceId

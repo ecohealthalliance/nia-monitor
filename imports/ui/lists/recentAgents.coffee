@@ -4,12 +4,12 @@ pp = 75
 
 Template.recentAgents.onCreated ->
   @recentAgents = new Meteor.Collection(null)
-  @articles = new Meteor.Collection(null)
+  @posts = new Meteor.Collection(null)
   @currentPageNumber = new ReactiveVar(0)
   @isLoading = new ReactiveVar(false)
   @theEnd = new ReactiveVar(false)
   order = 0
-  @loadMoreArticles = =>
+  @loadMorePosts = =>
     if @isLoading.get() then return
     pageNum = @currentPageNumber.get()
     @currentPageNumber.set(pageNum + 1)
@@ -24,29 +24,29 @@ Template.recentAgents.onCreated ->
         @theEnd.set(true)
         return
       for row in res.data.results
-        articleId = @articles.findOne(uri: row.currentArticle)?._id
-        unless articleId
-          articleId = @articles.insert
-            uri: row.currentArticle
+        postId = @posts.findOne(uri: row.post)?._id
+        unless postId
+          postId = @posts.insert
+            uri: row.post
             postSubject: row.postSubject
-            date: moment(new Date(row.currentDate))
+            postDate: moment(new Date(row.postDate))
             collapsed: false
             order: order++
-        row.articleId = articleId
-        if row.priorDate
-          row.priorDate = new Date(row.priorDate)
-          priorDate = moment(row.priorDate)
-          currentDate = moment(new Date(row.currentDate))
-          row.days = currentDate.diff(priorDate, 'days')
-          row.months = currentDate.diff(priorDate, 'months')
+        row.postId = postId
+        if row.priorPostDate
+          row.priorPostDate = new Date(row.priorPostDate)
+          priorPostDate = moment(row.priorPostDate)
+          postDate = moment(new Date(row.postDate))
+          row.days = postDate.diff(priorPostDate, 'days')
+          row.months = postDate.diff(priorPostDate, 'months')
           #show days or months since last mention
           if row.days > 30
             row.dm = true
         @recentAgents.insert(row)
       # ...
-      @articles.find().forEach (article) =>
-        if @recentAgents.find(articleId: article._id).count() > 5
-          @articles.update(article._id, { $set: { collapsed: true } })
+      @posts.find().forEach (post) =>
+        if @recentAgents.find(postId: post._id).count() > 5
+          @posts.update(post._id, { $set: { collapsed: true } })
 
 
 Template.recentAgents.onRendered ->
@@ -84,41 +84,41 @@ Template.recentAgents.onRendered ->
   options = {
     distance: 50
     callback: (done) =>
-      @$("button.load-more-articles").click()
+      @$("button.load-more-posts").click()
       done()
   }
 
   infiniteScroll(options)
-  @loadMoreArticles()
+  @loadMorePosts()
 
 Template.recentAgents.helpers
-  articles: ->
-    Template.instance().articles.find({}, {sort: {order: 1}})
+  post: ->
+    Template.instance().posts.find({}, {sort: {order: 1}})
   isLoading: ->
     Template.instance().isLoading.get()
   theEnd: ->
     Template.instance().theEnd.get()
-  isCollapsed: (articleId) ->
-    Template.instance().articles.findOne(articleId).collapsed
-  recentAgentsForArticle: (articleId, limit) ->
+  isCollapsed: (postId) ->
+    Template.instance().posts.findOne(postId).collapsed
+  recentAgentsForPost: (postId, limit) ->
     options = { sort: { 'priorDate': 1 } }
     if limit
       options.limit = 5
-    Template.instance().recentAgents.find(articleId: articleId, options)
+    Template.instance().recentAgents.find(postId: postId, options)
 
 
 Template.recentAgents.events
   'click .more': (event, instance) ->
-    instance.articles.update(@_id, { $set: { collapsed: false } })
-  'click .load-more-articles': (event, instance) ->
-    instance.loadMoreArticles()
+    instance.posts.update(@_id, { $set: { collapsed: false } })
+  'click .load-more-posts': (event, instance) ->
+    instance.loadMorePosts()
   'click .proMedLink': (event, template) ->
     if this.uri != undefined
       $('#proMedIFrame').attr('src', this.uri)
       $('#proMedURL').attr('href', this.uri)
       $('#proMedURL').text(this.uri)
     else
-      $('#proMedIFrame').attr('src', this.priorArticle)
-      $('#proMedURL').attr('href', this.priorArticle)
-      $('#proMedURL').text(this.priorArticle)
+      $('#proMedIFrame').attr('src', this.priorPost)
+      $('#proMedURL').attr('href', this.priorPost)
+      $('#proMedURL').text(this.priorPost)
     $('#proMedModal').modal("show")
