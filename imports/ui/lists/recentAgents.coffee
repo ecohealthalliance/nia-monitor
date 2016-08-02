@@ -101,7 +101,7 @@ Template.recentAgents.helpers
   isCollapsed: (postId) ->
     Template.instance().posts.findOne(postId).collapsed
   recentAgentsForPost: (postId, limit) ->
-    options = { sort: { 'priorDate': 1 } }
+    options = { sort: { 'priorPostDate': 1 } }
     if limit
       options.limit = 5
     Template.instance().recentAgents.find(postId: postId, options)
