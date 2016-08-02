@@ -43,7 +43,7 @@ makeRequest = (query) ->
     if err.code
       switch err.code
         when "ECONNREFUSED"
-          throw new Meteor.Error(err.code, "Unable to connect to Fuseki server.")
+          throw new Meteor.Error(err.code, "Unable to connect to SPARQL server.")
         else
           throw new Meteor.Error(500, "Internal Server Error")
     else
@@ -364,7 +364,6 @@ api.addRoute 'historicalData/:term/:range',
     GROUP BY ?timeInterval
     """
     response = makeRequest(query)
-    console.log JSON.stringify(response.results.bindings,0,2)
     return {
       status: "success"
       results: response.results.bindings.map(castBinding)
