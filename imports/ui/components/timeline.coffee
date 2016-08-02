@@ -89,7 +89,7 @@ Template.timeline.onCreated ->
         data:
           labels: xlabels
           datasets: [{
-            label: 'Articles'
+            label: 'Posts'
             fill: false
             lineTension: 0.1
             backgroundColor: 'rgb(11, 165, 255)'

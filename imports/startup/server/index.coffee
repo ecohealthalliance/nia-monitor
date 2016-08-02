@@ -9,7 +9,16 @@ prefix rdf: <http://www.w3.org/2000/01/rdf-schema#>
 prefix eha: <http://www.eha.io/types/>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 '''
-excludedAgents = "'viral infectious disease','disease by infectious agent','hypersensitivity reaction type I disease','exanthem','aortic valve stenosis','proliferative diabetic retinopathy'"
+excludedAgentArray = [
+  'viral infectious disease'
+  'disease by infectious agent'
+  'hypersensitivity reaction type I disease'
+  'exanthem'
+  'aortic valve stenosis'
+  'proliferative diabetic retinopathy'
+  'vaccinia'
+]
+excludedAgents = excludedAgentArray.map((s)->JSON.stringify(s)).join(",")
 
 # Convert { value, type } objects into flat objects where the value is cast to
 # the given type
@@ -248,7 +257,6 @@ api.addRoute 'recentAgents',
                   ?source pro:post/pro:date ?postDate
                   ; pro:post/pro:subject_raw ?postSubject.
                   ?source pro:post ?post
-                  FILTER(?termLabel not in (#{excludedAgents}))
               }
               GROUP BY ?resolvedTerm ?termLabel ?postDate ?post ?postSubject
               # Sort by date, then document, then offset within the document.
@@ -273,7 +281,9 @@ api.addRoute 'recentAgents',
     response = makeRequest(query)
     return {
       status: "success"
-      results: response.results.bindings.map(castBinding)
+      results: response.results.bindings
+        .map(castBinding)
+        .filter((x)-> not _.contains(excludedAgentArray, x.word))
     }
 
 ###
@@ -331,42 +341,30 @@ api.addRoute 'historicalData/:term/:range',
         dateStr = date.format("YYYY") + "-01-01T00:00:00+00:01"
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     query = prefixes + """
-      SELECT ?word ?timeInterval (count(?word) as ?count)
-      WHERE{
-        SELECT
-        (?termLabel as ?word) ?timeInterval
-        WHERE {
-          ?phrase anno:category "diseases"
-          ; anno:source_doc ?source
-          ; anno:selected-text ?rawText
-          ; ^dc:relation ?resolvedTerm
-          .
-          ?resolvedTerm rdfs:label ?termLabel .
-          ?source pro:post ?post.
-          ?source pro:date ?dateTime
-          FILTER(?termLabel = "#{escape(@urlParams.term)}")
-      """
-    if @urlParams.range != 'all'
-      query += """
-        FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
-        """
-    if @urlParams.range == '6months' || @urlParams.range == '1year'
-      query += """
-        BIND(month(?dateTime) AS ?timeInterval)
-        """
-    else
-      query += """
-        BIND(year(?dateTime) AS ?timeInterval)
-        """
-    query+=
-    """
-      }
-      GROUP BY ?termLabel ?post ?timeInterval
-      ORDER BY DESC(?dateTime)
+      SELECT
+      ?timeInterval (count(?post) as ?count)
+      WHERE {
+        ?phrase anno:category "diseases"
+        ; anno:source_doc ?source
+        ; anno:selected-text ?rawText
+        ; ^dc:relation ?resolvedTerm
+        .
+        ?resolvedTerm rdfs:label ?termLabel .
+        ?source pro:post ?post .
+        ?post pro:date ?dateTime
+        FILTER(?termLabel = "#{escape(@urlParams.term)}")
+        #{if @urlParams.range != 'all' then """
+          FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
+        """}
+        #{if @urlParams.range == '6months' || @urlParams.range == '1year' then """
+          BIND(month(?dateTime) AS ?timeInterval)
+        """ else """
+          BIND(year(?dateTime) AS ?timeInterval)"""}
     }
-    GROUP BY ?word ?timeInterval
+    GROUP BY ?timeInterval
     """
     response = makeRequest(query)
+    console.log JSON.stringify(response.results.bindings,0,2)
     return {
       status: "success"
       results: response.results.bindings.map(castBinding)
@@ -424,7 +422,6 @@ api.addRoute 'trendingAgents/:range',
 
             ?resolvedTerm rdfs:label ?termLabel
             FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
-            FILTER(?termLabel not in (#{excludedAgents}))
             {
               SELECT (count(distinct ?post2) as ?c2) ?resolvedTerm ?termLabel2
               WHERE {
@@ -435,7 +432,6 @@ api.addRoute 'trendingAgents/:range',
                 ?source2 pro:post/pro:date ?dateTime2 .
           		  ?resolvedTerm rdfs:label ?termLabel2
                 FILTER (?dateTime2 > "#{escape(dateStr2)}"^^xsd:dateTime)
-                FILTER(?termLabel2 not in (#{excludedAgents}))
                }
               GROUP BY ?resolvedTerm ?termLabel2
             }
@@ -453,7 +449,9 @@ api.addRoute 'trendingAgents/:range',
     response = makeRequest(query)
     return {
       status: "success"
-      results: response.results.bindings.map(castBinding)
+      results: response.results.bindings
+        .map(castBinding)
+        .filter((x)-> not _.contains(excludedAgentArray, x.word))
     }
 ###
 @api {get} postCountByAnnotator
