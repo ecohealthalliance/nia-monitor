@@ -2,11 +2,13 @@ require './recentMentions.jade'
 
 Template.recentMentions.onCreated ->
   @mentions = new Meteor.Collection(null)
+  @ready = new ReactiveVar(false)
   @sources = new Meteor.Collection(null)
   @autorun =>
     agent = Router.current().getParams()._agentName
     @mentions.find({}, reactive: false).map((d) => @mentions.remove(d))
     HTTP.call 'get', '/api/recentMentions/' + agent, (err, response) =>
+      @ready.set(true)
       if err
         toastr.error(err.message)
         $(".spinner").hide()
@@ -23,6 +25,8 @@ Template.recentMentions.onCreated ->
         @mentions.insert(row)
 
 Template.recentMentions.helpers
+  ready: ->
+    Template.instance().ready.get()
   sources: ->
     Template.instance().sources.find()
   mentionsForSource: (sourceId) ->
