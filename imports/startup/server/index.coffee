@@ -342,26 +342,26 @@ api.addRoute 'historicalData/:term/:range',
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     query = prefixes + """
       SELECT
-      ?timeInterval (count(?post) as ?count)
+      ?timeInterval (count(DISTINCT ?post) as ?count)
       WHERE {
         ?phrase anno:category "diseases"
-        ; anno:source_doc ?source
+        ; anno:source_doc/pro:post ?post
         ; anno:selected-text ?rawText
         ; ^dc:relation ?resolvedTerm
         .
-        ?resolvedTerm rdfs:label ?termLabel .
-        ?source pro:post ?post .
-        ?post pro:date ?dateTime
+        ?post pro:date ?dateTime .
+        ?resolvedTerm rdfs:label ?termLabel
         FILTER(?termLabel = "#{escape(@urlParams.term)}")
         #{if @urlParams.range != 'all' then """
           FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
-        """}
+        """ else ""}
         #{if @urlParams.range == '6months' || @urlParams.range == '1year' then """
           BIND(month(?dateTime) AS ?timeInterval)
         """ else """
-          BIND(year(?dateTime) AS ?timeInterval)"""}
-    }
-    GROUP BY ?timeInterval
+          BIND(year(?dateTime) AS ?timeInterval)
+        """}
+      }
+      GROUP BY ?timeInterval
     """
     response = makeRequest(query)
     return {
@@ -422,7 +422,7 @@ api.addRoute 'trendingAgents/:range',
             ?resolvedTerm rdfs:label ?termLabel
             FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
             {
-              SELECT (count(distinct ?post2) as ?c2) ?resolvedTerm ?termLabel2
+              SELECT (count(DISTINCT ?post2) as ?c2) ?resolvedTerm ?termLabel2
               WHERE {
                 ?prev_mention anno:source_doc ?source2
                 ; ^dc:relation ?resolvedTerm
