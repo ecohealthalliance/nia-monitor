@@ -206,6 +206,7 @@ api.addRoute 'recentDescriptorMentions',
           ?post pro:date ?date
           ; pro:subject_raw ?postSubject
           .
+          FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
           FILTER(lcase(?rawSelText) = "#{escape(descriptor).toLowerCase()}")
       }
       ORDER BY DESC(?date) DESC(?post) ASC(?t_start)
