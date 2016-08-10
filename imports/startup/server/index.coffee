@@ -206,7 +206,7 @@ api.addRoute 'recentDescriptorMentions',
           ?post pro:date ?date
           ; pro:subject_raw ?postSubject
           .
-          FILTER regex(?rawSelText, "#{escape(descriptor)}", "i")
+          FILTER(lcase(?rawSelText) = "#{escape(descriptor).toLowerCase()}")
       }
       ORDER BY DESC(?date) DESC(?post) ASC(?t_start)
       LIMIT 10
@@ -261,8 +261,8 @@ api.addRoute 'recentAgents',
               GROUP BY ?resolvedTerm ?termLabel ?postDate ?post ?postSubject
               # Sort by date, then document, then offset within the document.
               ORDER BY DESC(?postDate) DESC(?post) ASC(?firstMentionStart)
-              LIMIT #{pp}
-              OFFSET #{offset}
+              LIMIT #{escape(pp)}
+              OFFSET #{escape(offset)}
           }
           # Select the previous usages of the most recently mentioned terms
           OPTIONAL {
@@ -362,7 +362,7 @@ api.addRoute 'historicalData/:term/:range',
         """}
       }
       GROUP BY ?timeInterval
-    """
+      """
     response = makeRequest(query)
     return {
       status: "success"
