@@ -7,7 +7,7 @@ Template.recentMentions.onCreated ->
   @autorun =>
     agent = Router.current().getParams()._agentName
     @mentions.find({}, reactive: false).map((d) => @mentions.remove(d))
-    HTTP.call 'get', '/api/recentMentions/' + agent, (err, response) =>
+    HTTP.call 'get', '/api/recentMentions/' + agent + '/' + localStorage.getItem('tlf'), (err, response) =>
       @ready.set(true)
       if err
         toastr.error(err.message)

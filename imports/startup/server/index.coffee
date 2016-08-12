@@ -1,4 +1,4 @@
-SPARQurL = process.env.SPARQURL || 'http://localhost:3030/dataset/query'
+SPARQurL = process.env.SPARQURL || 'http://10.0.2.132:3030/dataset/query'
 prefixes = '''
 prefix pro: <http://www.eha.io/types/promed/>
 prefix anno: <http://www.eha.io/types/annotation_prop/>
@@ -54,6 +54,9 @@ escape = (text) ->
     JSON.stringify(text).slice(1,-1)
   else
     JSON.stringify(text)
+
+daysInMonth = (month, year) ->
+  return new Date(year, month + 1, 0).getDate()
 
 api = new Restivus
   useDefaultAuth: true
@@ -113,8 +116,23 @@ api.addRoute 'frequentDescriptors/:term',
 
 @apiParam {String} term Infectious Agent
 ###
-api.addRoute 'recentMentions/:term',
+api.addRoute 'recentMentions/:term/:tlf',
   get: ->
+    dateStr = ""
+    dateStr2 = ""
+    if @urlParams.tlf != "null"
+      if !isNaN(parseFloat(@urlParams.tlf)) #tlf is a numeric year
+        dateStr = @urlParams.tlf + "-01-01T00:00:00+00:01"
+        dateStr2 = @urlParams.tlf + "-12-31T00:00:00+00:01"
+      else #tlf is a string month
+        date = new Date()
+        filterDate = new Date(@urlParams.tlf + " " + date.getDay() + " " + date.getFullYear())
+        #in the year view the last 12 months are displayed; determine which year by which month was selected
+        if filterDate > new Date()
+          filterDate.setFullYear(date.getFullYear() - 1)
+        lastDay = daysInMonth(filterDate.getMonth(), filterDate.getFullYear())
+        dateStr = filterDate.getFullYear() + "-" + ('0' + (filterDate.getMonth() + 1)).slice(-2) + "-01T00:00:00+00:01"
+        dateStr2 = filterDate.getFullYear() + "-" + ('0' + (filterDate.getMonth() + 1)).slice(-2) + "-" + lastDay + "T00:00:00+00:01"
     query = prefixes + """
       SELECT DISTINCT
         ?phrase_text
@@ -145,6 +163,11 @@ api.addRoute 'recentMentions/:term',
           .
           OPTIONAL { ?source  pro:date  ?a_date }
           BIND(coalesce(?a_date, ?p_date) AS ?date)
+          #{if @urlParams.tlf != 'null' then """
+            FILTER (?date > "#{escape(dateStr)}"^^xsd:dateTime)
+            FILTER (?date < "#{escape(dateStr2)}"^^xsd:dateTime)
+          """ else ""}
+
       }
       ORDER BY DESC(?date) DESC(?source) ASC(?t_start)
       LIMIT 10

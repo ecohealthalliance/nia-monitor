@@ -6,6 +6,7 @@ require '../lists/frequentDescriptors.coffee'
 require './detail.jade'
 
 Template.detail.onRendered ->
+  @tlf = new ReactiveVar(null) #timeline filter
   Blaze.render(Template.recentMentions, $("#recentMentions")[0])
 
 Template.detail.events

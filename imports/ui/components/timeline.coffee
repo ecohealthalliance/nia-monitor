@@ -10,10 +10,21 @@ Template.timeline.events
   'change #timelineRange': (event, template) ->
     template.timelineRange.set($("#timelineRange").val())
     return
+  'click #canvas': (event, template) ->
+    activePoints = myLineChart.getElementsAtEvent(event)
+    clickedElementindex = activePoints[0]["_index"]
+    label = myLineChart.data.labels[clickedElementindex]
+    #set time line filter
+    localStorage.setItem('tlf', label)
+    #rerender recentMentions
+    $("#recentMentions").empty()
+    Blaze.render(Template.recentMentions, $("#recentMentions")[0])
+    return
 
 myLineChart = null
 
 Template.timeline.onCreated ->
+  localStorage.setItem('tlf', null)
   @ready = new ReactiveVar(false)
   @timelineRange = new ReactiveVar('5years')
   @tld = new Meteor.Collection(null)
