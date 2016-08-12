@@ -150,6 +150,36 @@
   },
   {
     "type": "get",
+    "url": "articleCountByAnnotator",
+    "title": "",
+    "name": "articleCountByAnnotator",
+    "group": "article",
+    "version": "0.0.0",
+    "filename": "./imports/startup/server/index.coffee",
+    "groupTitle": "article",
+    "sampleRequest": [
+      {
+        "url": "http://niam.eha.io/api/articleCountByAnnotator"
+      }
+    ]
+  },
+  {
+    "type": "get",
+    "url": "totalArticleCount",
+    "title": "",
+    "name": "totalArticleCount",
+    "group": "article",
+    "version": "0.0.0",
+    "filename": "./imports/startup/server/index.coffee",
+    "groupTitle": "article",
+    "sampleRequest": [
+      {
+        "url": "http://niam.eha.io/api/totalArticleCount"
+      }
+    ]
+  },
+  {
+    "type": "get",
     "url": "frequentDescriptors/:term",
     "title": "Request frequent descriptors for the term",
     "name": "frequentDescriptors",

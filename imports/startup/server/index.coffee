@@ -454,16 +454,16 @@ api.addRoute 'trendingAgents/:range',
         .filter((x)-> not _.contains(excludedAgentArray, x.word))
     }
 ###
-@api {get} postCountByAnnotator
-@apiName postCountByAnnotator
-@apiGroup post
+@api {get} articleCountByAnnotator
+@apiName articleCountByAnnotator
+@apiGroup article
 ###
-api.addRoute 'postCountByAnnotator',
+api.addRoute 'articleCountByAnnotator',
   get: ->
     query = prefixes + """
       SELECT
           ?annotator
-          (count(distinct ?post) AS ?postCount)
+          (count(distinct ?article) AS ?articleCount)
       WHERE {
           ?article pro:post ?post .
           OPTIONAL {
@@ -479,26 +479,17 @@ api.addRoute 'postCountByAnnotator',
     }
 
 ###
-@api {get} totalPostCount
-@apiName totalPostCount
-@apiGroup post
+@api {get} totalArticleCount
+@apiName totalArticleCount
+@apiGroup article
 ###
-api.addRoute 'totalPostCount',
+api.addRoute 'totalArticleCount',
   get: ->
     query = prefixes + """
       SELECT
-          (sum(?count) AS ?postCount)
+          (count(DISTINCT ?article) AS ?articleCount)
       WHERE {
-          SELECT
-              ?annotator
-              (count(distinct ?post) AS ?count)
-          WHERE {
-              ?article pro:post ?post .
-              OPTIONAL {
-                  ?article anno:annotated_by ?annotator
-              }
-          }
-          GROUP BY ?annotator
+          ?article pro:post ?post
       }
       """
     response = makeRequest(query)

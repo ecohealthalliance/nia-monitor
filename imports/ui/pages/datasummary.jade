@@ -3,19 +3,19 @@ template(name='datasummary')
   h2.col-md-12.dbSummaryHeaderText Database Summary Statistics
   .col-md-6.col-md-offset-3
     #dataSummaryDiv(style='padding-top: 50px;')
-      table#postsTable.table
+      table#articlesTable.table
         tbody
           th Annotator
-          th Posts
+          th Articles
 
-          each postsByAnnotator
+          each articlesByAnnotator
             tr
               td.ital
                 if annotator
                   a(href=annotator) {{annotator}}
                 else
                   | unannotated
-              td.ital {{postCount}}
+              td.ital {{articleCount}}
           tr.bold
             td Total
-            td #{totalPostCount}
+            td #{totalArticleCount}
