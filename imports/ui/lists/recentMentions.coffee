@@ -1,17 +1,26 @@
 require './recentMentions.jade'
 
 Template.recentMentions.onCreated ->
+  @selectedRangeRV = @data.selectedRangeRV
   @mentions = new Meteor.Collection(null)
   @ready = new ReactiveVar(false)
   @sources = new Meteor.Collection(null)
   @autorun =>
+    @ready.set(false)
+    params = {}
+    if @selectedRangeRV.get()
+      params =
+        from: @selectedRangeRV.get()[0].toISOString()
+        to: @selectedRangeRV.get()[1].toISOString()
     agent = Router.current().getParams()._agentName
     @mentions.find({}, reactive: false).map((d) => @mentions.remove(d))
-    HTTP.call 'get', '/api/recentMentions/' + agent, (err, response) =>
+    @sources.find({}, reactive: false).map((d) => @sources.remove(d))
+    HTTP.call 'get', '/api/recentMentions/' + agent, {
+      params: params
+    }, (err, response) =>
       @ready.set(true)
       if err
         toastr.error(err.message)
-        $(".spinner").hide()
         return
       for row in response.data.results
         if row.post
@@ -38,7 +47,14 @@ Template.recentMentions.helpers
         #{@phrase_text.slice(@t_end - @p_start, @t_start + 40 - @p_start)}...
       </span>
       """
-
+  startDate: ->
+    selectedRange = Template.instance().selectedRangeRV.get()
+    if selectedRange
+      moment(selectedRange[0]).format("MMM Do YYYY")
+  endDate: ->
+    selectedRange = Template.instance().selectedRangeRV.get()
+    if selectedRange
+      moment(selectedRange[1]).format("MMM Do YYYY")
 Template.recentMentions.events
   'click .proMedLink': (event, template) ->
     if this.uri != undefined

@@ -1,5 +1,10 @@
 template(name="recentMentions")
+
   .col-md-6.col-md-offset-3
+    if endDate
+      center
+        b Posts before: 
+        | #{endDate}
     each sources
       .panel-heading
         .col-md-8.col-xs-7.articleHeader
@@ -7,7 +12,7 @@ template(name="recentMentions")
             a.proMedLink.articleHeaderText(href="#" uri=uri)=postSubject
         .col-md-4.col-xs-5.articleHeader.ital
           h4
-            .pull-right{{age date}}
+            .pull-right {{ageOrDate date}}
       table#recentMentionsTable.table.table-striped
         tbody
           each mentionsForSource _id

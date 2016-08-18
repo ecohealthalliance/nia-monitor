@@ -112,6 +112,8 @@ api.addRoute 'frequentDescriptors/:term',
 @apiGroup descriptors
 
 @apiParam {String} term Infectious Agent
+@apiParam {String} to=now The last post date in ISO format
+@apiParam {String} from The earliest post date in ISO format
 ###
 api.addRoute 'recentMentions/:term',
   get: ->
@@ -145,6 +147,12 @@ api.addRoute 'recentMentions/:term',
           .
           OPTIONAL { ?source  pro:date  ?a_date }
           BIND(coalesce(?a_date, ?p_date) AS ?date)
+          #{if @queryParams.from then """
+            FILTER (?p_date >= "#{escape(@queryParams.from)}"^^xsd:dateTime)
+          """ else ""}
+          #{if @queryParams.to then """
+            FILTER (?p_date <= "#{escape(@queryParams.to)}"^^xsd:dateTime)
+          """ else ""}
       }
       ORDER BY DESC(?date) DESC(?source) ASC(?t_start)
       LIMIT 10

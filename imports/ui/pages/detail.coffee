@@ -5,20 +5,19 @@ require '../lists/frequentDescriptors.coffee'
 
 require './detail.jade'
 
-Template.detail.onRendered ->
-  Blaze.render(Template.recentMentions, $("#recentMentions")[0])
-
-Template.detail.events
-  'click #timelinePanelTab': (event, instance) ->
-    $("#timeline").empty()
-    Blaze.render(Template.timeline, $("#timeline")[0])
-  'click #frequentDescriptorsPanelTab': (event, instance) ->
-    $("#frequentDescriptors").empty()
-    Blaze.renderWithData(Template.frequentDescriptors, this, $("#frequentDescriptors")[0])
-  'click #recentMentionsPanelTab': (event, instance) ->
-    $("#recentMentions").empty()
-    Blaze.render(Template.recentMentions, $("#recentMentions")[0])
+Template.detail.onCreated ->
+  @selectedRangeRV = new ReactiveVar()
 
 Template.detail.helpers
   agent: ->
     Router.current().getParams()._agentName
+  selectedRangeRV: ->
+    Template.instance().selectedRangeRV
+  recentMentionsView: ->
+    view = Router.current().getParams()._view
+    if view
+      view == "recentMentions"
+    else
+      true
+  frequentDescriptorsView: ->
+    Router.current().getParams()._view == "frequentDescriptors"

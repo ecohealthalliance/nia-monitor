@@ -1,15 +1,16 @@
 template(name='detail')
   +header
-  +timeline
+  +timeline selectedRangeRV=selectedRangeRV
   hr.col-md-12.hr-padding
-  h2.col-md-12.articleHeader.mainHeaderText Articles mentioning #{agent}
+  h2.col-md-12.articleHeader.mainHeaderText Posts mentioning #{agent}
   ul.nav.nav-tabs.col-md-12
-    li.col-md-2.col-xs-12.active#recentMentionsPanelTab
-      a(href='#recentMentionsPanel', data-toggle='tab') Recent Mentions
-    li#frequentDescriptorsPanelTab.col-md-2.col-xs-12
-      a(href='#frequentDescriptorsPanel', data-toggle='tab') Frequent Descriptors
+    li.col-md-2.col-xs-12#recentMentionsPanelTab(class="{{#if recentMentionsView}}active{{/if}}")
+      a(href='/detail/#{agent}/recentMentions') Recent Mentions
+    li#frequentDescriptorsPanelTab.col-md-2.col-xs-12(class="{{#if frequentDescriptorsView}}active{{/if}}")
+      a(href='/detail/#{agent}/frequentDescriptors') Frequent Descriptors
   .tab-content
-    #recentMentionsPanel.tab-pane.active
-      #recentMentions
-    #frequentDescriptorsPanel.tab-pane
-      #frequentDescriptors
+    .tab-pane.active
+      if recentMentionsView
+        +recentMentions selectedRangeRV=selectedRangeRV
+      else if frequentDescriptorsView
+        +frequentDescriptors

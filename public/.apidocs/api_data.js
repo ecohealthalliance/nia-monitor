@@ -249,6 +249,21 @@ define({ "api": [
             "optional": false,
             "field": "term",
             "description": "<p>Infectious Agent</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "to",
+            "defaultValue": "now",
+            "description": "<p>The last post date in ISO format</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "from",
+            "description": "<p>The earliest post date in ISO format</p>"
           }
         ]
       }

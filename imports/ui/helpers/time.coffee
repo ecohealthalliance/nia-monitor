@@ -13,3 +13,10 @@ Template.registerHelper 'age', (date) ->
 
 Template.registerHelper 'since', (date, priorDate) ->
   moment(priorDate).from(date).replace('ago', '')
+
+# Return a relative age for recent dates, or formatted date for old dates.
+Template.registerHelper 'ageOrDate', (date) ->
+  if moment.duration(moment().diff(date)) > moment.duration(.9, 'months')
+    moment(date).format("MMM Do YYYY")
+  else
+    moment(date).fromNow()

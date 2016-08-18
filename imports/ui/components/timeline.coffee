@@ -1,22 +1,9 @@
 require './timeline.jade'
-
-Template.timeline.helpers
-  timelineRange: ->
-    Template.instance().timelineRange.get()
-  ready: ->
-    Template.instance().ready.get()
-
-Template.timeline.events
-  'change #timelineRange': (event, template) ->
-    template.timelineRange.set($("#timelineRange").val())
-    return
-
-myLineChart = null
-
 Template.timeline.onCreated ->
   @ready = new ReactiveVar(false)
   @timelineRange = new ReactiveVar('5years')
   @tld = new Meteor.Collection(null)
+  @myBarChart = null
   @autorun =>
     agent = Router.current().getParams()._agentName
     @tld.find({}, reactive: false).map((d) => @tld.remove(d))
@@ -24,15 +11,35 @@ Template.timeline.onCreated ->
       if err
         toastr.error(err.message)
         return
-      if myLineChart != null
-        myLineChart.destroy()
       for row in response.data.results
         data = {timeInterval: row.timeInterval, count: row.count}
         @tld.insert(data)
+      $("#timeLineSpinner").hide()
+  @selectedRangeRV = @data.selectedRangeRV
+  @selectedElement = new ReactiveVar(null)
+  @autorun =>
+    element = @selectedElement.get()
+    if element
+      if moment(element, "YYYY").isValid()
+        m = moment(element, "YYYY")
+        @selectedRangeRV.set [m, m.clone().add(1, 'year')]
+      else if moment(element, "MMM").isValid()
+        m = moment(element, "MMM")
+        # Parse months from the last year to date
+        if m > moment(moment.months(moment().month()), "MMM")
+          m.subtract(1, "year")
+        @selectedRangeRV.set [m, m.clone().add(1, 'month')]
+      else
+        console.error("Unknown date format:", element)
+    else
+      @selectedRangeRV.set null
+Template.timeline.onRendered ->
+  @autorun =>
+    if @tld.find().count()
+      if @myBarChart != null
+        @myBarChart.destroy()
       endDate = moment(new Date())
       baseDate = null
-      ymMax = moment(new Date()).year()
-      monthNames = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
       xlabels = []
       counts = []
       maxCount = 0
@@ -42,7 +49,7 @@ Template.timeline.onCreated ->
           baseMonth = endDate.subtract(5, 'months')
           ctr = 0
           while ctr < 6
-            xlabels.push monthNames[baseMonth.month() + 1]
+            xlabels.push moment.months(baseMonth.month())
             tdata = @tld.find({timeInterval: baseMonth.month() + 1}).fetch()
             if tdata.length == 0
               counts.push 0
@@ -55,7 +62,7 @@ Template.timeline.onCreated ->
           baseMonth = endDate.subtract(11, 'months')
           ctr = 0
           while ctr < 12
-            xlabels.push monthNames[baseMonth.month() + 1]
+            xlabels.push moment.months(baseMonth.month())
             tdata = @tld.find({timeInterval: baseMonth.month() + 1}).fetch()
             if tdata.length == 0
               counts.push 0
@@ -84,32 +91,29 @@ Template.timeline.onCreated ->
               counts.push tdata[0].count
             xlabels.push baseYear
             baseYear++
-      myLineChart = new Chart($("#canvas"),
+      selectedElement = @selectedElement.get()
+      @myBarChart = new Chart($("#canvas"),
         type: 'bar'
         data:
           labels: xlabels
           datasets: [{
             label: 'Posts'
             fill: false
-            lineTension: 0.1
-            backgroundColor: 'rgb(11, 165, 255)'
-            borderColor: 'rgba(75,192,192,1)'
-            borderCapStyle: 'butt'
-            borderDash: []
-            borderDashOffset: 0.0
-            borderJoinStyle: 'miter'
-            pointBorderColor: 'rgba(75,192,192,1)'
-            pointBackgroundColor: '#fff'
-            pointBorderWidth: 1
-            pointHoverRadius: 5
-            pointHoverBackgroundColor: 'rgba(75,192,192,1)'
-            pointHoverBorderColor: 'rgba(220,220,220,1)'
-            pointHoverBorderWidth: 2
-            pointRadius: 1
-            pointHitRadius: 10
+            backgroundColor: xlabels.map (xlabel)->
+              if selectedElement == xlabel
+                'rgb(75,200,255)'
+              else
+                'rgb(11, 165, 255)'
+            borderColor: 'rgba(0,0,0,1)'
+            #borderCapStyle: 'butt'
+            #borderDash: []
+            #borderDashOffset: 0.0
+            #borderJoinStyle: 'miter'
             data: counts
           } ]
         options:
+          animation:
+            duration: 0
           showScale: false
           legend:
             display: false
@@ -132,4 +136,22 @@ Template.timeline.onCreated ->
                 color: "rgba(255,255,255,0)"
             }]
       )
-      $("#timeLineSpinner").hide()
+
+Template.timeline.helpers
+  timelineRange: ->
+    Template.instance().timelineRange.get()
+  ready: ->
+    Template.instance().ready.get()
+
+Template.timeline.events
+  'change #timelineRange': (event, template) ->
+    template.timelineRange.set($("#timelineRange").val())
+  'click #canvas': (event, template) ->
+    myBarChart = template.myBarChart
+    activePoints = myBarChart.getElementsAtEvent(event)
+    clickedElementindex = activePoints[0]["_index"]
+    label = myBarChart.data.labels[clickedElementindex]
+    if template.selectedElement.get() == label
+      template.selectedElement.set null
+    else
+      template.selectedElement.set label
