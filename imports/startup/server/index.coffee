@@ -141,17 +141,15 @@ api.addRoute 'recentMentions/:term',
           ; anno:end ?t_end
           ; anno:source_doc ?source
           .
-          ?source pro:post/pro:date ?p_date
+          ?source pro:post/pro:date ?date
           ; pro:post/pro:subject_raw ?postSubject
           ; pro:post ?post
           .
-          OPTIONAL { ?source  pro:date  ?a_date }
-          BIND(coalesce(?a_date, ?p_date) AS ?date)
           #{if @queryParams.from then """
-            FILTER (?p_date >= "#{escape(@queryParams.from)}"^^xsd:dateTime)
+            FILTER (?date >= "#{escape(@queryParams.from)}"^^xsd:dateTime)
           """ else ""}
           #{if @queryParams.to then """
-            FILTER (?p_date <= "#{escape(@queryParams.to)}"^^xsd:dateTime)
+            FILTER (?date <= "#{escape(@queryParams.to)}"^^xsd:dateTime)
           """ else ""}
       }
       ORDER BY DESC(?date) DESC(?source) ASC(?t_start)
