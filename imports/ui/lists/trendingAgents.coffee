@@ -11,9 +11,10 @@ Template.trendingAgents.onCreated ->
       if err
         toastr.error(err.message)
         return
-      for binding in response.data.results
-        if binding.count == 0
-          continue
+      filteredResults = response.data.results.filter (b)-> b.count != 0
+      maxScore = _.max(filteredResults, (binding)->binding.result).result
+      for binding in filteredResults
+        binding.bars = _.range(Math.round(3 * binding.result / maxScore))
         @trendingAgents.insert(binding)
 
 Template.trendingAgents.helpers
@@ -29,3 +30,6 @@ Template.trendingAgents.events
     template.ready.set(false)
     template.trendingRange.set($("#trendingRange").val())
     return
+
+Template.powerBars.onRendered ->
+  @$('[data-toggle="tooltip"]').tooltip()

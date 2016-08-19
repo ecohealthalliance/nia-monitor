@@ -16,10 +16,17 @@ template(name="trendingAgents")
                   a(href="/detail/#{word}")= word
               td.ital
                 div.pull-right(style="color:white;") {{result}}
+              td
+                +powerBars
           else
             if ready
               span.no-priors.col-md-12 No Trending Infectious Agents in the last
-                {{trendingRange}}.
+                | {{trendingRange}}
             else
               .loading.spinner-margin
                 i.fa.fa-spinner.fa-2x.fa-spin
+
+template(name="powerBars")
+  .power-bars(data-toggle="tooltip" data-placement="left" title="The number of bars indicates the relative strength of the trend.")
+    each bars
+      .power-bar
