@@ -3,6 +3,7 @@ require './recentAgents.jade'
 pp = 75
 
 Template.recentAgents.onCreated ->
+  @regionFeed = @data.regionFeed
   @recentAgents = new Meteor.Collection(null)
   @posts = new Meteor.Collection(null)
   @currentPageNumber = new ReactiveVar(0)

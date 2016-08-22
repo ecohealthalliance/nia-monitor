@@ -8,7 +8,11 @@ template(name='main')
       | A disease's novelty can be assessed through its time since the previous
       | mention and through its ranking on the trending diseases list.
     p.col-md-8.col-md-offset-2 Click on a disease to see its historical mentions.
-
+  .regionSelectorContainer.col-md-1.col-sm-12.col-xs-12
+    select#regionSelector.select2(name='regionSelector')
+      option(val="all") All Feeds
+      each feed
+        option #{label}
   .col-md-12.col-sm-12.col-xs-12.mainContent
     ul.nav.nav-tabs
       li.col-md-2.col-sm-8.col-xs-10.active#recentPanelTab
