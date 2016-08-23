@@ -233,6 +233,7 @@ api.addRoute 'recentAgents',
   get: ->
     page = @queryParams.page
     pp = @queryParams.pp
+    regionFeed = @queryParams.regionFeed
     offset = page * pp
     query = prefixes + """
       SELECT
@@ -290,7 +291,7 @@ api.addRoute 'recentAgents',
       status: "success"
       results: response.results.bindings
         .map(castBinding)
-        .filter((x)-> not _.contains(excludedAgentArray, x.word))
+        .filter((x) -> not _.contains(excludedAgentArray, x.word))
     }
 
 ###
@@ -300,6 +301,7 @@ api.addRoute 'recentAgents',
 ###
 api.addRoute 'frequentAgents',
   get: ->
+    regionFeed = @queryParams.regionFeed
     baseYear = 1991
     # Use current year - 5 with full dataset
     # baseYear = moment(new Date()).year() - 5
@@ -383,6 +385,7 @@ api.addRoute 'historicalData/:term/:range',
 ###
 api.addRoute 'trendingAgents/:range',
   get: ->
+    regionFeed = @queryParams.regionFeed
     dateStr = ""
     dateStr2 = ""
     date = moment(new Date())
