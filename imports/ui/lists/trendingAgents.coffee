@@ -3,8 +3,14 @@ require './trendingAgents.jade'
 Template.trendingAgents.onCreated ->
   @trendingAgents = new Meteor.Collection(null)
   @ready = new ReactiveVar(false)
-  @trendingRange = new ReactiveVar("year")
+  @trendingRange = new ReactiveVar("month")
   @autorun =>
+    if Router.current().getParams()._trendingRange
+      @trendingRange.set Router.current().getParams()._trendingRange
+    else
+      @trendingRange.set "month"
+  @autorun =>
+    @ready.set(false)
     @trendingAgents.find({}, reactive: false).map((d) => @trendingAgents.remove(d))
     HTTP.get '/api/trendingAgents/' + @trendingRange.get(), (err, response) =>
       @ready.set(true)
@@ -24,12 +30,8 @@ Template.trendingAgents.helpers
     Template.instance().trendingAgents.find()
   trendingRange: ->
     Template.instance().trendingRange.get()
-
-Template.trendingAgents.events
-  'change #trendingRange': (event, template) ->
-    template.ready.set(false)
-    template.trendingRange.set($("#trendingRange").val())
-    return
+  trendingDate: ->
+    Template.instance().trendingDate.get()
 
 Template.powerBars.onRendered ->
   @$('[data-toggle="tooltip"]').tooltip()

@@ -12,7 +12,7 @@ require '../../ui/helpers/time.coffee'
 require '../../ui/helpers/moment.coffee'
 require '../../ui/helpers/plus.coffee'
 require '../../ui/helpers/pluralize.coffee'
-
+require '../../ui/helpers/misc.coffee'
 
 # routes
 Router.route '/', ->
@@ -29,3 +29,7 @@ Router.route '/datasummary', ->
   @render 'datasummary', { data: this.params }
 Router.route '/about', ->
   @render 'about'
+Router.route '/:_view(trending)/:_trendingRange', ->
+  @render 'main', { data: this.params }
+Router.route '/:_view', ->
+  @render 'main', { data: this.params }
