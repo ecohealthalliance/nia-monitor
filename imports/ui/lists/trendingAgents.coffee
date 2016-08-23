@@ -4,6 +4,7 @@ Template.trendingAgents.onCreated ->
   @trendingAgents = new Meteor.Collection(null)
   @ready = new ReactiveVar(false)
   @trendingRange = new ReactiveVar("month")
+  @trendingDate = new ReactiveVar(new Date())
   @autorun =>
     if Router.current().getParams()._trendingRange
       @trendingRange.set Router.current().getParams()._trendingRange
@@ -12,7 +13,10 @@ Template.trendingAgents.onCreated ->
   @autorun =>
     @ready.set(false)
     @trendingAgents.find({}, reactive: false).map((d) => @trendingAgents.remove(d))
-    HTTP.get '/api/trendingAgents/' + @trendingRange.get(), (err, response) =>
+    HTTP.get '/api/trendingAgents/' + @trendingRange.get(), {
+      params:
+        trendingDate: @trendingDate.get().toISOString()
+    }, (err, response) =>
       @ready.set(true)
       if err
         toastr.error(err.message)
@@ -23,6 +27,12 @@ Template.trendingAgents.onCreated ->
         binding.bars = _.range(Math.round(3 * binding.result / maxScore))
         @trendingAgents.insert(binding)
 
+Template.trendingAgents.onRendered ->
+    @$('.date-picker').data('DateTimePicker')?.destroy()
+    @$('.date-picker').datetimepicker(
+      format: 'MM/DD/YYYY'
+    )
+
 Template.trendingAgents.helpers
   ready: ->
     Template.instance().ready.get()
@@ -31,7 +41,12 @@ Template.trendingAgents.helpers
   trendingRange: ->
     Template.instance().trendingRange.get()
   trendingDate: ->
-    Template.instance().trendingDate.get()
+    moment(Template.instance().trendingDate.get()).format("MM/DD/YYYY")
+
+Template.trendingAgents.events
+  'dp.change #trendingDate': (event,  instance) ->
+    d = $(event.target).data('DateTimePicker')?.date().toDate()
+    if d then instance.trendingDate.set d
 
 Template.powerBars.onRendered ->
   @$('[data-toggle="tooltip"]').tooltip()
