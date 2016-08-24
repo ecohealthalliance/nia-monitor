@@ -120,6 +120,7 @@ Template.timeline.onRendered ->
           scales:
             yAxes: [{
               ticks:
+                min: 0
                 display: false
               gridLines:
                 lineWidth: 0,
