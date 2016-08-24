@@ -41,3 +41,10 @@ Template.main.events
   'click #showAppDesc': (event, instance) ->
     $(".appDescriptionContainer").show()
     localStorage.setItem('showAppDesc', true)
+
+Template.main.helpers
+  view: ->
+    switch Router.current().getParams()._view
+      when "trending" then "trendingAgents"
+      when "frequent" then "frequentAgents"
+      else "recentAgents"

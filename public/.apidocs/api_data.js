@@ -135,6 +135,14 @@ define({ "api": [
             "optional": false,
             "field": "range",
             "description": "<p>(year, month, week)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "ISODateString",
+            "optional": false,
+            "field": "trendingDate",
+            "defaultValue": "today",
+            "description": "<p>The date of interest</p>"
           }
         ]
       }

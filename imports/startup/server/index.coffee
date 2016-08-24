@@ -382,30 +382,38 @@ api.addRoute 'historicalData/:term/:range',
 @apiName trendingAgents
 @apiGroup agent
 @apiParam {String} range (year, month, week)
+@apiParam {ISODateString} trendingDate=today The date of interest
 ###
 api.addRoute 'trendingAgents/:range',
   get: ->
     regionFeed = @queryParams.regionFeed
+    if @queryParams.trendingDate
+      trendingMoment = moment(@queryParams.trendingDate)
+      if not trendingMoment.isValid()
+        throw new Meteor.Error(500, "Invalid date")
+    else
+      trendingMoment = moment()
     dateStr = ""
     dateStr2 = ""
-    date = moment(new Date())
-    date2 = moment(new Date())
-    duration = "365"
+    date = trendingMoment.clone()
+    date2 = trendingMoment.clone()
+    durationDays = 365
     switch @urlParams.range
       when "year"
         date.subtract(1, 'years')
         date2.subtract(4, 'years')
-        duration = "365"
+        durationDays = 365
       when "month"
         date.subtract(1, 'months')
         date2.subtract(4, 'months')
-        duration  = Math.round(moment.duration(moment(new Date()).diff(date)).asDays()).toString()
+        durationDays  = Math.round(moment.duration(moment(new Date()).diff(date)).asDays())
       when "week"
         date.subtract(1, 'weeks')
         date2.subtract(4, 'weeks')
-        duration = "7"
+        durationDays = 7
       else
-        return
+        throw new Meteor.Error(500, "Invalid interval")
+    stopDateStr = trendingMoment.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr2 = date2.format("YYYY-MM-DD") + "T00:00:00+00:01"
     query = prefixes + """
@@ -431,6 +439,7 @@ api.addRoute 'trendingAgents/:range',
 
             ?resolvedTerm rdfs:label ?termLabel
             FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
+            FILTER (?dateTime <= "#{escape(stopDateStr)}"^^xsd:dateTime)
             {
               SELECT (count(DISTINCT ?post2) as ?c2) ?resolvedTerm ?termLabel2
               WHERE {
@@ -441,14 +450,15 @@ api.addRoute 'trendingAgents/:range',
                 ?source2 pro:post/pro:date ?dateTime2 .
           		  ?resolvedTerm rdfs:label ?termLabel2
                 FILTER (?dateTime2 > "#{escape(dateStr2)}"^^xsd:dateTime)
+                FILTER (?dateTime2 <= "#{escape(stopDateStr)}"^^xsd:dateTime)
                }
               GROUP BY ?resolvedTerm ?termLabel2
             }
           }
           GROUP BY ?resolvedTerm
         }
-        BIND(?count/xsd:float(#{escape(duration)}) as ?rate)
-        BIND(?count2/xsd:float(#{escape(duration)}*4) as ?rate2)
+        BIND(?count/xsd:float(#{escape(durationDays)}) as ?rate)
+        BIND(?count2/xsd:float(#{escape(durationDays * 4)}) as ?rate2)
         BIND(?rate - ?rate2 AS ?result)
         FILTER(?result > 0)
       }

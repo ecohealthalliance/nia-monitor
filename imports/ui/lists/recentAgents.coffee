@@ -3,7 +3,6 @@ require './recentAgents.jade'
 pp = 75
 
 Template.recentAgents.onCreated ->
-  @regionFeed = @data.regionFeed
   @recentAgents = new Meteor.Collection(null)
   @posts = new Meteor.Collection(null)
   @currentPageNumber = new ReactiveVar(0)
@@ -16,7 +15,7 @@ Template.recentAgents.onCreated ->
     @currentPageNumber.set(pageNum + 1)
     # @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
     @isLoading.set(true)
-    HTTP.get '/api/recentAgents', {params: {page: pageNum, pp: pp, regionFeed: @regionFeed}}, (err, res) =>
+    HTTP.get '/api/recentAgents', {params: {page: pageNum, pp: pp, regionFeed: Session.get("region")}}, (err, res) =>
       @isLoading.set(false)
       if err
         toastr.error(err.message)
