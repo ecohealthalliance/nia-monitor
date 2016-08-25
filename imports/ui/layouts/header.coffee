@@ -2,6 +2,8 @@ require './header.jade'
 
 Template.header.onCreated ->
   @Feeds = require '../components/feeds.coffee'
+  if Session.get('region') == undefined
+    Session.set('region', "All Regions")
 
 Template.header.helpers
   feed: ->
@@ -11,6 +13,4 @@ Template.header.helpers
 
 Template.header.events
   'click .regionSelector': (event, instance) ->
-    Session.set('region', event.toElement.attributes.region.value)
-    $(Session.get("currentTab")).empty()
-    Blaze.renderWithData(Template[Session.get("currentTemplate")], {regionFeed: Session.get('region')}, $(Session.get("currentTab"))[0])
+    Session.set('region', event.target.text)

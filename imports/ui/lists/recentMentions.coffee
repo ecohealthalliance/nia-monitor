@@ -6,6 +6,7 @@ Template.recentMentions.onCreated ->
   @ready = new ReactiveVar(false)
   @sources = new Meteor.Collection(null)
   @autorun =>
+    Session.get("region")
     @ready.set(false)
     params = {}
     if @selectedRangeRV.get()

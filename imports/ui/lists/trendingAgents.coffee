@@ -11,12 +11,12 @@ Template.trendingAgents.onCreated ->
     else
       @trendingRange.set "month"
   @autorun =>
+    Session.get("region")
     @ready.set(false)
     @trendingAgents.find({}, reactive: false).map((d) => @trendingAgents.remove(d))
     HTTP.get '/api/trendingAgents/' + @trendingRange.get(), {
       params:
         trendingDate: @trendingDate.get().toISOString()
-        regionFeed: Session.get("region")
     }, (err, response) =>
       @ready.set(true)
       if err

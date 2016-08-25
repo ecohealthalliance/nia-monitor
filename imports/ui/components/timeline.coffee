@@ -1,20 +1,24 @@
 require './timeline.jade'
 Template.timeline.onCreated ->
-  @ready = new ReactiveVar(false)
+  @isLoading = new ReactiveVar(false)
   @timelineRange = new ReactiveVar('5years')
   @tld = new Meteor.Collection(null)
   @myBarChart = null
   @autorun =>
+    Session.get("region")
     agent = Router.current().getParams()._agentName
     @tld.find({}, reactive: false).map((d) => @tld.remove(d))
+    @isLoading.set(true)
+    $("#timelineDiv").hide()
     HTTP.call 'get', '/api/historicalData/' + agent + '/' + @timelineRange.get(), (err, response) =>
+      @isLoading.set(false)
       if err
         toastr.error(err.message)
         return
       for row in response.data.results
         data = {timeInterval: row.timeInterval, count: row.count}
         @tld.insert(data)
-      $("#timeLineSpinner").hide()
+      $("#timelineDiv").show()
   @selectedRangeRV = @data.selectedRangeRV
   @selectedElement = new ReactiveVar(null)
   @autorun =>
@@ -141,8 +145,8 @@ Template.timeline.onRendered ->
 Template.timeline.helpers
   timelineRange: ->
     Template.instance().timelineRange.get()
-  ready: ->
-    Template.instance().ready.get()
+  isLoading: ->
+    Template.instance().isLoading.get()
 
 Template.timeline.events
   'change #timelineRange': (event, template) ->

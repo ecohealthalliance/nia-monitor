@@ -4,9 +4,10 @@ Template.frequentAgents.onCreated ->
   @frequentAgents = new Meteor.Collection(null)
   @isLoading = new ReactiveVar(false)
   @autorun =>
+    Session.get("region")
     @frequentAgents.find({}, reactive: false).map((d) => @frequentAgents.remove(d))
     @isLoading.set(true)
-    HTTP.call 'get', '/api/frequentAgents', {params: {regionFeed: Session.get("region")}}, (err, response) =>
+    HTTP.call 'get', '/api/frequentAgents', (err, response) =>
       @isLoading.set(false)
       if err
         toastr.error(err.message)
