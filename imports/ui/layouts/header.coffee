@@ -1,9 +1,10 @@
 require './header.jade'
 
+if Session.get('region') == undefined
+  Session.set('region', "All Regions")
+
 Template.header.onCreated ->
   @Feeds = require '../components/feeds.coffee'
-  if Session.get('region') == undefined
-    Session.set('region', "All Regions")
 
 Template.header.helpers
   feed: ->

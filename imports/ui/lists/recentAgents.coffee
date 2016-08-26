@@ -7,54 +7,55 @@ Template.recentAgents.onCreated ->
   @posts = new Meteor.Collection(null)
   @currentPageNumber = new ReactiveVar(0)
   @isLoading = new ReactiveVar(false)
-  @clear = true
   @theEnd = new ReactiveVar(false)
   order = 0
+
+  @getRecentAgents = (pageNum) =>
+    @isLoading.set(true)
+    HTTP.get '/api/recentAgents', {params: {page: pageNum, pp: pp}}, (err, res) =>
+      if err
+        toastr.error(err.message)
+        return
+      unless res.data.results.length
+        @theEnd.set(true)
+        return
+      for row in res.data.results
+        postId = @posts.findOne(uri: row.post)?._id
+        unless postId
+          postId = @posts.insert
+            uri: row.post
+            postSubject: row.postSubject
+            postDate: moment(new Date(row.postDate))
+            collapsed: false
+            order: order++
+        row.postId = postId
+        if row.priorPostDate
+          row.priorPostDate = new Date(row.priorPostDate)
+          priorPostDate = moment(row.priorPostDate)
+          postDate = moment(new Date(row.postDate))
+          row.days = postDate.diff(priorPostDate, 'days')
+          row.months = postDate.diff(priorPostDate, 'months')
+          #show days or months since last mention
+          if row.days > 30
+            row.dm = true
+        @recentAgents.insert(row)
+      @posts.find().forEach (post) =>
+        if @recentAgents.find(postId: post._id).count() > 5
+          @posts.update(post._id, { $set: { collapsed: true } })
+      @isLoading.set(false)
+
   @loadMorePosts = =>
     if @isLoading.get() then return
     pageNum = @currentPageNumber.get()
     @currentPageNumber.set(pageNum + 1)
     # @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
-    @isLoading.set(true)
-    @autorun =>
-      Session.get("region")
-      if @clear #changed the region feed
-        @isLoading.set(true)
-        @posts.remove({})
-        @recentAgents.remove({})
-      @clear = true
-      HTTP.get '/api/recentAgents', {params: {page: pageNum, pp: pp}}, (err, res) =>
-        @isLoading.set(false)
-        if err
-          toastr.error(err.message)
-          return
-        unless res.data.results.length
-          @theEnd.set(true)
-          return
-        for row in res.data.results
-          postId = @posts.findOne(uri: row.post)?._id
-          unless postId
-            postId = @posts.insert
-              uri: row.post
-              postSubject: row.postSubject
-              postDate: moment(new Date(row.postDate))
-              collapsed: false
-              order: order++
-          row.postId = postId
-          if row.priorPostDate
-            row.priorPostDate = new Date(row.priorPostDate)
-            priorPostDate = moment(row.priorPostDate)
-            postDate = moment(new Date(row.postDate))
-            row.days = postDate.diff(priorPostDate, 'days')
-            row.months = postDate.diff(priorPostDate, 'months')
-            #show days or months since last mention
-            if row.days > 30
-              row.dm = true
-          @recentAgents.insert(row)
-        @posts.find().forEach (post) =>
-          if @recentAgents.find(postId: post._id).count() > 5
-            @posts.update(post._id, { $set: { collapsed: true } })
+    @getRecentAgents(pageNum)
 
+  @autorun =>
+    Session.get("region")
+    @posts.remove({})
+    @recentAgents.remove({})
+    @getRecentAgents(0)
 
 Template.recentAgents.onRendered ->
   prevScrollPos = window.pageYOffset
@@ -96,7 +97,7 @@ Template.recentAgents.onRendered ->
   }
 
   infiniteScroll(options)
-  @loadMorePosts(false)
+  @loadMorePosts()
 
 Template.recentAgents.helpers
   post: ->
@@ -113,12 +114,10 @@ Template.recentAgents.helpers
       options.limit = 5
     Template.instance().recentAgents.find(postId: postId, options)
 
-
 Template.recentAgents.events
   'click .more': (event, instance) ->
     instance.posts.update(@_id, { $set: { collapsed: false } })
   'click .load-more-posts': (event, instance) ->
-    instance.clear = false
     instance.loadMorePosts()
   'click .proMedLink': (event, template) ->
     if this.uri != undefined

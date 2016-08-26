@@ -7,11 +7,6 @@ require '../lists/frequentAgents.coffee'
 require '../lists/trendingAgents.coffee'
 
 Template.main.onRendered ->
-  $(document).ready(() ->
-    $("#regionSelector").select2({
-      placeholder: "Select a Feed..."
-    })
-  )
   if localStorage.getItem('showAppDesc') != "false"
     $(".appDescriptionContainer").show()
 Template.main.events
