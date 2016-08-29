@@ -5,12 +5,14 @@ Template.timeline.onCreated ->
   @tld = new Meteor.Collection(null)
   @myBarChart = null
   @autorun =>
-    Session.get("region")
     agent = Router.current().getParams()._agentName
-    @tld.find({}, reactive: false).map((d) => @tld.remove(d))
+    @tld.remove({}) #find({}, reactive: false).map((d) => @tld.remove(d))
+    console.log("tld", @tld.find({}, reactive: false).fetch())
     @isLoading.set(true)
-    $("#timelineDiv").hide()
-    HTTP.call 'get', '/api/historicalData/' + agent + '/' + @timelineRange.get(), (err, response) =>
+    HTTP.get '/api/historicalData/' + agent + '/' + @timelineRange.get(), {
+      params:
+        promedFeedId: Session.get('promedFeedId') or null
+    }, (err, response) =>
       @isLoading.set(false)
       if err
         toastr.error(err.message)
@@ -18,7 +20,6 @@ Template.timeline.onCreated ->
       for row in response.data.results
         data = {timeInterval: row.timeInterval, count: row.count}
         @tld.insert(data)
-      $("#timelineDiv").show()
   @selectedRangeRV = @data.selectedRangeRV
   @selectedElement = new ReactiveVar(null)
   @autorun =>
@@ -39,7 +40,10 @@ Template.timeline.onCreated ->
       @selectedRangeRV.set null
 Template.timeline.onRendered ->
   @autorun =>
-    if @tld.find().count()
+    @timelineRange.get()
+    if @tld.find().count() == 0
+      console.log "No data"
+    else
       if @myBarChart != null
         @myBarChart.destroy()
       endDate = moment(new Date())
@@ -96,7 +100,7 @@ Template.timeline.onRendered ->
             xlabels.push baseYear
             baseYear++
       selectedElement = @selectedElement.get()
-      @myBarChart = new Chart($("#canvas"),
+      @myBarChart = new Chart(@$("canvas"),
         type: 'bar'
         data:
           labels: xlabels
@@ -109,10 +113,6 @@ Template.timeline.onRendered ->
               else
                 'rgb(11, 165, 255)'
             borderColor: 'rgba(0,0,0,1)'
-            #borderCapStyle: 'butt'
-            #borderDash: []
-            #borderDashOffset: 0.0
-            #borderJoinStyle: 'miter'
             data: counts
           } ]
         options:
@@ -143,6 +143,10 @@ Template.timeline.onRendered ->
       )
 
 Template.timeline.helpers
+  noData: ->
+    emptyResult = Template.instance().tld.find().count() == 0
+    loading = Template.instance().isLoading.get()
+    emptyResult or loading
   timelineRange: ->
     Template.instance().timelineRange.get()
   isLoading: ->
@@ -150,8 +154,8 @@ Template.timeline.helpers
 
 Template.timeline.events
   'change #timelineRange': (event, template) ->
-    template.timelineRange.set($("#timelineRange").val())
-  'click #canvas': (event, template) ->
+    template.timelineRange.set(template.$("#timelineRange").val())
+  'click canvas': (event, template) ->
     myBarChart = template.myBarChart
     activePoints = myBarChart.getElementsAtEvent(event)
     clickedElementindex = activePoints[0]["_index"]

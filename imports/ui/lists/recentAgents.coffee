@@ -16,7 +16,12 @@ Template.recentAgents.onCreated ->
     @currentPageNumber.set(pageNum + 1)
     # @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
     @isLoading.set(true)
-    HTTP.get '/api/recentAgents', {params: {page: pageNum, pp: pp}}, (err, res) =>
+    HTTP.get '/api/recentAgents', {
+      params: 
+        promedFeedId: Session.get('promedFeedId')  or null
+        page: pageNum
+        pp: pp
+    }, (err, res) =>
       @isLoading.set(false)
       if err
         toastr.error(err.message)
@@ -91,13 +96,12 @@ Template.recentAgents.onRendered ->
   infiniteScroll(options)
 
   @autorun =>
-    Session.get("region")
+    Session.get("promedFeedId")
     @posts.remove({})
     @recentAgents.remove({})
     @isLoading.set(false)
     @theEnd.set(false)
     @currentPageNumber.set(0)
-    console.log(@posts.find({reactive:false}).fetch())
     _.defer =>
       @loadMorePosts()
 

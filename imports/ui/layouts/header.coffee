@@ -1,17 +1,12 @@
 require './header.jade'
-
-if Session.get('region') == undefined
-  Session.set('region', "All Regions")
-
-Template.header.onCreated ->
-  @Feeds = require '../components/feeds.coffee'
+Feeds = require '../components/feeds.coffee'
 
 Template.header.helpers
-  feed: ->
-    Template.instance().Feeds.find()
+  feeds: ->
+    Feeds.find()
   region: ->
-    Session.get('region')
+    Feeds.findOne(Session.get('promedFeedId'))?.label or "All Regions"
 
 Template.header.events
   'click .regionSelector': (event, instance) ->
-    Session.set('region', event.target.text)
+    Session.set('promedFeedId', @_id)

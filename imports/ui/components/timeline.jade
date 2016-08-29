@@ -11,4 +11,7 @@ template(name='timeline')
       .loading.spinner-margin
         i.fa.fa-spinner.fa-2x.fa-spin
     #timelineDiv
-      canvas#canvas(width='500', height='100')
+      canvas(width='500', height='100', hidden=noData)
+    if noData
+      .spacer(style="height: 120px;")
+  hr.col-md-12.hr-padding

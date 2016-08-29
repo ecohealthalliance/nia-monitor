@@ -4,9 +4,11 @@ Template.frequentDescriptors.onCreated ->
   @frequentDescriptors = new Meteor.Collection(null)
   @ready = new ReactiveVar(false)
   @autorun =>
-    Session.get("region")
     @frequentDescriptors.find({}, reactive: false).map((d) => @frequentDescriptors.remove(d))
-    HTTP.call 'get', '/api/frequentDescriptors/' + this.data._agentName, (err, response) =>
+    HTTP.get '/api/frequentDescriptors/' + this.data._agentName, {
+      params:
+        promedFeedId: Session.get('promedFeedId') or null
+    }, (err, response) =>
       @ready.set(true)
       if err
         toastr.error(err.message)

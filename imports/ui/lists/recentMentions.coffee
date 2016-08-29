@@ -6,9 +6,10 @@ Template.recentMentions.onCreated ->
   @ready = new ReactiveVar(false)
   @sources = new Meteor.Collection(null)
   @autorun =>
-    Session.get("region")
     @ready.set(false)
-    params = {}
+    params = {
+      promedFeedId: Session.get('promedFeedId') or null
+    }
     if @selectedRangeRV.get()
       params =
         from: @selectedRangeRV.get()[0].toISOString()
@@ -16,7 +17,7 @@ Template.recentMentions.onCreated ->
     agent = Router.current().getParams()._agentName
     @mentions.find({}, reactive: false).map((d) => @mentions.remove(d))
     @sources.find({}, reactive: false).map((d) => @sources.remove(d))
-    HTTP.call 'get', '/api/recentMentions/' + agent, {
+    HTTP.get '/api/recentMentions/' + agent, {
       params: params
     }, (err, response) =>
       @ready.set(true)

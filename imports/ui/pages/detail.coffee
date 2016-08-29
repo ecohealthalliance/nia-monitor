@@ -7,8 +7,6 @@ require './detail.jade'
 
 Template.detail.onCreated ->
   @selectedRangeRV = new ReactiveVar()
-  if Session.get('region') == undefined
-    Session.set('region', "All Regions")
 
 Template.detail.helpers
   agent: ->

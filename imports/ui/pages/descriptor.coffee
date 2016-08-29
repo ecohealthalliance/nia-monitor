@@ -4,8 +4,6 @@ require './descriptor.jade'
 
 Template.descriptor.onCreated ->
   @ready = new ReactiveVar(false)
-  if Session.get('region') == undefined
-    Session.set('region', "All Regions")
 
 Template.descriptor.helpers
   descriptorName: ->

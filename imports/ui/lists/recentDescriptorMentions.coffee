@@ -9,6 +9,7 @@ Template.recentDescriptorMentions.onCreated ->
     {_descriptorName, _term} = Router.current().getParams()
     params = {
       descriptor: _descriptorName
+      promedFeedId: Session.get('promedFeedId') or null
     }
     if _term
       params.term = _term
