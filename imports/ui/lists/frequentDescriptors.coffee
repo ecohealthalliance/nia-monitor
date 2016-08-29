@@ -5,7 +5,10 @@ Template.frequentDescriptors.onCreated ->
   @ready = new ReactiveVar(false)
   @autorun =>
     @frequentDescriptors.find({}, reactive: false).map((d) => @frequentDescriptors.remove(d))
-    HTTP.call 'get', '/api/frequentDescriptors/' + this.data._agentName, (err, response) =>
+    HTTP.get '/api/frequentDescriptors/' + this.data._agentName, {
+      params:
+        promedFeedId: Session.get('promedFeedId') or null
+    }, (err, response) =>
       @ready.set(true)
       if err
         toastr.error(err.message)

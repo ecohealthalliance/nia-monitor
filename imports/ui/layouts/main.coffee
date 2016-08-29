@@ -1,4 +1,4 @@
-require './header.jade'
+require './header.coffee'
 require './main.jade'
 
 require '../components/datacheck.coffee'

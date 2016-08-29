@@ -65,9 +65,13 @@ api = new Restivus
 @apiGroup descriptors
 
 @apiParam {String} term Infectious Agent
+@apiParam {String} promedFeedId=all The ProMED-mail regional feed to query
 ###
 api.addRoute 'frequentDescriptors/:term',
   get: ->
+    promedFeedId = @queryParams.promedFeedId
+    if promedFeedId == 'null'
+      promedFeedId = null
     query = prefixes + """
       SELECT
         ?selText
@@ -79,6 +83,9 @@ api.addRoute 'frequentDescriptors/:term',
           ; ?dep_rel ?descriptor
           ; anno:source_doc/pro:post ?post
           .
+          #{if promedFeedId then """
+            ?post pro:feed_id "#{escape(promedFeedId)}" .
+          """ else ""}
           ?descriptor anno:start ?d_start
           ; anno:end ?d_end
           ; anno:selected-text ?rawSelText
@@ -114,9 +121,13 @@ api.addRoute 'frequentDescriptors/:term',
 @apiParam {String} term Infectious Agent
 @apiParam {String} to=now The last post date in ISO format
 @apiParam {String} from The earliest post date in ISO format
+@apiParam {String} promedFeedId=all The ProMED-mail regional feed to query
 ###
 api.addRoute 'recentMentions/:term',
   get: ->
+    promedFeedId = @queryParams.promedFeedId
+    if promedFeedId == 'null'
+      promedFeedId = null
     query = prefixes + """
       SELECT DISTINCT
         ?phrase_text
@@ -141,9 +152,12 @@ api.addRoute 'recentMentions/:term',
           ; anno:end ?t_end
           ; anno:source_doc ?source
           .
-          ?source pro:post/pro:date ?date
-          ; pro:post/pro:subject_raw ?postSubject
-          ; pro:post ?post
+          ?source pro:post ?post .
+          ?post pro:date ?date
+          ; pro:subject_raw ?postSubject
+          #{if promedFeedId then """
+            ; pro:feed_id "#{escape(promedFeedId)}"
+          """ else ""}
           .
           #{if @queryParams.from then """
             FILTER (?date >= "#{escape(@queryParams.from)}"^^xsd:dateTime)
@@ -167,9 +181,13 @@ api.addRoute 'recentMentions/:term',
 @apiGroup agent
 @apiParam {String} descriptor
 @apiParam {String} [term]
+@apiParam {String} promedFeedId=all The ProMED-mail regional feed to query
 ###
 api.addRoute 'recentDescriptorMentions',
   get: ->
+    promedFeedId = @queryParams.promedFeedId
+    if promedFeedId == 'null'
+      promedFeedId = null
     { term, descriptor } = @queryParams
     query = prefixes + """
       SELECT DISTINCT
@@ -211,6 +229,9 @@ api.addRoute 'recentDescriptorMentions',
           ?source pro:post ?post .
           ?post pro:date ?date
           ; pro:subject_raw ?postSubject
+          #{if promedFeedId then """
+            ; pro:feed_id "#{escape(promedFeedId)}"
+          """ else ""}
           .
           FILTER ( ?d_end <= ?t_start || ?t_end <= ?d_start )
           FILTER(lcase(?rawSelText) = "#{escape(descriptor).toLowerCase()}")
@@ -228,9 +249,13 @@ api.addRoute 'recentDescriptorMentions',
 @api {get} recentAgents Request recent Agents
 @apiName recentAgents
 @apiGroup agent
+@apiParam {String} promedFeedId=all The ProMED-mail regional feed to query
 ###
 api.addRoute 'recentAgents',
   get: ->
+    promedFeedId = @queryParams.promedFeedId
+    if promedFeedId == 'null'
+      promedFeedId = null
     page = @queryParams.page
     pp = @queryParams.pp
     offset = page * pp
@@ -261,9 +286,13 @@ api.addRoute 'recentAgents',
                   ; ^dc:relation ?resolvedTerm
                   .
                   ?resolvedTerm rdfs:label ?termLabel .
-                  ?source pro:post/pro:date ?postDate
-                  ; pro:post/pro:subject_raw ?postSubject.
-                  ?source pro:post ?post
+                  ?source pro:post ?post .
+                  ?post pro:date ?postDate
+                  ; pro:subject_raw ?postSubject
+                  #{if promedFeedId then """
+                    ; pro:feed_id "#{escape(promedFeedId)}"
+                  """ else ""}
+                  .
               }
               GROUP BY ?resolvedTerm ?termLabel ?postDate ?post ?postSubject
               # Sort by date, then document, then offset within the document.
@@ -276,8 +305,12 @@ api.addRoute 'recentAgents',
             ?prev_mention anno:source_doc ?prevSource
             ; ^dc:relation ?resolvedTerm
             .
-            ?prevSource pro:post/pro:date ?prevPostDate .
-            ?prevSource pro:post ?prevPost
+            ?prevSource pro:post ?prevPost .
+            ?prevPost pro:date ?prevPostDate
+            #{if promedFeedId then """
+              ; pro:feed_id "#{escape(promedFeedId)}"
+            """ else ""}
+            .
             FILTER(?postDate > ?prevPostDate && ?post != ?prevPost)
           }
       }
@@ -290,16 +323,20 @@ api.addRoute 'recentAgents',
       status: "success"
       results: response.results.bindings
         .map(castBinding)
-        .filter((x)-> not _.contains(excludedAgentArray, x.word))
+        .filter((x) -> not _.contains(excludedAgentArray, x.word))
     }
 
 ###
 @api {get} frequentAgents Request frequent agents
 @apiName frequentAgents
 @apiGroup agent
+@apiParam {String} promedFeedId=all The ProMED-mail regional feed to query
 ###
 api.addRoute 'frequentAgents',
   get: ->
+    promedFeedId = @queryParams.promedFeedId
+    if promedFeedId == 'null'
+      promedFeedId = null
     baseYear = 1991
     # Use current year - 5 with full dataset
     # baseYear = moment(new Date()).year() - 5
@@ -310,9 +347,12 @@ api.addRoute 'frequentAgents',
       WHERE {
         ?phrase anno:category "diseases"
         ; ^dc:relation ?resolvedTerm
-        ; anno:source_doc ?source.
-        ?source pro:post ?post.
-        ?source pro:date ?dateTime.
+        ; anno:source_doc ?source .
+        ?source pro:post ?post .
+        #{if promedFeedId then """
+          ?post pro:feed_id "#{escape(promedFeedId)}" .
+        """ else ""}
+        ?source pro:date ?dateTime .
         ?resolvedTerm rdfs:label ?termLabel
         FILTER (?dateTime > "#{escape(baseYear)}-01-01T00:00:00+00:01"^^xsd:dateTime)
         FILTER(?termLabel not in (#{excludedAgents}))
@@ -331,9 +371,13 @@ api.addRoute 'frequentAgents',
 @apiName historicalData
 @apiGroup descriptors
 @apiParam {String} term Infectious Agent
+@apiParam {String} promedFeedId=all The ProMED-mail regional feed to query
 ###
 api.addRoute 'historicalData/:term/:range',
   get: ->
+    promedFeedId = @queryParams.promedFeedId
+    if promedFeedId == 'null'
+      promedFeedId = null
     dateStr = ""
     date = moment(new Date())
     switch @urlParams.range
@@ -356,7 +400,11 @@ api.addRoute 'historicalData/:term/:range',
         ; anno:selected-text ?rawText
         ; ^dc:relation ?resolvedTerm
         .
-        ?post pro:date ?dateTime .
+        ?post pro:date ?dateTime
+        #{if promedFeedId then """
+          ; pro:feed_id "#{escape(promedFeedId)}"
+        """ else ""}
+        .
         ?resolvedTerm rdfs:label ?termLabel
         FILTER(?termLabel = "#{escape(@urlParams.term)}")
         #{if @urlParams.range != 'all' then """
@@ -381,9 +429,13 @@ api.addRoute 'historicalData/:term/:range',
 @apiGroup agent
 @apiParam {String} range (year, month, week)
 @apiParam {ISODateString} trendingDate=today The date of interest
+@apiParam {String} promedFeedId=all The ProMED-mail regional feed to query
 ###
 api.addRoute 'trendingAgents/:range',
   get: ->
+    promedFeedId = @queryParams.promedFeedId
+    if promedFeedId == 'null'
+      promedFeedId = null
     if @queryParams.trendingDate
       trendingMoment = moment(@queryParams.trendingDate)
       if not trendingMoment.isValid()
@@ -431,9 +483,12 @@ api.addRoute 'trendingAgents/:range',
             ; ^dc:relation ?resolvedTerm
             ; anno:source_doc ?source
             .
-            ?source pro:post ?post.
-            ?source pro:post/pro:date ?dateTime .
-
+            ?source pro:post ?post .
+            ?post pro:date ?dateTime
+            #{if promedFeedId then """
+              ; pro:feed_id "#{escape(promedFeedId)}"
+            """ else ""}
+            .
             ?resolvedTerm rdfs:label ?termLabel
             FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
             FILTER (?dateTime <= "#{escape(stopDateStr)}"^^xsd:dateTime)
@@ -444,7 +499,11 @@ api.addRoute 'trendingAgents/:range',
                 ; ^dc:relation ?resolvedTerm
                 .
                 ?source2 pro:post ?post2 .
-                ?source2 pro:post/pro:date ?dateTime2 .
+                ?post2 pro:date ?dateTime2
+                #{if promedFeedId then """
+                  ; pro:feed_id "#{escape(promedFeedId)}"
+                """ else ""}
+                .
           		  ?resolvedTerm rdfs:label ?termLabel2
                 FILTER (?dateTime2 > "#{escape(dateStr2)}"^^xsd:dateTime)
                 FILTER (?dateTime2 <= "#{escape(stopDateStr)}"^^xsd:dateTime)

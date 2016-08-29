@@ -9,13 +9,19 @@ Template.recentAgents.onCreated ->
   @isLoading = new ReactiveVar(false)
   @theEnd = new ReactiveVar(false)
   order = 0
+  
   @loadMorePosts = =>
     if @isLoading.get() then return
     pageNum = @currentPageNumber.get()
     @currentPageNumber.set(pageNum + 1)
     # @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
     @isLoading.set(true)
-    HTTP.get '/api/recentAgents', {params: {page: pageNum, pp: pp}}, (err, res) =>
+    HTTP.get '/api/recentAgents', {
+      params: 
+        promedFeedId: Session.get('promedFeedId')  or null
+        page: pageNum
+        pp: pp
+    }, (err, res) =>
       @isLoading.set(false)
       if err
         toastr.error(err.message)
@@ -47,7 +53,6 @@ Template.recentAgents.onCreated ->
       @posts.find().forEach (post) =>
         if @recentAgents.find(postId: post._id).count() > 5
           @posts.update(post._id, { $set: { collapsed: true } })
-
 
 Template.recentAgents.onRendered ->
   prevScrollPos = window.pageYOffset
@@ -89,7 +94,16 @@ Template.recentAgents.onRendered ->
   }
 
   infiniteScroll(options)
-  @loadMorePosts()
+
+  @autorun =>
+    Session.get("promedFeedId")
+    @posts.remove({})
+    @recentAgents.remove({})
+    @isLoading.set(false)
+    @theEnd.set(false)
+    @currentPageNumber.set(0)
+    _.defer =>
+      @loadMorePosts()
 
 Template.recentAgents.helpers
   post: ->

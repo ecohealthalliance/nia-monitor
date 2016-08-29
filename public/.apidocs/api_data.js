@@ -61,6 +61,20 @@ define({ "api": [
     "title": "Request frequent agents",
     "name": "frequentAgents",
     "group": "agent",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "promedFeedId",
+            "defaultValue": "all",
+            "description": "<p>The ProMED-mail regional feed to query</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "./imports/startup/server/index.coffee",
     "groupTitle": "agent",
@@ -76,6 +90,20 @@ define({ "api": [
     "title": "Request recent Agents",
     "name": "recentAgents",
     "group": "agent",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "promedFeedId",
+            "defaultValue": "all",
+            "description": "<p>The ProMED-mail regional feed to query</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "./imports/startup/server/index.coffee",
     "groupTitle": "agent",
@@ -107,6 +135,14 @@ define({ "api": [
             "optional": true,
             "field": "term",
             "description": ""
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "promedFeedId",
+            "defaultValue": "all",
+            "description": "<p>The ProMED-mail regional feed to query</p>"
           }
         ]
       }
@@ -143,6 +179,14 @@ define({ "api": [
             "field": "trendingDate",
             "defaultValue": "today",
             "description": "<p>The date of interest</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "promedFeedId",
+            "defaultValue": "all",
+            "description": "<p>The ProMED-mail regional feed to query</p>"
           }
         ]
       }
@@ -201,6 +245,14 @@ define({ "api": [
             "optional": false,
             "field": "term",
             "description": "<p>Infectious Agent</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "promedFeedId",
+            "defaultValue": "all",
+            "description": "<p>The ProMED-mail regional feed to query</p>"
           }
         ]
       }
@@ -229,6 +281,14 @@ define({ "api": [
             "optional": false,
             "field": "term",
             "description": "<p>Infectious Agent</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "promedFeedId",
+            "defaultValue": "all",
+            "description": "<p>The ProMED-mail regional feed to query</p>"
           }
         ]
       }
@@ -272,6 +332,14 @@ define({ "api": [
             "optional": false,
             "field": "from",
             "description": "<p>The earliest post date in ISO format</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "promedFeedId",
+            "defaultValue": "all",
+            "description": "<p>The ProMED-mail regional feed to query</p>"
           }
         ]
       }

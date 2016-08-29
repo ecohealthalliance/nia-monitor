@@ -7,7 +7,11 @@ template(name='timeline')
         option(value="1year") 1 Year
         option( selected, value="5years") 5 Years
         option(value="all") All Time
-    #timeLineSpinner.loading.spinner-margin
+    if isLoading
+      .loading.spinner-margin
         i.fa.fa-spinner.fa-2x.fa-spin
     #timelineDiv
-      canvas#canvas(width='500', height='100')
+      canvas(width='500', height='100', hidden=noData)
+    if noData
+      .spacer(style="height: 120px;")
+  hr.col-md-12.hr-padding

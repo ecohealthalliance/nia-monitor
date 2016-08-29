@@ -6,7 +6,10 @@ Template.frequentAgents.onCreated ->
   @autorun =>
     @frequentAgents.find({}, reactive: false).map((d) => @frequentAgents.remove(d))
     @isLoading.set(true)
-    HTTP.call 'get', '/api/frequentAgents', (err, response) =>
+    HTTP.get '/api/frequentAgents', {
+      params:
+        promedFeedId: Session.get('promedFeedId') or null
+    }, (err, response) =>
       @isLoading.set(false)
       if err
         toastr.error(err.message)
