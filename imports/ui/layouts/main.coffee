@@ -9,13 +9,6 @@ require '../lists/trendingAgents.coffee'
 Template.main.onRendered ->
   if localStorage.getItem('showAppDesc') != "false"
     $(".appDescriptionContainer").show()
-Template.main.events
-  'click #hideAppDesc': (event, instance) ->
-    $(".appDescriptionContainer").hide()
-    localStorage.setItem('showAppDesc', false)
-  'click #showAppDesc': (event, instance) ->
-    $(".appDescriptionContainer").show()
-    localStorage.setItem('showAppDesc', true)
 
 Template.main.helpers
   view: ->
@@ -23,3 +16,11 @@ Template.main.helpers
       when "trending" then "trendingAgents"
       when "frequent" then "frequentAgents"
       else "recentAgents"
+
+Template.main.events
+  'click #hideAppDesc': (event, instance) ->
+    $(".appDescriptionContainer").hide()
+    localStorage.setItem('showAppDesc', false)
+  'click #showAppDesc': (event, instance) ->
+    $(".appDescriptionContainer").show()
+    localStorage.setItem('showAppDesc', true)

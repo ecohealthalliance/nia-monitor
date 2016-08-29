@@ -9,10 +9,15 @@ Template.recentAgents.onCreated ->
   @isLoading = new ReactiveVar(false)
   @theEnd = new ReactiveVar(false)
   order = 0
-
-  @getRecentAgents = (pageNum) =>
+  
+  @loadMorePosts = =>
+    if @isLoading.get() then return
+    pageNum = @currentPageNumber.get()
+    @currentPageNumber.set(pageNum + 1)
+    # @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
     @isLoading.set(true)
     HTTP.get '/api/recentAgents', {params: {page: pageNum, pp: pp}}, (err, res) =>
+      @isLoading.set(false)
       if err
         toastr.error(err.message)
         return
@@ -39,23 +44,10 @@ Template.recentAgents.onCreated ->
           if row.days > 30
             row.dm = true
         @recentAgents.insert(row)
+      # ...
       @posts.find().forEach (post) =>
         if @recentAgents.find(postId: post._id).count() > 5
           @posts.update(post._id, { $set: { collapsed: true } })
-      @isLoading.set(false)
-
-  @loadMorePosts = =>
-    if @isLoading.get() then return
-    pageNum = @currentPageNumber.get()
-    @currentPageNumber.set(pageNum + 1)
-    # @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
-    @getRecentAgents(pageNum)
-
-  @autorun =>
-    Session.get("region")
-    @posts.remove({})
-    @recentAgents.remove({})
-    @getRecentAgents(0)
 
 Template.recentAgents.onRendered ->
   prevScrollPos = window.pageYOffset
@@ -97,7 +89,17 @@ Template.recentAgents.onRendered ->
   }
 
   infiniteScroll(options)
-  @loadMorePosts()
+
+  @autorun =>
+    Session.get("region")
+    @posts.remove({})
+    @recentAgents.remove({})
+    @isLoading.set(false)
+    @theEnd.set(false)
+    @currentPageNumber.set(0)
+    console.log(@posts.find({reactive:false}).fetch())
+    _.defer =>
+      @loadMorePosts()
 
 Template.recentAgents.helpers
   post: ->
@@ -113,6 +115,7 @@ Template.recentAgents.helpers
     if limit
       options.limit = 5
     Template.instance().recentAgents.find(postId: postId, options)
+
 
 Template.recentAgents.events
   'click .more': (event, instance) ->
