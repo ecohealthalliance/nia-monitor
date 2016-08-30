@@ -18,7 +18,7 @@ excludedAgentArray = [
   'proliferative diabetic retinopathy'
   'vaccinia'
 ]
-excludedAgents = excludedAgentArray.map((s)->JSON.stringify(s)).join(",")
+excludedAgents = excludedAgentArray.map( (s) -> JSON.stringify(s) ).join(",")
 
 # Convert { value, type } objects into flat objects where the value is cast to
 # the given type
@@ -31,23 +31,31 @@ castBinding = (binding) ->
       result[key] = value.value
   result
 
-makeRequest = (query) ->
-  try
-    response = HTTP.post SPARQurL,
-      headers:
-        'Accept': 'application/sparql-results+json'
-      params:
-        query: query
-    JSON.parse response.content
-  catch err
-    if err.code
-      switch err.code
-        when "ECONNREFUSED"
-          throw new Meteor.Error(err.code, "Unable to connect to SPARQL server.")
-        else
-          throw new Meteor.Error(500, "Internal Server Error")
-    else
-      throw new Meteor.Error(err.response.statusCode, err.response.content)
+makeRequest = null
+defineRequest = ->
+  makeRequest = _.memoize (query) ->
+    try
+      response = HTTP.post SPARQurL,
+        headers:
+          'Accept': 'application/sparql-results+json'
+        params:
+          query: query
+      JSON.parse response.content
+    catch err
+      if err.code
+        switch err.code
+          when "ECONNREFUSED"
+            throw new Meteor.Error(err.code, "Unable to connect to SPARQL server.")
+          else
+            throw new Meteor.Error(500, "Internal Server Error")
+      else
+        throw new Meteor.Error(err.response.statusCode, err.response.content)
+
+defineRequest()
+
+# Flush the request cache every 4 hours
+restartFrequency = 1000 * 3600 * 4
+setTimeout(defineRequest, restartFrequency)
 
 escape = (text) ->
   if _.isString text
@@ -63,7 +71,6 @@ api = new Restivus
 @api {get} frequentDescriptors/:term Request frequent descriptors for the term
 @apiName frequentDescriptors
 @apiGroup descriptors
-
 @apiParam {String} term Infectious Agent
 @apiParam {String} promedFeedId=all The ProMED-mail regional feed to query
 ###
@@ -117,7 +124,6 @@ api.addRoute 'frequentDescriptors/:term',
 @api {get} recentMentions/:term Request recent mentions for the term
 @apiName recentMentions
 @apiGroup descriptors
-
 @apiParam {String} term Infectious Agent
 @apiParam {String} to=now The last post date in ISO format
 @apiParam {String} from The earliest post date in ISO format
@@ -366,6 +372,7 @@ api.addRoute 'frequentAgents',
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
+
 ###
 @api {get} historicalData/:term Request historical data for the term
 @apiName historicalData
@@ -423,6 +430,7 @@ api.addRoute 'historicalData/:term/:range',
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
+
 ###
 @api {get} trendingAgents/:range Request trending agents in a time range (year, month, week)
 @apiName trendingAgents
@@ -528,6 +536,7 @@ api.addRoute 'trendingAgents/:range',
         .map(castBinding)
         .filter((x)-> not _.contains(excludedAgentArray, x.word))
     }
+
 ###
 @api {get} articleCountByAnnotator
 @apiName articleCountByAnnotator
