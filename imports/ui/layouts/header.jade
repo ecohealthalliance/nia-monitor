@@ -12,12 +12,12 @@ template(name='header')
             a.feed.feedText.dropdown-toggle(href='#', data-toggle='dropdown')
               #feed #{region}
                 div.caret
-            ul.dropdown-menu(role='menu')
+            ul.dropdown-menu.regionSelector(role='menu')
               li
-                a.regionSelector(href='#')  All Feeds
+                a(href='#')  All Feeds
               each feeds
                 li
-                  a.regionSelector(href='#')  #{label}
+                  a(href='#')  #{label}
       div.col-md-3
         a.about.aboutText.pull-left(href="/about") About
 
