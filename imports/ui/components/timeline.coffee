@@ -6,8 +6,7 @@ Template.timeline.onCreated ->
   @myBarChart = null
   @autorun =>
     agent = Router.current().getParams()._agentName
-    @tld.remove({}) #find({}, reactive: false).map((d) => @tld.remove(d))
-    console.log("tld", @tld.find({}, reactive: false).fetch())
+    @tld.remove({})
     @isLoading.set(true)
     HTTP.get '/api/historicalData/' + agent + '/' + @timelineRange.get(), {
       params:
