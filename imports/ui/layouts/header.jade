@@ -14,10 +14,10 @@ template(name='header')
                 div.caret
             ul.dropdown-menu.regionSelector(role='menu')
               li
-                a(href='#')  All Feeds
+                a.feed-opt(href='#')  All Feeds
               each feeds
                 li
-                  a(href='#')  #{label}
+                  a.feed-opt(href='#')  #{label}
       div.col-md-3
         a.about.aboutText.pull-left(href="/about") About
 
