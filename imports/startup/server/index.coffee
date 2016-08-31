@@ -18,7 +18,7 @@ excludedAgentArray = [
   'proliferative diabetic retinopathy'
   'vaccinia'
 ]
-excludedAgents = excludedAgentArray.map((s)->JSON.stringify(s)).join(",")
+excludedAgents = excludedAgentArray.map( (s) -> JSON.stringify(s) ).join(",")
 
 # Convert { value, type } objects into flat objects where the value is cast to
 # the given type
@@ -48,6 +48,22 @@ makeRequest = (query) ->
           throw new Meteor.Error(500, "Internal Server Error")
     else
       throw new Meteor.Error(err.response.statusCode, err.response.content)
+makeCachedRequest = null
+refreshCache = ->
+  console.log "Refreshing Cache @ " + new Date()
+  makeCachedRequest = _.memoize(makeRequest)
+  Meteor.defer ->
+    try
+      HTTP.get(Meteor.absoluteUrl('/api/recentAgents?page=0&pp=75'))
+      console.log("recentAgents cached")
+    catch e
+      console.log "Cache error:"
+      console.log e
+refreshCache()
+
+# Flush the request cache every 4 hours
+restartFrequency = 1000 * 3600 * 4
+setTimeout(refreshCache, restartFrequency)
 
 escape = (text) ->
   if _.isString text
@@ -63,7 +79,6 @@ api = new Restivus
 @api {get} frequentDescriptors/:term Request frequent descriptors for the term
 @apiName frequentDescriptors
 @apiGroup descriptors
-
 @apiParam {String} term Infectious Agent
 @apiParam {String} promedFeedId=all The ProMED-mail regional feed to query
 ###
@@ -107,7 +122,7 @@ api.addRoute 'frequentDescriptors/:term',
       HAVING (count(DISTINCT ?post) > 0)
       ORDER BY DESC(count(DISTINCT ?post))
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings.map(castBinding)
@@ -117,7 +132,6 @@ api.addRoute 'frequentDescriptors/:term',
 @api {get} recentMentions/:term Request recent mentions for the term
 @apiName recentMentions
 @apiGroup descriptors
-
 @apiParam {String} term Infectious Agent
 @apiParam {String} to=now The last post date in ISO format
 @apiParam {String} from The earliest post date in ISO format
@@ -169,7 +183,7 @@ api.addRoute 'recentMentions/:term',
       ORDER BY DESC(?date) DESC(?source) ASC(?t_start)
       LIMIT 10
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings.map(castBinding)
@@ -239,7 +253,7 @@ api.addRoute 'recentDescriptorMentions',
       ORDER BY DESC(?date) DESC(?post) ASC(?t_start)
       LIMIT 10
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings.map(castBinding)
@@ -318,7 +332,7 @@ api.addRoute 'recentAgents',
       GROUP BY ?resolvedTerm ?postDate ?post ?postSubject ?firstMentionStart
       ORDER BY DESC(?postDate) DESC(?post) ASC(?firstMentionStart)
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings
@@ -361,11 +375,12 @@ api.addRoute 'frequentAgents',
       ORDER BY DESC(?count)
       LIMIT 20
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
+
 ###
 @api {get} historicalData/:term Request historical data for the term
 @apiName historicalData
@@ -418,11 +433,12 @@ api.addRoute 'historicalData/:term/:range',
       }
       GROUP BY ?timeInterval
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
+
 ###
 @api {get} trendingAgents/:range Request trending agents in a time range (year, month, week)
 @apiName trendingAgents
@@ -521,13 +537,14 @@ api.addRoute 'trendingAgents/:range',
       ORDER BY DESC(?result)
       LIMIT 50
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings
         .map(castBinding)
         .filter((x)-> not _.contains(excludedAgentArray, x.word))
     }
+
 ###
 @api {get} articleCountByAnnotator
 @apiName articleCountByAnnotator
