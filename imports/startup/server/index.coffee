@@ -31,31 +31,39 @@ castBinding = (binding) ->
       result[key] = value.value
   result
 
-makeRequest = null
-defineRequest = ->
-  makeRequest = _.memoize (query) ->
+makeRequest = (query) ->
+  try
+    response = HTTP.post SPARQurL,
+      headers:
+        'Accept': 'application/sparql-results+json'
+      params:
+        query: query
+    JSON.parse response.content
+  catch err
+    if err.code
+      switch err.code
+        when "ECONNREFUSED"
+          throw new Meteor.Error(err.code, "Unable to connect to SPARQL server.")
+        else
+          throw new Meteor.Error(500, "Internal Server Error")
+    else
+      throw new Meteor.Error(err.response.statusCode, err.response.content)
+makeCachedRequest = null
+refreshCache = ->
+  console.log "Refreshing Cache @ " + new Date()
+  makeCachedRequest = _.memoize(makeRequest)
+  Meteor.defer ->
     try
-      response = HTTP.post SPARQurL,
-        headers:
-          'Accept': 'application/sparql-results+json'
-        params:
-          query: query
-      JSON.parse response.content
-    catch err
-      if err.code
-        switch err.code
-          when "ECONNREFUSED"
-            throw new Meteor.Error(err.code, "Unable to connect to SPARQL server.")
-          else
-            throw new Meteor.Error(500, "Internal Server Error")
-      else
-        throw new Meteor.Error(err.response.statusCode, err.response.content)
-
-defineRequest()
+      HTTP.get(Meteor.absoluteUrl('/api/recentAgents?page=0&pp=75'))
+      console.log("recentAgents cached")
+    catch e
+      console.log "Cache error:"
+      console.log e
+refreshCache()
 
 # Flush the request cache every 4 hours
 restartFrequency = 1000 * 3600 * 4
-setTimeout(defineRequest, restartFrequency)
+setTimeout(refreshCache, restartFrequency)
 
 escape = (text) ->
   if _.isString text
@@ -114,7 +122,7 @@ api.addRoute 'frequentDescriptors/:term',
       HAVING (count(DISTINCT ?post) > 0)
       ORDER BY DESC(count(DISTINCT ?post))
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings.map(castBinding)
@@ -175,7 +183,7 @@ api.addRoute 'recentMentions/:term',
       ORDER BY DESC(?date) DESC(?source) ASC(?t_start)
       LIMIT 10
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings.map(castBinding)
@@ -245,7 +253,7 @@ api.addRoute 'recentDescriptorMentions',
       ORDER BY DESC(?date) DESC(?post) ASC(?t_start)
       LIMIT 10
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings.map(castBinding)
@@ -324,7 +332,7 @@ api.addRoute 'recentAgents',
       GROUP BY ?resolvedTerm ?postDate ?post ?postSubject ?firstMentionStart
       ORDER BY DESC(?postDate) DESC(?post) ASC(?firstMentionStart)
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings
@@ -367,7 +375,7 @@ api.addRoute 'frequentAgents',
       ORDER BY DESC(?count)
       LIMIT 20
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings.map(castBinding)
@@ -425,7 +433,7 @@ api.addRoute 'historicalData/:term/:range',
       }
       GROUP BY ?timeInterval
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings.map(castBinding)
@@ -529,7 +537,7 @@ api.addRoute 'trendingAgents/:range',
       ORDER BY DESC(?result)
       LIMIT 50
       """
-    response = makeRequest(query)
+    response = makeCachedRequest(query)
     return {
       status: "success"
       results: response.results.bindings
