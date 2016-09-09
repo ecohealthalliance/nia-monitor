@@ -396,6 +396,9 @@ api.addRoute 'historicalData/:term/:range',
     dateStr = ""
     date = moment(new Date())
     switch @urlParams.range
+      when "1month"
+        date.subtract(1, 'month')
+        dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
       when "6months"
         date.subtract(6, 'months')
         dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"

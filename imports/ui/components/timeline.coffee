@@ -51,6 +51,26 @@ Template.timeline.onRendered ->
       counts = []
       maxCount = 0
       switch @timelineRange.get()
+        when "1month"
+          endDay = endDate.date() + 1
+          baseDate = moment(new Date())
+          baseDate.subtract(1, 'month')
+          ctr = 0
+          while ctr < endDate.diff(baseDate, 'days')
+            if baseDate.month() != baseDate.add(5, 'days').month()
+              xlabels.push moment.months(baseDate.month()) + " " + baseDate.date() + " - " + moment.months(baseDate.add(5, 'days').month()) + " " + baseDate.add(5, 'days').date()
+              baseDate.subtract(5, 'days')
+            else
+              xlabels.push moment.months(baseDate.month()) + " " + baseDate.date() + " - " + baseDate.add(5, 'days').date()
+              baseDate.subtract(5, 'days')
+
+            tdata = @tld.find({timeInterval: baseDate.month() + 1}).fetch()
+            if tdata.length == 0
+              counts.push 0
+            else
+              counts.push tdata[0].count
+            baseDate.add(5, 'days')
+            ctr++
         when "6months"
           endMonth = endDate.month() + 1
           baseMonth = endDate.subtract(5, 'months')
