@@ -394,7 +394,7 @@ api.addRoute 'historicalData/:term/:range',
     if promedFeedId == 'null'
       promedFeedId = null
     dateStr = ""
-    date = moment(new Date())
+    date = moment(new Date()) #for testing: date = moment(new Date("11/30/1995"))
     switch @urlParams.range
       when "1month"
         date.subtract(1, 'month')
@@ -430,6 +430,8 @@ api.addRoute 'historicalData/:term/:range',
         """ else ""}
         #{if @urlParams.range == '6months' || @urlParams.range == '1year' then """
           BIND(month(?dateTime) AS ?timeInterval)
+        """ else if @urlParams.range == '1month' then """
+          BIND(?dateTime AS ?timeInterval)
         """ else """
           BIND(year(?dateTime) AS ?timeInterval)
         """}

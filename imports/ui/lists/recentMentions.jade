@@ -1,10 +1,10 @@
 template(name="recentMentions")
 
   .col-md-6.col-md-offset-3
-    if endDate
+    if range
       center
-        b Posts before: 
-        | #{endDate}
+        b Posts between:
+        | #{startDate} and #{endDate}
     each sources
       .panel-heading
         .col-md-8.col-xs-7.articleHeader

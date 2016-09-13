@@ -17,14 +17,22 @@ Template.timeline.onCreated ->
         toastr.error(err.message)
         return
       for row in response.data.results
-        data = {timeInterval: row.timeInterval, count: row.count}
+        if @timelineRange.get() == "1month"
+          data = {timeInterval: new Date(row.timeInterval), count: row.count}
+        else
+          data = {timeInterval: row.timeInterval, count: row.count}
         @tld.insert(data)
   @selectedRangeRV = @data.selectedRangeRV
   @selectedElement = new ReactiveVar(null)
   @autorun =>
     element = @selectedElement.get()
     if element
-      if moment(element, "YYYY").isValid()
+      now = moment(new Date()) #for testing: now = moment(new Date("11/30/1995"))
+      if element.indexOf(" - ") > 0
+        el = element.split(" - ")
+        m = moment(new Date(el[0] + " " + now.year()))
+        @selectedRangeRV.set [m, m.clone().add(4, 'days')]
+      else if moment(element, "YYYY").isValid()
         m = moment(element, "YYYY")
         @selectedRangeRV.set [m, m.clone().add(1, 'year')]
       else if moment(element, "MMM").isValid()
@@ -45,7 +53,7 @@ Template.timeline.onRendered ->
     else
       if @myBarChart != null
         @myBarChart.destroy()
-      endDate = moment(new Date())
+      endDate = moment(new Date()) #for testing: endDate = moment(new Date("11/30/1995"))
       baseDate = null
       xlabels = []
       counts = []
@@ -53,24 +61,24 @@ Template.timeline.onRendered ->
       switch @timelineRange.get()
         when "1month"
           endDay = endDate.date() + 1
-          baseDate = moment(new Date())
+          baseDate = moment(new Date()) #for testing: baseDate = moment(new Date("11/30/1995"))
           baseDate.subtract(1, 'month')
-          ctr = 0
-          while ctr < endDate.diff(baseDate, 'days')
-            if baseDate.month() != baseDate.add(5, 'days').month()
-              xlabels.push moment.months(baseDate.month()) + " " + baseDate.date() + " - " + moment.months(baseDate.add(5, 'days').month()) + " " + baseDate.add(5, 'days').date()
-              baseDate.subtract(5, 'days')
+          while 0 < endDate.diff(baseDate, 'days')
+            if baseDate.month() != baseDate.add(4, 'days').month()
+              baseDate.subtract(4, 'days')
+              xlabels.push moment.months(baseDate.month()) + " " + baseDate.date() + " - " + moment.months(baseDate.add(4, 'days').month()) + " " + baseDate.date()
             else
-              xlabels.push moment.months(baseDate.month()) + " " + baseDate.date() + " - " + baseDate.add(5, 'days').date()
-              baseDate.subtract(5, 'days')
-
-            tdata = @tld.find({timeInterval: baseDate.month() + 1}).fetch()
+              baseDate.subtract(4, 'days')
+              xlabels.push moment.months(baseDate.month()) + " " + baseDate.date() + " - " + baseDate.add(4, 'days').date()
+            start = new Date(baseDate.format("MM-DD-YYYY"))
+            end = new Date(baseDate.add(5, 'days').format("MM-DD-YYYY"))
+            baseDate.subtract(5, 'days')
+            tdata = @tld.find({timeInterval: {$gte: start, $lt: end}}).fetch()
             if tdata.length == 0
               counts.push 0
             else
-              counts.push tdata[0].count
-            baseDate.add(5, 'days')
-            ctr++
+              counts.push tdata.length
+            baseDate.add(1, 'days')
         when "6months"
           endMonth = endDate.month() + 1
           baseMonth = endDate.subtract(5, 'months')
