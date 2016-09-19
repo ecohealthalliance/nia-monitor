@@ -181,7 +181,7 @@ api.addRoute 'recentMentions/:term',
           """ else ""}
       }
       ORDER BY DESC(?date) DESC(?source) ASC(?t_start)
-      LIMIT 10
+      LIMIT 50
       """
     response = makeCachedRequest(query)
     return {
