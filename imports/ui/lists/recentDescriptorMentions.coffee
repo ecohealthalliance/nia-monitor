@@ -29,7 +29,7 @@ Template.recentDescriptorMentions.onCreated ->
             sourceId = @sources.insert
               uri: row.post
               postSubject: row.postSubject
-              date: moment(new Date(row.date))
+              date: moment.utc(row.date)
           row.sourceId = sourceId
         @mentions.insert(row)
       $(".spinner").hide()

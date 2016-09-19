@@ -6,7 +6,7 @@ template(name="recentAgents")
             a.proMedLink.postHeaderText(href="#" uri=uri) {{postSubject}}
         .col-md-4.col-xs-5.postHeader.ital
           h4
-            .pull-right {{age postDate}}
+            .pull-right {{ageOrDate postDate}}
         table#recentAgentsTable.table
           tbody
             each recentAgentsForPost _id collapsed
