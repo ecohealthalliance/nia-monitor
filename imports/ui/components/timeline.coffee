@@ -1,9 +1,12 @@
 require './timeline.jade'
 Template.timeline.onCreated ->
   @isLoading = new ReactiveVar(false)
-  @timelineRange = new ReactiveVar('5years')
+  @timelineRange = new ReactiveVar()
   @tld = new Meteor.Collection(null)
   @myBarChart = null
+  @autorun =>
+    console.log Router.current().getParams()
+    @timelineRange.set Router.current().getParams().query?.timerange or "1year"
   @autorun =>
     agent = Router.current().getParams()._agentName
     @tld.remove({})
@@ -17,14 +20,21 @@ Template.timeline.onCreated ->
         toastr.error(err.message)
         return
       for row in response.data.results
-        data = {timeInterval: row.timeInterval, count: row.count}
+        if @timelineRange.get() == "1month"
+          data = {timeInterval: moment.utc(row.timeInterval).toDate(), count: row.count}
+        else
+          data = {timeInterval: row.timeInterval, count: row.count}
         @tld.insert(data)
   @selectedRangeRV = @data.selectedRangeRV
   @selectedElement = new ReactiveVar(null)
   @autorun =>
     element = @selectedElement.get()
     if element
-      if moment(element, "YYYY").isValid()
+      if _.isString(element) and element.indexOf(" - ") > 0
+        el = element.split(" - ")
+        m = moment(el[0], "MMM D")
+        @selectedRangeRV.set [m, m.clone().add(4, 'days')]
+      else if moment(element, "YYYY").isValid()
         m = moment(element, "YYYY")
         @selectedRangeRV.set [m, m.clone().add(1, 'year')]
       else if moment(element, "MMM").isValid()
@@ -45,12 +55,27 @@ Template.timeline.onRendered ->
     else
       if @myBarChart != null
         @myBarChart.destroy()
-      endDate = moment(new Date())
+      endDate = moment().set({hour: 0, minute: 0, second: 0})
       baseDate = null
       xlabels = []
       counts = []
       maxCount = 0
       switch @timelineRange.get()
+        when "1month"
+          intervalStart = moment().set({hour: 0, minute: 0, second: 0}).subtract(1, 'month')
+          while 0 < endDate.diff(intervalStart, 'days')
+            intervalEnd = intervalStart.clone().add(4, 'days')
+            if intervalStart.month() != intervalEnd.month()
+              xlabels.push intervalStart.format("MMM D") + " - " + intervalEnd.format("MMM D")
+            else
+              xlabels.push intervalStart.format("MMM D") + " - " + intervalEnd.date()
+            tdata = @tld.find(
+              timeInterval:
+                $gte: intervalStart.toDate()
+                $lt: intervalEnd.toDate()
+            ).fetch()
+            counts.push(_.reduce(tdata, ((sofar, d)-> d.count + sofar), 0))
+            intervalStart.add(4, 'days')
         when "6months"
           endMonth = endDate.month() + 1
           baseMonth = endDate.subtract(5, 'months')
@@ -152,8 +177,6 @@ Template.timeline.helpers
     Template.instance().isLoading.get()
 
 Template.timeline.events
-  'change #timelineRange': (event, template) ->
-    template.timelineRange.set(template.$("#timelineRange").val())
   'click canvas': (event, template) ->
     myBarChart = template.myBarChart
     activePoints = myBarChart.getElementsAtEvent(event)

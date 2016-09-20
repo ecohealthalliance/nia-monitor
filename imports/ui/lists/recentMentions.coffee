@@ -31,7 +31,7 @@ Template.recentMentions.onCreated ->
             sourceId = @sources.insert
               uri: row.post
               postSubject: row.postSubject
-              date: moment(new Date(row.date))
+              date: moment.utc(row.date)
           row.sourceId = sourceId
         @mentions.insert(row)
 
@@ -57,6 +57,10 @@ Template.recentMentions.helpers
     selectedRange = Template.instance().selectedRangeRV.get()
     if selectedRange
       moment(selectedRange[1]).format("MMM Do YYYY")
+  range: ->
+    selectedRange = Template.instance().selectedRangeRV.get()
+    if selectedRange
+      moment(selectedRange[0]).format("MMM Do YYYY") + " - " + moment(selectedRange[1]).format("MMM Do YYYY")
 Template.recentMentions.events
   'click .proMedLink': (event, template) ->
     if this.uri != undefined

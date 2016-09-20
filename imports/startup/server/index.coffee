@@ -181,7 +181,7 @@ api.addRoute 'recentMentions/:term',
           """ else ""}
       }
       ORDER BY DESC(?date) DESC(?source) ASC(?t_start)
-      LIMIT 10
+      LIMIT 50
       """
     response = makeCachedRequest(query)
     return {
@@ -394,8 +394,11 @@ api.addRoute 'historicalData/:term/:range',
     if promedFeedId == 'null'
       promedFeedId = null
     dateStr = ""
-    date = moment(new Date())
+    date = moment(new Date()) #for testing: date = moment(new Date("11/30/1995"))
     switch @urlParams.range
+      when "1month"
+        date.subtract(1, 'month')
+        dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
       when "6months"
         date.subtract(6, 'months')
         dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
@@ -427,6 +430,8 @@ api.addRoute 'historicalData/:term/:range',
         """ else ""}
         #{if @urlParams.range == '6months' || @urlParams.range == '1year' then """
           BIND(month(?dateTime) AS ?timeInterval)
+        """ else if @urlParams.range == '1month' then """
+          BIND(?dateTime AS ?timeInterval)
         """ else """
           BIND(year(?dateTime) AS ?timeInterval)
         """}

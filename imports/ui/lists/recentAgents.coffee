@@ -35,16 +35,15 @@ Template.recentAgents.onCreated ->
           postId = @posts.insert
             uri: row.post
             postSubject: row.postSubject
-            postDate: moment(new Date(row.postDate))
+            postDate: moment.utc(row.postDate)
             collapsed: false
             order: order++
         row.postId = postId
         if row.priorPostDate
-          row.priorPostDate = new Date(row.priorPostDate)
-          priorPostDate = moment(row.priorPostDate)
-          postDate = moment(new Date(row.postDate))
-          row.days = postDate.diff(priorPostDate, 'days')
-          row.months = postDate.diff(priorPostDate, 'months')
+          row.priorPostDate = moment.utc(row.priorPostDate).toDate()
+          postDate = moment.utc(row.postDate)
+          row.days = postDate.diff(row.priorPostDate, 'days')
+          row.months = postDate.diff(row.priorPostDate, 'months')
           #show days or months since last mention
           if row.days > 30
             row.dm = true
