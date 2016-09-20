@@ -1,13 +1,14 @@
 template(name='timeline')
   .col-md-10.col-md-offset-1
-    .col-md-12.col-s-8.col-xs-12
-      h4.iaHeader.pull-left Timeline range:
-      select#timelineRange.col-md-8.col-sm-10.col-xs-8.form-control
-        option(value="1month") 1 Month
-        option(value="6months") 6 Months
-        option(value="1year") 1 Year
-        option( selected, value="5years") 5 Years
-        option(value="all") All Time
+    .col-md-12.timeline-range-controls
+      label Time range:
+      ul.timeline-range-selector
+        li(class="{{#if eq timelineRange '1month'}}active{{/if}}")
+          a(href="?timerange=1month") Month
+        li(class="{{#if eq timelineRange '1year'}}active{{/if}}")
+          a(href="?timerange=1year") Year
+        li(class="{{#if eq timelineRange 'all'}}active{{/if}}")
+          a(href="?timerange=all") All Time
     if isLoading
       .loading.spinner-margin
         i.fa.fa-spinner.fa-2x.fa-spin

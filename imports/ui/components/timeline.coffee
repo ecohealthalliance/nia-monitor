@@ -1,9 +1,12 @@
 require './timeline.jade'
 Template.timeline.onCreated ->
   @isLoading = new ReactiveVar(false)
-  @timelineRange = new ReactiveVar('5years')
+  @timelineRange = new ReactiveVar()
   @tld = new Meteor.Collection(null)
   @myBarChart = null
+  @autorun =>
+    console.log Router.current().getParams()
+    @timelineRange.set Router.current().getParams().query?.timerange or "1year"
   @autorun =>
     agent = Router.current().getParams()._agentName
     @tld.remove({})
@@ -27,7 +30,7 @@ Template.timeline.onCreated ->
   @autorun =>
     element = @selectedElement.get()
     if element
-      if element.indexOf(" - ") > 0
+      if _.isString(element) and element.indexOf(" - ") > 0
         el = element.split(" - ")
         m = moment(el[0], "MMM D")
         @selectedRangeRV.set [m, m.clone().add(4, 'days')]
@@ -174,8 +177,6 @@ Template.timeline.helpers
     Template.instance().isLoading.get()
 
 Template.timeline.events
-  'change #timelineRange': (event, template) ->
-    template.timelineRange.set(template.$("#timelineRange").val())
   'click canvas': (event, template) ->
     myBarChart = template.myBarChart
     activePoints = myBarChart.getElementsAtEvent(event)
