@@ -150,6 +150,7 @@ Template.timeline.onRendered ->
               ticks:
                 min: 0
                 display: false
+                beginAtZero: true
               gridLines:
                 lineWidth: 0,
                 color: "rgba(255,255,255,0)"
