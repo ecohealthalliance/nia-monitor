@@ -1,24 +1,27 @@
 template(name='main')
   +header
-  i#showAppDesc.fa.fa-question-circle.fa-2x
-  .appDescriptionContainer
-    i#hideAppDesc.fa.fa-times.fa-2x
-    p.col-md-6.col-md-offset-3.headerDescription
-      | NIAM displays the diseases mentioned in ProMED-mail posts.
-      | A disease's novelty can be assessed through its time since the previous
-      | mention and through its ranking on the trending diseases list.
-    p.col-md-8.col-md-offset-2 Click on a disease to see its historical mentions.
+
+  if showDescription
+    .app-description-container.container-fluid-padded
+      i.hide-app-desc.fa.fa-times.fa-2x
+      p.header-description
+        | NIAM displays the diseases mentioned in ProMED-mail posts.
+        | A disease's novelty can be assessed through its time since the previous
+        | mention and through its ranking on the trending diseases list.
+      p Click on a disease to see its historical mentions.
 
   .main-content
-    ul.nav.nav-tabs
-      li.col-md-2.col-sm-8.col-xs-10(class="{{#if eq view 'recentAgents'}}active{{/if}}")
+    ul.tabs.list-unstyled
+      li(class="{{#if eq view 'recentAgents'}}active{{/if}}")
         a(href='/') Recently Mentioned
-      li.col-md-2.col-sm-8.col-xs-10(class="{{#if eq view 'frequentAgents'}}active{{/if}}")
+      li(class="{{#if eq view 'frequentAgents'}}active{{/if}}")
         a(href='/frequent') Frequently Mentioned
-      li.col-md-2.col-sm-8.col-xs-10(class="{{#if eq view 'trendingAgents'}}active{{/if}}")
+      li(class="{{#if eq view 'trendingAgents'}}active{{/if}}")
         a(href='/trending') Trending
+      unless showDescription
+        i.show-app-desc.fa.fa-question-circle.fa-2x
     .tab-content
       .tab-pane.active
         +Template.dynamic template=view
-  .clear
+
   +proMedModal

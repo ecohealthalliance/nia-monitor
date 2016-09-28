@@ -2,10 +2,10 @@ template(name='detail')
   +header
   +timeline selectedRangeRV=selectedRangeRV
   h2.col-md-12.articleHeader.mainHeaderText Posts mentioning #{agent}
-  ul.nav.nav-tabs.col-md-12
-    li.col-md-2.col-xs-12#recentMentionsPanelTab(class="{{#if recentMentionsView}}active{{/if}}")
+  ul.tabs.list-unstyled
+    li#recentMentionsPanelTab(class="{{#if recentMentionsView}}active{{/if}}")
       a(href='/detail/#{agent}/recentMentions') Recent Mentions
-    li#frequentDescriptorsPanelTab.col-md-2.col-xs-12(class="{{#if frequentDescriptorsView}}active{{/if}}")
+    li#frequentDescriptorsPanelTab(class="{{#if frequentDescriptorsView}}active{{/if}}")
       a(href='/detail/#{agent}/frequentDescriptors') Frequent Descriptors
   .tab-content
     .tab-pane.active

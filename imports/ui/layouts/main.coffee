@@ -6,9 +6,9 @@ require '../lists/recentAgents.coffee'
 require '../lists/frequentAgents.coffee'
 require '../lists/trendingAgents.coffee'
 
-Template.main.onRendered ->
-  if localStorage.getItem('showAppDesc') != "false"
-    $(".appDescriptionContainer").show()
+Template.main.onCreated ->
+  state = if localStorage.getItem('showAppDesc') != 'false' then true
+  @showDescription = new ReactiveVar state or false
 
 Template.main.helpers
   view: ->
@@ -17,10 +17,14 @@ Template.main.helpers
       when "frequent" then "frequentAgents"
       else "recentAgents"
 
+Template.main.helpers
+  showDescription: ->
+    Template.instance().showDescription.get()
+
 Template.main.events
-  'click #hideAppDesc': (event, instance) ->
-    $(".appDescriptionContainer").hide()
+  'click .hide-app-desc': (event, instance) ->
+    instance.showDescription.set false
     localStorage.setItem('showAppDesc', false)
-  'click #showAppDesc': (event, instance) ->
-    $(".appDescriptionContainer").show()
+  'click .show-app-desc': (event, instance) ->
+    instance.showDescription.set true
     localStorage.setItem('showAppDesc', true)

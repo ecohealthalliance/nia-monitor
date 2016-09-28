@@ -4,8 +4,6 @@ template(name='header')
       img(src="/images/logo.svg" alt="Novel Infectious Agent Monitor")
     nav.main-nav
       ul.list-unstyled
-        li
-          a(href="/about") About
         li.dropdown
           a.feed.feedText.dropdown-toggle(href='#', data-toggle='dropdown')
             #feed #{region}
@@ -14,5 +12,6 @@ template(name='header')
             li
               a.feed-opt(href='#')  All Feeds
             each feeds
-              li
-                a.feed-opt(href='#')  #{label}
+              li #{label}
+        li
+          a(href="/about") About
