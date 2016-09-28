@@ -24,5 +24,5 @@ ssh -L 8890:localhost:8890 ubuntu@niam.eha.io
 
 Start meteor with the following environment variable:
 ```
-SPARQURL=localhost:8890/sparql?graph=http://eha.io/t11 meteor
+SPARQURL=http://localhost:8890/sparql?graph=http://eha.io/t11 meteor
 ```
