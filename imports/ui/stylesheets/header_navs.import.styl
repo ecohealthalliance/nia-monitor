@@ -1,26 +1,50 @@
-.navbar
-  height 60px
 
-.navbar-default
-  padding-top 6px
-  margin-bottom 6px
-  background-color transparent
-  border none
+.header
+  display flex
+  .logo
+    padding-top 1em
+    padding-bottom 1em
+
+.main-nav
+  margin-left auto
+  display flex
+  align-items center
+  ul
+    display flex
+    margin-bottom 0
+    height 100%
+    > li
+      display flex
+      align-items center
+      cursor pointer
+      &:hover
+        background $primary-light
+      a
+        padding 0 1em
+        text-transform uppercase
+        font-weight 300
+        font-size 1.3em
+        color $nav-text-color
+
+  .dropdown
+    &:hover
+      background $primary-light
+  a
+    padding 0 1em
+    text-transform uppercase
+    text-decoration none
+    font-weight 300
+    font-size 1.5em
+    color $d-gray
 
 .logo
-  position absolute
-  top 3px
-  height 50px
   width 420px
-  margin-left -50px
-  background-position center center
-  text-indent -9999px
 
 .about
   float right
   margin-top 22px
   font-size 1.5em
-  color #999999
+  color $d-gray
 
 #feed
   margin-top 12px
@@ -29,7 +53,7 @@
 .feedText,
 .aboutText
   font-family Lato
-  color #999999
+  color $d-gray
   font-size 1.5em
   margin-right -25px
 
