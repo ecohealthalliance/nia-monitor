@@ -16,7 +16,7 @@ http
 jquery
 session
 coffeescript
-mquandalle:stylus
+stylus
 momentjs:moment
 
 # ui

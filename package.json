@@ -7,8 +7,9 @@
     "docs": "apidoc -o public/.apidocs -e node_modules -e meteor"
   },
   "dependencies": {
+    "apidoc": "0.16.1",
     "meteor-node-stubs": "~0.2.0",
-    "apidoc": "0.16.1"
+    "rupture": "^0.6.1"
   },
   "version": "0.0.1",
   "repository": {
