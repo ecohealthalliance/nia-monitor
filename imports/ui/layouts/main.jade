@@ -13,11 +13,14 @@ template(name='main')
   .main-content
     ul.tabs.list-unstyled
       li(class="{{#if eq view 'recentAgents'}}active{{/if}}")
-        a(href='/') Recently Mentioned
+        a(href='/')
+          span Recently Mentioned
       li(class="{{#if eq view 'frequentAgents'}}active{{/if}}")
-        a(href='/frequent') Frequently Mentioned
+        a(href='/frequent')
+          span Frequently Mentioned
       li(class="{{#if eq view 'trendingAgents'}}active{{/if}}")
-        a(href='/trending') Trending
+        a(href='/trending')
+          span Trending
       unless showDescription
         i.show-app-desc.fa.fa-question-circle.fa-2x
     .tab-content

@@ -4,9 +4,11 @@ template(name='detail')
   h2.col-md-12.articleHeader.mainHeaderText Posts mentioning #{agent}
   ul.tabs.list-unstyled
     li#recentMentionsPanelTab(class="{{#if recentMentionsView}}active{{/if}}")
-      a(href='/detail/#{agent}/recentMentions') Recent Mentions
+      a(href='/detail/#{agent}/recentMentions')
+        span Recent Mentions
     li#frequentDescriptorsPanelTab(class="{{#if frequentDescriptorsView}}active{{/if}}")
-      a(href='/detail/#{agent}/frequentDescriptors') Frequent Descriptors
+      a(href='/detail/#{agent}/frequentDescriptors')
+        span Frequent Descriptors
   .tab-content
     .tab-pane.active
       if recentMentionsView

@@ -125,7 +125,8 @@
   position relative
 
 .main-content
-  margin-top 30px
+  +above(3)
+    margin-top 30px
 
 .hide-app-desc
 .show-app-desc
@@ -136,6 +137,8 @@
   top 50%
   right 15px
   transform translate(0, -50%)
+  +below(2)
+    display none
 
 .hide-app-desc
   top 15px
