@@ -1,15 +1,14 @@
 template(name="frequentAgents")
-  .col-md-6.col-md-offset-3
-    .col-md-12
-      table#frequentAgentsTable.table
-        tbody
-          each frequentAgents
-            tr.ital
-              td.frequentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
-                div.fmia-word
-                  a(href="/detail/#{word}")= word
-              td
-                div.pull-right appears in {{pluralize 'article' count}}
-          if isLoading
-            .loading.spinner-margin
-              i.fa.fa-spinner.fa-2x.fa-spin
+  .list
+    table#frequentAgentsTable.table
+      tbody
+        each frequentAgents
+          tr.ital
+            td.frequentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
+              div.fmia-word
+                a(href="/detail/#{word}")= word
+            td
+              div.pull-right appears in {{pluralize 'article' count}}
+        if isLoading
+          .loading.spinner-margin
+            i.fa.fa-spinner.fa-2x.fa-spin

@@ -1,15 +1,13 @@
 template(name="trendingAgents")
-  .col-md-6.col-md-offset-3
-    .col-md-6
-      //.col-s-8.col-xs-12
-      label Trend Interval
-      ul.range-selector
-        li(class="{{#if eq trendingRange 'year'}}active{{/if}}")
-          a(href="/trending/year") Year
-        li(class="{{#if eq trendingRange 'month'}}active{{/if}}")
-          a(href="/trending/month") Month
-        li(class="{{#if eq trendingRange 'week'}}active{{/if}}")
-          a(href="/trending/week") Week
+  .list
+    label Trend Interval
+    ul.range-selector
+      li(class="{{#if eq trendingRange 'year'}}active{{/if}}")
+        a(href="/trending/year") Year
+      li(class="{{#if eq trendingRange 'month'}}active{{/if}}")
+        a(href="/trending/month") Month
+      li(class="{{#if eq trendingRange 'week'}}active{{/if}}")
+        a(href="/trending/week") Week
     .col-md-6
       label Trend Date
         .input-group.date#trendingDate
