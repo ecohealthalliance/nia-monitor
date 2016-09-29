@@ -5,12 +5,11 @@ template(name='header')
     nav.main-nav
       ul.list-unstyled
         li.dropdown
-          a.feed.feedText.dropdown-toggle(href='#', data-toggle='dropdown')
-            #feed #{region}
-              div.caret
-          ul.dropdown-menu.regionSelector(role='menu')
-            li
-              a.feed-opt(href='#')  All Feeds
+          a.feeds(href='#', data-toggle='dropdown')
+            .feed #{region}
+              i.fa.fa-angle-down
+          ul.dropdown-menu.region-selector(role='menu')
+            li All Feeds
             each feeds
               li #{label}
         li

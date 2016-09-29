@@ -8,5 +8,5 @@ Template.header.helpers
     Feeds.findOne(Session.get('promedFeedId'))?.label or "All Feeds"
 
 Template.header.events
-  'click .feed-opt': (event, instance) ->
+  'click .region-selector li': (event, instance) ->
     Session.set('promedFeedId', @_id)

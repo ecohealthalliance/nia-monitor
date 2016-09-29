@@ -1,3 +1,5 @@
+$nav-text-color = lighten($body-text, 25%)
+
 .header
   display flex
   .logo
@@ -8,7 +10,7 @@
   margin-left auto
   display flex
   align-items center
-  ul
+  > ul
     display flex
     margin-bottom 0
     height 100%
@@ -27,13 +29,36 @@
 
   .dropdown
     &:hover
-      background $primary-light
-  a
-    padding 0 1em
-    text-transform uppercase
-    font-weight 300
-    font-size 1.5em
-    color $d-gray
+      ul
+        display block
+
+  .dropdown-menu
+    top 100%
+    left auto
+    right 0
+    transform translate(0,0)
+    float none
+    width 100%
+    border 0
+    margin 0
+    padding 0
+    box-shadow none
+    background $primary-light
+    min-width 200px
+    border-top-left-radius 0
+    border-top-right-radius 0
+    border-bottom-left-radius 4px
+    border-bottom-left-radius 4px
+    > li
+      font-size 1em
+      text-transform capitalize
+      padding .45em .75em
+      color $nav-text-color
+      cursor pointer
+      &:hover
+        background $primary
+      &:first-of-type
+        font-weight 600
 
 .logo
   width 420px
@@ -44,11 +69,7 @@
   font-size 1.5em
   color $d-gray
 
-#feed
-  margin-top 12px
-  color #999999
-
-.feedText,
+.feedText
 .aboutText
   font-family Lato
   color $d-gray
@@ -120,6 +141,3 @@
 button.fa.fa-times.close.fa-2x
   margin-top 5px
   margin-right 5px
-
-.regionSelector
-  z-index 1041
