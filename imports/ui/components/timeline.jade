@@ -1,6 +1,6 @@
 template(name='timeline')
   .col-md-10.col-md-offset-1
-    .col-md-12.timeline-range-controls
+    .timeline-range-controls
       label Time range:
       ul.timeline-range-selector
         li(class="{{#if eq timelineRange '1month'}}active{{/if}}")
@@ -9,10 +9,9 @@ template(name='timeline')
           a(href="?timerange=1year") Year
         li(class="{{#if eq timelineRange 'all'}}active{{/if}}")
           a(href="?timerange=all") All Time
-    if isLoading
-      .loading.spinner-margin
-        i.fa.fa-spinner.fa-2x.fa-spin
-    #timelineDiv
+    .timeline
+      unless ready
+        +loader centered=true subtle=true
       canvas(width='500', height='100', hidden=noData)
     if noData
       .spacer(style="height: 120px;")

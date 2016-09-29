@@ -2,15 +2,15 @@ require './frequentAgents.jade'
 
 Template.frequentAgents.onCreated ->
   @frequentAgents = new Meteor.Collection(null)
-  @isLoading = new ReactiveVar(false)
+  @ready = new ReactiveVar(false)
   @autorun =>
     @frequentAgents.find({}, reactive: false).map((d) => @frequentAgents.remove(d))
-    @isLoading.set(true)
+    @ready.set(false)
     HTTP.get '/api/frequentAgents', {
       params:
         promedFeedId: Session.get('promedFeedId') or null
     }, (err, response) =>
-      @isLoading.set(false)
+      @ready.set(true)
       if err
         toastr.error(err.message)
         return
@@ -20,5 +20,3 @@ Template.frequentAgents.onCreated ->
 Template.frequentAgents.helpers
   frequentAgents: ->
     Template.instance().frequentAgents.find()
-  isLoading: ->
-    Template.instance().isLoading.get()

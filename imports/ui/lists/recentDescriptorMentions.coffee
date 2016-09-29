@@ -35,8 +35,6 @@ Template.recentDescriptorMentions.onCreated ->
       $(".spinner").hide()
 
 Template.recentDescriptorMentions.helpers
-  ready: ->
-    Template.instance().ready.get()
   sources: ->
     Template.instance().sources.find()
   mentionsForSource: (sourceId) ->

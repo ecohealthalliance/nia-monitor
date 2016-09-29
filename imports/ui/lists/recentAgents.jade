@@ -24,9 +24,8 @@ template(name="recentAgents")
         if collapsed
           .more.text-center
             button(type="button").btn.btn-show-all-ia Show All Infectious Agents for Post
-    if isLoading
-      .loading.spinner-margin
-        i.fa.fa-spinner.fa-2x.fa-spin
-    else
+    if ready
       unless theEnd
         button(type="button").btn.btn-info.load-more-posts Load More
+    else
+      +loader
