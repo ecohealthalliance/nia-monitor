@@ -1,14 +1,17 @@
 template(name="frequentAgents")
   .list
-    table#frequentAgentsTable.table
+    table.table.table-centered-content
+      thead
+        tr
+          th Infectious Agent
+          th Article Count
       tbody
         each frequentAgents
-          tr.ital
+          tr
             td.frequentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
-              div.fmia-word
+              span.fmia-word
                 a(href="/detail/#{word}")= word
-            td
-              div.pull-right appears in {{pluralize 'article' count}}
+            td= count
         if isLoading
           .loading.spinner-margin
             i.fa.fa-spinner.fa-2x.fa-spin

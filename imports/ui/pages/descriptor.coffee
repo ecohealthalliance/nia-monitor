@@ -14,7 +14,7 @@ Template.descriptor.helpers
     Template.instance().ready.get()
 
 Template.descriptor.events
-  'click .proMedLink': (event, template) ->
+  'click .promed-link': (event, template) ->
     if this.uri != undefined
       $('#proMedIFrame').attr('src', this.uri)
       $('#proMedURL').attr('href', this.uri)

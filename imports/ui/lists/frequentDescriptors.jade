@@ -1,16 +1,20 @@
 template(name="frequentDescriptors")
   .list
-    table#frequentDescriptorsTable.table.table-striped
+    table.table.table-centered-content
+      thead
+        tr
+          th Descriptor
+          th Article Count
       tbody
         each frequentDescriptors
           tr
-            td.frequentDescriptorsTableRow
-              div.fmia-word
+            td
+              span.fmia-word
                 a(href="/descriptor/{{plus selText}}/{{plus term}}")= selText
-            td appears in {{pluralize 'article' count}}
+            td= count
         else
           if ready
-            span.no-priors.col-md-12.text-center No Frequent Descriptors
+            span.no-priors.text-center No Frequent Descriptors
           else
             .loading.spinner-margin
               i.fa.fa-spinner.fa-2x.fa-spin

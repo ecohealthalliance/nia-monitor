@@ -9,7 +9,7 @@ Template.recentAgents.onCreated ->
   @isLoading = new ReactiveVar(false)
   @theEnd = new ReactiveVar(false)
   order = 0
-  
+
   @loadMorePosts = =>
     if @isLoading.get() then return
     pageNum = @currentPageNumber.get()
@@ -17,7 +17,7 @@ Template.recentAgents.onCreated ->
     # @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
     @isLoading.set(true)
     HTTP.get '/api/recentAgents', {
-      params: 
+      params:
         promedFeedId: Session.get('promedFeedId')  or null
         page: pageNum
         pp: pp
@@ -121,11 +121,11 @@ Template.recentAgents.helpers
 
 
 Template.recentAgents.events
-  'click .more': (event, instance) ->
+  'click .btn-show-all-ia': (event, instance) ->
     instance.posts.update(@_id, { $set: { collapsed: false } })
   'click .load-more-posts': (event, instance) ->
     instance.loadMorePosts()
-  'click .proMedLink': (event, template) ->
+  'click .promed-link': (event, template) ->
     if this.uri != undefined
       $('#proMedIFrame').attr('src', this.uri)
       $('#proMedURL').attr('href', this.uri)

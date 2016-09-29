@@ -1,6 +1,36 @@
-.lists
+.list
   width 100%
-  +above(2)
-    width 75%
+  max-width $max-ui-width
+  +above(5)
     margin-right auto
     margin-left auto
+    width 65%
+
+  .details
+    display flex
+    flex-direction column
+    border-bottom 1px solid $border-gray
+    padding 0 1.5em
+    padding-bottom 1.1em
+    +above(3)
+      flex-direction row
+      align-items flex-end
+    h1
+      flex 4
+      font-size 1.25em
+      font-weight 500
+      line-height 1.5em
+      margin 0 0 .5em 0
+      +above(3)
+        margin 0
+      a
+        color $secondary
+        &:hover
+          color darken(@color, 20%)
+    .time-link
+      font-style italic
+
+.list--sub-group
+  li
+    padding .75em .5em
+    border-bottom 1px solid $border-gray

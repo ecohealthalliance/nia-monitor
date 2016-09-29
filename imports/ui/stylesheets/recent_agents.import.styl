@@ -1,0 +1,48 @@
+.post
+  margin-bottom 4.5em
+
+.post--mentions
+  margin 0
+  li
+    padding 1em 1.5em
+    display flex
+    align-items center
+    border-color lighten($border-gray, 30%)
+    > a
+      color $body-text
+      &:hover
+        color $secondary
+  .prior-mentions
+    margin-left auto
+    color $d-gray
+    font-weight 300
+    font-style italic
+    span
+      &:nth-of-type(1)
+        font-weight 400
+      &:nth-of-type(2)
+        margin-left .1em
+        margin-right .3em
+      &.no-priors
+        font-weight 600
+        color $negative
+
+.post--details
+  .time-since
+    font-size .95em
+    color $d-gray
+    font-style italic
+    margin 0
+  .time-link
+    flex 1
+    display flex
+    align-items center
+    +above(3)
+      maring-left auto
+      justify-content flex-end
+    .promed-link
+      font-size 1.25em
+  .seperator
+    border 1px solid $border-gray
+    margin 0 .75em
+    align-self stretch

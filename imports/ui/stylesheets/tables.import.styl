@@ -3,6 +3,12 @@
   border-bottom 1px solid $l-gray
   padding 20px
 
+thead
+  tr
+    th
+      font-size 1.25em
+      font-weight 600
+
 hr
   position relative
   background-color $secondary
@@ -25,3 +31,22 @@ hr
   height .2em
   vertical-align middle
   margin-left .5em
+
+.table-centered-content
+  width 100%
+  table-layout fixed
+  tbody
+  thead
+    tr
+      max-width 50%
+    tr
+      th
+      td
+        padding 15px 25px
+        &:first-of-type
+          text-align right
+          border-right 1px solid $border-gray
+      &:last-of-type
+        td
+          border-bottom 0
+          padding-bottom 25px

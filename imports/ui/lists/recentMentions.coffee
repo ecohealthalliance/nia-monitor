@@ -62,7 +62,7 @@ Template.recentMentions.helpers
     if selectedRange
       moment(selectedRange[0]).format("MMM Do YYYY") + " - " + moment(selectedRange[1]).format("MMM Do YYYY")
 Template.recentMentions.events
-  'click .proMedLink': (event, template) ->
+  'click .promed-link': (event, template) ->
     if this.uri != undefined
       $('#proMedIFrame').attr('src', this.uri)
       $('#proMedURL').attr('href', this.uri)

@@ -1,32 +1,30 @@
 template(name="recentAgents")
   .list
     each post
-      .col-md-8.col-xs-7.postHeader
-        h4
-          a.proMedLink.postHeaderText(href="#" uri=uri) {{postSubject}}
-      .col-md-4.col-xs-5.postHeader.ital
-        h4
-          .pull-right {{ageOrDate postDate}}
-      table#recentAgentsTable.table
-        tbody
+      article.post
+        .post--details.details
+          h1
+            a.promed-link(href="#" uri=uri)= postSubject
+          .time-link
+            p.time-since {{ageOrDate postDate}}
+            span.seperator
+            a.fa.fa-newspaper-o.promed-link(href="#" uri=uri)
+        ul.post--mentions.list--sub-group.list-unstyled
           each recentAgentsForPost _id collapsed
-            tr
-              td.recentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
-                a(href="/detail/{{plus word}}")= word
-              td.ital
+            li(data-agentname=word)
+              a(href="/detail/{{plus word}}")= word
+              .prior-mentions
                 if priorPost
-                  .pull-right
-                    span.boldrange {{since ../date priorPostDate}}
-                    span since
-                    a.proMedLink(href="#" uri=priorPost) prior mention
+                  span {{since ../date priorPostDate}}
+                  span since
+                  a.promed-link(href="#" uri=priorPost) prior mention
                 else
-                  span.no-priors.pull-right no prior mentions
-      if collapsed
-        .more.text-center
-          button(type="button").btn.btn-show-all-ia Show All Infectious Agents for Post
+                  span.no-priors no prior mentions
+        if collapsed
+          button.btn.btn-success.btn-show-all-ia(type="button") Show All Infectious Agents for Post
     if isLoading
       .loading.spinner-margin
         i.fa.fa-spinner.fa-2x.fa-spin
     else
       unless theEnd
-        button(type="button").btn.btn-info.load-more-posts Load More
+        button.btn.btn-info.load-more-posts(type="button") Load More
