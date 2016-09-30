@@ -1,28 +1,36 @@
+.source-mentions
+  li
+    position relative
+    display flex
+    flex-direction column
+    align-items center
+    justify-content center
+    padding-top 1.25em
+    padding-bottom 1.25em
+
 .kwic
-  white-space nowrap
-  margin auto
-  :nth-child(1)
-    text-align right
-  :nth-child(1)
-  :nth-child(2)
-    display inline-block
-    width 23em
+  position absolute
+  left 50%
+  top 50%
+  transform translate(-50%, -50%)
+  margin 0
+  font-weight 800
+  letter-spacing .01em
+  span
+    position absolute
     white-space nowrap
-    strong
-      display inline
-      margin-right 0px
+    top 0
+    font-weight 400
+    letter-spacing 0
+  :nth-child(1)
+    left 0
+    transform translate(-102%, 0)
+  :nth-child(2)
+    right 0
+    transform translate(105%, 0)
 
 .source--details
   +above(2)
     margin-bottom 0
     h4
       margin-bottom 0
-
-.source-mentions
-  li
-    display flex
-    flex-direction column
-    align-items center
-    justify-content center
-    padding-top 1em
-    padding-bottom 1em
