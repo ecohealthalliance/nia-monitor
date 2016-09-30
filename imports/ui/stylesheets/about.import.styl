@@ -19,6 +19,8 @@
 .about--detail-centered
 .about--detail-wide
   margin-bottom 10em
+  +below(2)
+    margin-bottom 5em
   .detail-text
     font-size 1.25em
     color darken($d-gray, 30%)
@@ -28,6 +30,8 @@
   align-items center
   justify-content center
   flex-direction row
+  +below(2)
+    flex-direction column
   .detail-text
     flex 1
     margin 0 0 1em 0
@@ -46,6 +50,8 @@
   margin-left auto
   margin-right auto
   text-align center
+  +below(2)
+    max-width 95%
   .detail-text
     margin-bottom 2em
   .btn
@@ -55,6 +61,9 @@
 .detail-image
   flex 1
   min-width 40%
+  +below(2)
+    min-width 100%
+    margin-top 1em
 
 .acknowledgements
   margin-left 20%
@@ -69,19 +78,3 @@
     max-width 100%
   .square
     max-width 60%
-
-
-@media (max-width:800px)
-  .about--detail-wide
-      flex-direction column
-
-  .about--detail-centered
-  .about--detail-wide
-    margin-bottom 5em
-
-  .detail-image
-    min-width 100%
-    margin-top 1em
-
-  .about--detail-centered
-    max-width 95%

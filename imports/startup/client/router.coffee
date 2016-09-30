@@ -14,6 +14,9 @@ require '../../ui/helpers/plus.coffee'
 require '../../ui/helpers/pluralize.coffee'
 require '../../ui/helpers/misc.coffee'
 
+# modals
+require '../../ui/modals/index'
+
 # routes
 Router.route '/', ->
   @render 'main'

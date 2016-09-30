@@ -1,71 +1,149 @@
-.navbar
-  height 60px
+$nav-text-color = lighten($body-text, 25%)
 
-.navbar-default
-  padding-top 6px
-  margin-bottom 6px
-  background-color transparent
-  border none
+.header
+  display flex
+  .logo
+    flex 1
+    height 40px
+    margin-top 1em
+    margin-bottom 1em
+    margin-left 1em
+    background url("/images/logo-simple.svg") no-repeat
+    +above(3)
+      height 50px
+      background url("/images/logo.svg") no-repeat
+
+.main-nav
+  margin-left auto
+  display flex
+  align-items center
+  > ul
+    display flex
+    margin-bottom 0
+    height 100%
+    > li
+      display flex
+      align-items center
+      cursor pointer
+      &:hover
+        background $primary-light
+      a
+        padding 0 1em
+        text-transform uppercase
+        font-weight 300
+        font-size 1em
+        color $nav-text-color
+        +above(2)
+          font-size 1.3em
+
+  .dropdown
+    &:hover
+      ul
+        display block
+
+  .dropdown-menu
+    top 100%
+    left auto
+    right 0
+    transform translate(0,0)
+    float none
+    width 100%
+    border 0
+    margin 0
+    padding 0
+    box-shadow none
+    background $primary-light
+    min-width 200px
+    border-top-left-radius 0
+    border-top-right-radius 0
+    border-bottom-left-radius 4px
+    border-bottom-left-radius 4px
+    outline 5px solid alpha(white, 80%)
+    > li
+      font-size 1em
+      text-transform capitalize
+      padding .5em .85em
+      color $nav-text-color
+      cursor pointer
+      &:hover
+        background $primary
+      &:first-of-type
+        font-weight 600
 
 .logo
-  position absolute
-  top 3px
-  height 50px
   width 420px
-  margin-left -50px
-  background-position center center
-  text-indent -9999px
 
 .about
   float right
   margin-top 22px
   font-size 1.5em
-  color #999999
+  color $d-gray
 
-#feed
-  margin-top 12px
-  color #999999
-
-.feedText,
+.feedText
 .aboutText
   font-family Lato
-  color #999999
+  color $d-gray
   font-size 1.5em
   margin-right -25px
 
-.nav-tabs
-  text-align center
-  border-bottom 3px solid $primary
-  margin-bottom 20px
-
-.nav-tabs > li
-.nav-pills > li
-  float none
-  display inline-block
-  min-width 300px
+.tabs
+  position relative
+  display flex
+  align-items stretch
   margin-bottom 0
-  letter-spacing $letter-spacing
+  +above(2)
+    flex-direction row
+  +above(3)
+    margin-top 40px
+  +above(4)
+    justify-content center
+    padding-right 20%
+    padding-left 20%
 
-.nav-tabs > li > a
-.nav-tabs > li > a:hover
-.nav-tabs > li > a:focus
-.nav-tabs > li > a:active
-  color $primary
-  background-color $primary-light
+.tabs > li
+.nav-pills > li
+  flex 1
+  text-align center
+  letter-spacing $letter-spacing
+  +above(4)
+    min-width 300px
+    margin 0 .5em
+
+.tabs > li > a
+.tabs > li > a:hover
+.tabs > li > a:focus
+.tabs > li > a:active
+  display flex
+  align-items center
+  justify-content center
+  height 100%
+  padding .75em 1em
+  background-color lighten($primary-light, 20%)
   border 1px solid lighten($primary, 60%)
   border-bottom 0
+  color darken($primary, 20%)
+  font-size .9em
+  +above(2)
+    font-size 1.25em
+  +above(4)
+    border-top-left-radius 4px
+    border-top-right-radius 4px
 
-.nav-tabs > li > a:hover
+
+.tabs > li > a:hover
   background-color darken($primary-light, 3%)
   color darken($primary, 10%)
 
-.nav-tabs > li.active > a
-.nav-tabs > li.active > a:hover
-.nav-tabs > li.active > a:focus
-  border 0
-  color white
-  font-weight bold
+.tabs > li.active > a
+.tabs > li.active > a:hover
+.tabs > li.active > a:focus
+  border-color $primary
   background-color $primary
+  color $body-text
+
+.tab-content
+  border-top 2px solid $primary
+  padding-top 2em
 
 #proMedIFrame
   width 100%
@@ -80,6 +158,3 @@
 button.fa.fa-times.close.fa-2x
   margin-top 5px
   margin-right 5px
-
-.regionSelector
-  z-index 1041
