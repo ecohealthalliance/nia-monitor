@@ -11,10 +11,10 @@ template(name="recentMentions")
             a.promed-link.featured.article-header-text(href="#" uri=uri)=postSubject
           .time-link
             p {{ageOrDate date}}
-        ul.source-mentions.list--sub-group.list-unstyled
+        ul.source-mentions.keword-in-context-list.list--sub-group.list-unstyled
           each mentionsForSource _id
             li
-              p.kwic #{kwic}
+              p.keword-in-context #{kwic}
     else
       if ready
         p.no-priors.centered.subtle No Recent Mentions
