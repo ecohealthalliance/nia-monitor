@@ -1,10 +1,14 @@
 .trend-interval
-  flex 2
-  margin-right 2em
+  margin-bottom 1em
+  +above(2)
+    margin-right 2em
+    margin-bottom 0
+    flex 2
 
 .trend-date
-  flex 1
-  margin-left auto
+  +above(2)
+    margin-left auto
+    flex 1
 
 .trending-agents
   li
@@ -26,10 +30,16 @@
   display flex
   margin 0
   li
+    flex 1
     margin-right .5em
     border-radius 4px
     background-color lighten($primary-light, 20%)
     border 1px solid lighten($primary, 60%)
+    text-align center
+    &:last-of-type
+      margin-right 0
+    +above(2)
+      flex 0
     &.active
       &
       &:hover
@@ -42,8 +52,13 @@
       background darken(@background-color, 5%)
       border-color darken(@background-color, 5%)
   a
-    padding .3em 1em
+    padding .75em 1em
     display block
     color $body-text
+    font-size .9em
+    +above(2)
+      padding-top .3em
+      padding-bottom .3em
+      font-size 1em
     &:hover
       color $body-text
