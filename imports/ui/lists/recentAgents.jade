@@ -4,7 +4,7 @@ template(name="recentAgents")
       article.post
         .post--details.details
           h1
-            a.promed-link(href="#" uri=uri)= postSubject
+            a.promed-link.featured(href="#" uri=uri)= postSubject
           .time-link
             p.time-since {{ageOrDate postDate}}
             span.seperator
@@ -17,7 +17,7 @@ template(name="recentAgents")
                 if priorPost
                   span {{since ../date priorPostDate}}
                   span since
-                  a.promed-link(href="#" uri=priorPost) prior mention
+                  a.promed-link.featured(href="#" uri=priorPost) prior mention
                 else
                   span.no-priors no prior mentions
         if collapsed

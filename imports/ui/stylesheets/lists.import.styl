@@ -5,6 +5,15 @@
     margin-right auto
     margin-left auto
     width 65%
+  article
+    margin-bottom 5em
+  a
+    color $body-text
+    &:hover
+    &.featured:hover
+      color darken($positive, 10%)
+    &.featured
+      color $secondary
 
   .details
     display flex
@@ -23,14 +32,39 @@
       margin 0 0 .5em 0
       +above(3)
         margin 0
-      a
-        color $secondary
-        &:hover
-          color darken(@color, 20%)
     .time-link
+      flex 1
+      display flex
+      align-items center
       font-style italic
+      +above(3)
+        maring-left auto
+        justify-content flex-end
+      .promed-link
+        font-size 1.25em
+          margin-top 2px
+      p
+        margin 0
 
 .list--sub-group
   li
-    padding .75em .5em
+    padding 1em 1.5em
     border-bottom 1px solid $border-gray
+    color $body-text
+    &:hover
+      color $secondary-dark
+
+.list--options
+  display flex
+  align-items flex-end
+  justify-content space-around
+  flex-direction column
+  padding 0 1.5em 1.2em 1.5em
+  border-bottom 1px solid $border-gray
+  +above(2)
+    flex-direction row
+  h2
+    font-size 1.25em
+    font-weight 400
+    color $secondary
+    margin 0 0 .5em 0

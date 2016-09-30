@@ -1,0 +1,49 @@
+.trend-interval
+  flex 2
+  margin-right 2em
+
+.trend-date
+  flex 1
+  margin-left auto
+
+.trending-agents
+  li
+    display flex
+    align-items flex-end
+    flex-direction row
+  .relative-strength
+    margin-left auto
+
+.power-bar
+  display inline-block
+  vertical-align middle
+  width 1.3em
+  height .3em
+  margin-left .5em
+  background-color $primary
+
+.range-selector
+  display flex
+  margin 0
+  li
+    margin-right .5em
+    border-radius 4px
+    background-color lighten($primary-light, 20%)
+    border 1px solid lighten($primary, 60%)
+    &.active
+      &
+      &:hover
+        background $primary
+        border-color $primary
+      a
+        color $body-text
+
+    &:hover
+      background darken(@background-color, 5%)
+      border-color darken(@background-color, 5%)
+  a
+    padding .3em 1em
+    display block
+    color $body-text
+    &:hover
+      color $body-text

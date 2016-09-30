@@ -4,14 +4,9 @@
 .post--mentions
   margin 0
   li
-    padding 1em 1.5em
     display flex
     align-items center
     border-color lighten($border-gray, 30%)
-    > a
-      color $body-text
-      &:hover
-        color $secondary
   .prior-mentions
     margin-left auto
     color $d-gray
@@ -42,6 +37,9 @@
       justify-content flex-end
     .promed-link
       font-size 1.25em
+        margin-top 2px
+    p
+      margin 0
   .seperator
     border 1px solid $border-gray
     margin 0 .75em

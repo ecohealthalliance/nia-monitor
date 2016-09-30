@@ -1,38 +1,36 @@
 template(name="trendingAgents")
   .list
-    label Trend Interval
-    ul.range-selector
-      li(class="{{#if eq trendingRange 'year'}}active{{/if}}")
-        a(href="/trending/year") Year
-      li(class="{{#if eq trendingRange 'month'}}active{{/if}}")
-        a(href="/trending/month") Month
-      li(class="{{#if eq trendingRange 'week'}}active{{/if}}")
-        a(href="/trending/week") Week
-    .col-md-6
-      label Trend Date
+    .list--options
+      .trend-interval
+        h2 Trend Interval
+        ul.range-selector.list-unstyled
+          li(class="{{#if eq trendingRange 'year'}}active{{/if}}")
+            a(href="/trending/year") Year
+          li(class="{{#if eq trendingRange 'month'}}active{{/if}}")
+            a(href="/trending/month") Month
+          li(class="{{#if eq trendingRange 'week'}}active{{/if}}")
+            a(href="/trending/week") Week
+
+      .trend-date
+        h2 Trend Date
         .input-group.date#trendingDate
           input.date-button.form-control.input-sm.date-picker(value="{{trendingDate}}" type="text")
           .input-group-addon
             span.glyphicon.glyphicon-calendar
-    .col-md-12
-      table#trendingAgentsTable.table
-        tbody
-          each trendingAgents
-            tr
-              td.trendingInfectiousAgentsTableRow(data-agentname=word)
-                div.fmia-word
-                  a(href="/detail/#{word}")= word
-              td.ital
-                div.pull-right(style="color:white;") {{result}}
-              td
-                +powerBars
-          else
-            if ready
-              span.no-priors.col-md-12 No Trending Infectious Agents in the last
-                | {{trendingRange}}
-            else
-              .loading.spinner-margin
-                i.fa.fa-spinner.fa-2x.fa-spin
+
+    ul.trending-agents.list--sub-group.list-unstyled
+      each trendingAgents
+        li(data-agentname=word)
+          a.fmia-word(href="/detail/#{word}")= word
+          .relative-strength
+            +powerBars
+      else
+        if ready
+          p.no-priors.centered.subtle No Trending Infectious Agents in the last
+            | {{trendingRange}}
+        else
+          .loading.spinner-margin
+            i.fa.fa-spinner.fa-2x.fa-spin
 
 template(name="powerBars")
   .power-bars(data-toggle="tooltip" data-placement="left" title="The number of bars indicates the relative strength of the trend.")
