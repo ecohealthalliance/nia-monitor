@@ -1,5 +1,5 @@
 $letter-spacing = .03em
-$letter-spacing-loose = $letter-spacing + .01em
+$letter-spacing-loose = $letter-spacing  .01em
 $letter-spacing-tight = $letter-spacing - .01em
 
 
@@ -8,6 +8,15 @@ body
   font-family 'Open Sans', sans-serif
   font-weight 400
   color $body-text
+
+p
+  &.subtle
+    color $m-gray
+  &.centered
+    text-align center
+    margin 5em 0
+    padding-left 1em
+    padding-right 1em
 
 a
   &:hover

@@ -5,8 +5,24 @@
     flex-direction column
     align-items center
     justify-content center
-    padding-top 1.25em
-    padding-bottom 1.25em
+    padding-top 1.75em
+    padding-bottom 1.75em
+    &:before
+    &:after
+      position absolute
+      left 0
+      width 10%
+      background linear-gradient(to right, white, alpha(white, 0))
+      top 0
+      bottom 0
+      content ''
+      z-index 1
+      +above(3)
+        display none
+    &:after
+      left auto
+      right 0
+      background linear-gradient(to left, white, alpha(white, 0))
 
 .kwic
   position absolute
@@ -16,6 +32,11 @@
   margin 0
   font-weight 800
   letter-spacing .01em
+  font-size .8em
+  +above(2)
+    font-size .9em
+  +above(3)
+    font-size 1em
   span
     position absolute
     white-space nowrap
@@ -29,8 +50,16 @@
     right 0
     transform translate(105%, 0)
 
-.source--details
-  +above(2)
-    margin-bottom 0
-    h4
-      margin-bottom 0
+.source
+  .source--details
+    flex-direction column
+    align-items center
+    h1
+    .time-link
+      text-align center
+      flex 1
+    h1
+      margin-bottom .25em
+    .time-link
+      p
+        color $d-gray
