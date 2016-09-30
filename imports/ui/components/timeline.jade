@@ -11,7 +11,7 @@ template(name='timeline')
           a(href="?timerange=all") All Time
     .timeline
       unless ready
-        +loader centered=true subtle=true
+        +loader classes="centered subtle"
       canvas(width='500', height='100', hidden=noData)
     if noData
       .spacer(style="height: 120px;")

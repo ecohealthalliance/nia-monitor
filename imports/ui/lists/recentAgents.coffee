@@ -117,7 +117,6 @@ Template.recentAgents.helpers
       options.limit = 5
     Template.instance().recentAgents.find(postId: postId, options)
 
-
 Template.recentAgents.events
   'click .more': (event, instance) ->
     instance.posts.update(@_id, { $set: { collapsed: false } })
