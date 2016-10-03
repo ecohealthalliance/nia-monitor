@@ -11,11 +11,10 @@ template(name="frequentDescriptors")
             td
               span.fmia-word
                 a(href="/descriptor/{{plus selText}}/{{plus term}}")= selText
-            td= count
+            td=count
 
     if ready
       unless empty
         p.no-priors.centered.subtle No Frequent Descriptors
     else
-      .loading.spinner-margin
-        i.fa.fa-spinner.fa-2x.fa-spin
+      +loader classes='inline'

@@ -80,6 +80,13 @@ $buttons()
   font-weight 400
   letter-spacing .03em
 
+.btn-hidden
+  visibility hidden
+
+.btn-centered
+  display block
+  margin 10px auto
+
 .btn-delete
   @extend .btn-danger
 
@@ -101,10 +108,13 @@ $buttons()
 
 .btn-featured
   padding 1em 5em
+  font-size 1.1em
+  padding .75em 8em
+  +mobile()
+    width 100%
 
-.btn-centered
-  display block
-  margin 10px auto
+.btn-allcaps
+  text-transform uppercase
 
 .btn-sm
   padding-top .25em
@@ -117,7 +127,3 @@ $buttons()
     font-family 'FontAwesome'
     margin-right 10px
     content '\f003'
-
-+mobile()
-  .btn-featured
-    width 100%

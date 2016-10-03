@@ -22,9 +22,10 @@ template(name="recentAgents")
                   span.no-priors no prior mentions
         if collapsed
           button.btn.btn-success.btn-show-all-ia(type="button") Show All Infectious Agents for Post
-    if isLoading
-      .loading.spinner-margin
-        i.fa.fa-spinner.fa-2x.fa-spin
+    if ready
+      if theEnd
+        p.centered.subtle All posts have been loaded
+      else
+        button.btn.btn-primary.btn-centered.btn-hidden.load-more-posts(type="button") Load More
     else
-      unless theEnd
-        button.btn.btn-info.load-more-posts(type="button") Load More
+      +loader classes='inline'

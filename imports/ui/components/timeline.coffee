@@ -1,6 +1,6 @@
 require './timeline.jade'
 Template.timeline.onCreated ->
-  @isLoading = new ReactiveVar(false)
+  @ready = new ReactiveVar(false)
   @timelineRange = new ReactiveVar()
   @tld = new Meteor.Collection(null)
   @myBarChart = null
@@ -10,12 +10,12 @@ Template.timeline.onCreated ->
   @autorun =>
     agent = Router.current().getParams()._agentName
     @tld.remove({})
-    @isLoading.set(true)
+    @ready.set(false)
     HTTP.get '/api/historicalData/' + agent + '/' + @timelineRange.get(), {
       params:
         promedFeedId: Session.get('promedFeedId') or null
     }, (err, response) =>
-      @isLoading.set(false)
+      @ready.set(true)
       if err
         toastr.error(err.message)
         return
@@ -170,12 +170,10 @@ Template.timeline.onRendered ->
 Template.timeline.helpers
   noData: ->
     emptyResult = Template.instance().tld.find().count() == 0
-    loading = Template.instance().isLoading.get()
-    emptyResult or loading
+    ready = Template.instance().ready.get()
+    emptyResult or not ready
   timelineRange: ->
     Template.instance().timelineRange.get()
-  isLoading: ->
-    Template.instance().isLoading.get()
 
 Template.timeline.events
   'click canvas': (event, template) ->

@@ -36,8 +36,6 @@ Template.recentMentions.onCreated ->
         @mentions.insert(row)
 
 Template.recentMentions.helpers
-  ready: ->
-    Template.instance().ready.get()
   sources: ->
     Template.instance().sources.find()
   mentionsForSource: (sourceId) ->

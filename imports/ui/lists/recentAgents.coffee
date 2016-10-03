@@ -6,23 +6,23 @@ Template.recentAgents.onCreated ->
   @recentAgents = new Meteor.Collection(null)
   @posts = new Meteor.Collection(null)
   @currentPageNumber = new ReactiveVar(0)
-  @isLoading = new ReactiveVar(false)
+  @ready = new ReactiveVar(false)
   @theEnd = new ReactiveVar(false)
   order = 0
 
   @loadMorePosts = =>
-    if @isLoading.get() then return
+    if not @ready.get() then return
     pageNum = @currentPageNumber.get()
     @currentPageNumber.set(pageNum + 1)
     # @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
-    @isLoading.set(true)
+    @ready.set(false)
     HTTP.get '/api/recentAgents', {
       params:
         promedFeedId: Session.get('promedFeedId')  or null
         page: pageNum
         pp: pp
     }, (err, res) =>
-      @isLoading.set(false)
+      @ready.set(true)
       if err
         toastr.error(err.message)
         return
@@ -98,7 +98,7 @@ Template.recentAgents.onRendered ->
     Session.get("promedFeedId")
     @posts.remove({})
     @recentAgents.remove({})
-    @isLoading.set(false)
+    @ready.set(true)
     @theEnd.set(false)
     @currentPageNumber.set(0)
     _.defer =>
@@ -107,8 +107,6 @@ Template.recentAgents.onRendered ->
 Template.recentAgents.helpers
   post: ->
     Template.instance().posts.find({}, {sort: {order: 1}})
-  isLoading: ->
-    Template.instance().isLoading.get()
   theEnd: ->
     Template.instance().theEnd.get()
   isCollapsed: (postId) ->
@@ -118,7 +116,6 @@ Template.recentAgents.helpers
     if limit
       options.limit = 5
     Template.instance().recentAgents.find(postId: postId, options)
-
 
 Template.recentAgents.events
   'click .btn-show-all-ia': (event, instance) ->

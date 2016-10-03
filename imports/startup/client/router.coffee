@@ -1,6 +1,9 @@
 # layout
 require '../../ui/layouts/main.coffee'
 
+# components
+require '../../ui/components/loader.jade'
+
 # pages
 require '../../ui/pages/detail.coffee'
 require '../../ui/pages/descriptor.coffee'
@@ -13,6 +16,7 @@ require '../../ui/helpers/moment.coffee'
 require '../../ui/helpers/plus.coffee'
 require '../../ui/helpers/pluralize.coffee'
 require '../../ui/helpers/misc.coffee'
+require '../../ui/helpers/ready.coffee'
 
 # modals
 require '../../ui/modals/index'

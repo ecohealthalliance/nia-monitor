@@ -29,8 +29,7 @@ template(name="trendingAgents")
           p.no-priors.centered.subtle No Trending Infectious Agents in the last
             | {{trendingRange}}
         else
-          .loading.spinner-margin
-            i.fa.fa-spinner.fa-2x.fa-spin
+          +loader classes='inline'
 
 template(name="powerBars")
   .power-bars(data-toggle="tooltip" data-placement="left" title="The number of bars indicates the relative strength of the trend.")
