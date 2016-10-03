@@ -118,11 +118,11 @@ Template.recentAgents.helpers
     Template.instance().recentAgents.find(postId: postId, options)
 
 Template.recentAgents.events
-  'click .more': (event, instance) ->
+  'click .btn-show-all-ia': (event, instance) ->
     instance.posts.update(@_id, { $set: { collapsed: false } })
   'click .load-more-posts': (event, instance) ->
     instance.loadMorePosts()
-  'click .proMedLink': (event, template) ->
+  'click .promed-link': (event, template) ->
     if this.uri != undefined
       $('#proMedIFrame').attr('src', this.uri)
       $('#proMedURL').attr('href', this.uri)

@@ -8,10 +8,6 @@
   cursor hand
   color $secondary
 
-.no-priors
-  font-weight bold
-  color $primary
-
 #trendingRange
 #timelineRange
   width 100px
@@ -39,18 +35,18 @@
 .clear
   clear both
 
-.articleHeader
+.article-header
   font-weight bold
 
-.articleHeaderText
+.article-header-text
   color $secondary
   margin-left -10px
 
-.mainHeaderText
+.main-header-text
+  font-weight 600
+  margin-bottom 2em
   color $primary
-  padding 20px
   text-align center
-  margin-top -50px
 
 .dbSummaryHeaderText
   color $primary
@@ -99,14 +95,18 @@
   font-weight bold
 
 .btn-show-all-ia
+  display block
+  width 40%
+  max-width 600px
+  min-width 400px
+  padding .75em 5em
+  margin 0 auto
   border 1px solid $positive
   border-top-left-radius 0
   border-top-right-radius 0
   border-top  0
   background none
-  color $positive
-  padding .75em 5em
-  margin 0 auto
+  color darken($positive, 20%)
   &:hover
     background lighten(@color, 90%)
     color darken(@color, 40%)
@@ -127,6 +127,7 @@
   position relative
 
 .main-content
+  position relative
   +above(3)
     margin-top 30px
 
@@ -136,7 +137,7 @@
   cursor pointer
 
 .show-app-desc
-  top 50%
+  top 25px
   right 15px
   transform translate(0, -50%)
   +below(2)
@@ -154,23 +155,3 @@
 
 label
   color $primary
-
-.range-selector
-.timeline-range-selector
-  padding-left 0
-  a
-    color $secondary
-  li
-    display inline
-    margin 5px
-  li.active a
-    text-decoration underline
-    color $secondary-dark
-
-.timeline-range-selector
-  display inline
-  margin-left .5em
-
-.timeline-range-controls
-  line-height 2.5em
-  text-align center

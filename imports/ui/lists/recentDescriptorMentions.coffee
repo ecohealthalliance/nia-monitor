@@ -39,19 +39,11 @@ Template.recentDescriptorMentions.helpers
     Template.instance().sources.find()
   mentionsForSource: (sourceId) ->
     Template.instance().mentions.find(sourceId: sourceId)
-  kwic: ->
-    new Spacebars.SafeString """
-      <span>...#{@phrase_text.slice(Math.max(0, @t_start - 40 - @p_start), @t_start - @p_start)}</span>
-      <span>
-        <strong>#{@phrase_text.slice(@t_start - @p_start, @t_end - @p_start)}</strong>
-        #{@phrase_text.slice(@t_end - @p_start, @t_start + 40 - @p_start)}...
-      </span>
-      """
 
   Template.recentDescriptorMentions.events
-    'click .proMedLink': (event, template) ->
-      if this.uri != undefined
-        $('#proMedIFrame').attr('src', this.uri)
-        $('#proMedURL').attr('href', this.uri)
-        $('#proMedURL').text(this.uri)
-        $('#proMedModal').modal("show")
+    'click .promed-link': (event, template) ->
+      if @uri != undefined
+        $('#proMedIFrame').attr('src', @uri)
+        $('#proMedURL').attr('href', @uri)
+        $('#proMedURL').text(@uri)
+        $('#proMedModal').modal('show')

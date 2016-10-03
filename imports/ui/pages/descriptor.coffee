@@ -12,7 +12,7 @@ Template.descriptor.helpers
     Router.current().getParams()._term
 
 Template.descriptor.events
-  'click .proMedLink': (event, template) ->
+  'click .promed-link': (event, template) ->
     if this.uri != undefined
       $('#proMedIFrame').attr('src', this.uri)
       $('#proMedURL').attr('href', this.uri)

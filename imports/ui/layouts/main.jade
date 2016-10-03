@@ -11,6 +11,8 @@ template(name='main')
       p Click on a disease to see its historical mentions.
 
   .main-content
+    unless showDescription
+      i.show-app-desc.fa.fa-question-circle.fa-2x
     ul.tabs.list-unstyled
       li(class="{{#if eq view 'recentAgents'}}active{{/if}}")
         a(href='/')
@@ -21,8 +23,6 @@ template(name='main')
       li(class="{{#if eq view 'trendingAgents'}}active{{/if}}")
         a(href='/trending')
           span Trending
-      unless showDescription
-        i.show-app-desc.fa.fa-question-circle.fa-2x
     .tab-content
       .tab-pane.active
         +Template.dynamic template=view

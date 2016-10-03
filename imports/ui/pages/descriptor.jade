@@ -1,14 +1,16 @@
 template(name='descriptor')
   +header
-
-  h2.col-md-12.articleHeader.descriptor-header-text
-    | Descriptor: #{descriptorName}
-    if term
-      | , Term: #{term}
-  .col-md-12
-    .panel.panel-primary
-      .panel-body
-        #recentMentions
-          h4 Recent Mentions
-          .panel.panel-default
-            +recentDescriptorMentions
+  .recent-mentions
+    .recent-mentions--header
+      h1.article-header.descriptor-header-text Recent Mentions
+      .mention--details
+        .descriptor
+          span Descriptor
+          h1= descriptorName
+        if term
+          .seperator
+          .term
+            span Term
+            h2= term
+    .list
+      +recentDescriptorMentions

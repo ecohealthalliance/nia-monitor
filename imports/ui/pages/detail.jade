@@ -1,7 +1,7 @@
 template(name='detail')
   +header
   +timeline selectedRangeRV=selectedRangeRV
-  h2.col-md-12.articleHeader.mainHeaderText Posts mentioning #{agent}
+  h2.col-md-12.article-header.main-header-text Posts mentioning #{agent}
   ul.tabs.list-unstyled
     li#recentMentionsPanelTab(class="{{#if recentMentionsView}}active{{/if}}")
       a(href='/detail/#{agent}/recentMentions')

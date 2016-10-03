@@ -10,7 +10,7 @@ $secondary-light = lighten($secondary, $pole)
 $positive       = rgba(111, 210, 168, 1)
 $negative       = rgba(255, 124, 75, 1)
 
-$conform = $positive
+$confirm = $positive
 $delete  = $negative
 $warning = rgba(242, 173, 64, 1)
 
@@ -29,7 +29,7 @@ $white-trans = rgba(255,255,255,.7)
 
 $body-text = $dd-gray
 
-$border-gray          = #DDD
+$border-gray          = lighten(#DDD, 20%)
 $border-primary       = lighten($primary-light, 70%)
 $border-primary-l     = lighten($border-primary, 20%)
 $border-primary-d     = darken($border-primary, 20%)
@@ -42,3 +42,6 @@ $border-btn = #95989A
 $letter-spacing = .03em
 $letter-spacing-loose = $letter-spacing + .01em
 $letter-spacing-tight = $letter-spacing - .01em
+$nav-text-color = lighten($body-text, 25%)
+
+$max-ui-width = 1000px
