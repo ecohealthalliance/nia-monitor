@@ -12,14 +12,11 @@ Template.frequentDescriptors.onCreated ->
       @ready.set(true)
       if err
         toastr.error(err.message)
-        $(".spinner").hide()
         return
       for row in response.data.results
         @frequentDescriptors.insert(row)
 
 Template.frequentDescriptors.helpers
-  ready: ->
-    Template.instance().ready.get()
   frequentDescriptors: ->
     Template.instance().frequentDescriptors.find()
   term: ->

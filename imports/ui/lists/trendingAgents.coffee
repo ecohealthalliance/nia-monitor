@@ -35,8 +35,6 @@ Template.trendingAgents.onRendered ->
     )
 
 Template.trendingAgents.helpers
-  ready: ->
-    Template.instance().ready.get()
   trendingAgents: ->
     Template.instance().trendingAgents.find()
   trendingRange: ->

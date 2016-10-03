@@ -10,8 +10,6 @@ Template.descriptor.helpers
     Router.current().getParams()._descriptorName
   term: ->
     Router.current().getParams()._term
-  ready: ->
-    Template.instance().ready.get()
 
 Template.descriptor.events
   'click .proMedLink': (event, template) ->

@@ -1,8 +1,6 @@
 require './datasummary.jade'
 
 Template.datasummary.helpers
-  ready: ->
-    Template.instance().ready.get()
   totalArticleCount: ->
     Template.instance().totalArticleCount.get()
   articlesByAnnotator: ->

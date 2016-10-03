@@ -1,0 +1,60 @@
+.loading-wrapper
+  position absolute
+  top 5em
+  left 50%
+  transform translate(-50%, 0)
+  &.inline
+    position static
+    transform none
+    .loader
+      margin-top 8em
+    span
+      display block
+      text-align center
+      margin-bottom 5em
+  &.centered
+    top 50%
+    transform translate(-50%, -50%)
+  &.subtle
+    opacity .5
+  span
+    color $m-gray
+    text-transform uppercase
+    font-weight 300
+    letter-spacing .07em
+
+.loader
+.loader:before
+.loader:after
+  background $m-gray
+  animation loader 1s infinite ease-in-out
+  width 1em
+  height 4em
+
+.loader:before
+.loader:after
+  position absolute
+  top 0
+  content ''
+
+.loader
+  color $m-gray
+  text-indent -9999em
+  position relative
+  margin 0 auto 1em auto
+  font-size 11px
+  transform translateZ(0)
+  animation-delay -0.16s
+  &:before
+    left -1.5em
+    animation-delay -0.32s
+  &:after
+    left 1.5em
+
+@keyframes loader
+  0%
+  80%
+  100%
+    box-shadow 0 0
+  40%
+    box-shadow 0 -2em
