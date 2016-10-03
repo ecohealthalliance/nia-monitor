@@ -40,15 +40,6 @@ Template.recentMentions.helpers
     Template.instance().sources.find()
   mentionsForSource: (sourceId) ->
     Template.instance().mentions.find(sourceId: sourceId)
-  kwic: ->
-    beforePhrase = @phrase_text.slice(Math.max(0, @t_start - 40 - @p_start), @t_start - @p_start)
-    keyPhrase    = @phrase_text.slice(@t_start - @p_start, @t_end - @p_start)
-    afterPhrase  = @phrase_text.slice(@t_end - @p_start, @t_start + 40 - @p_start)
-    new Spacebars.SafeString """
-      <span>...#{beforePhrase}</span>
-      #{keyPhrase}
-      <span>#{afterPhrase}...</span>
-    """
   startDate: ->
     selectedRange = Template.instance().selectedRangeRV.get()
     if selectedRange
