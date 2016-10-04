@@ -1,18 +1,13 @@
 template(name='timeline')
-  .col-md-10.col-md-offset-1
-    .timeline-range-controls
-      label Time range:
-      ul.timeline-range-selector
-        li(class="{{#if eq timelineRange '1month'}}active{{/if}}")
-          a(href="?timerange=1month") Month
-        li(class="{{#if eq timelineRange '1year'}}active{{/if}}")
-          a(href="?timerange=1year") Year
-        li(class="{{#if eq timelineRange 'all'}}active{{/if}}")
-          a(href="?timerange=all") All Time
-    .timeline
-      unless ready
-        +loader classes="centered subtle"
-      canvas(width='500', height='100', hidden=noData)
-    if noData
-      .spacer(style="height: 120px;")
-  hr.col-md-12.hr-padding
+  .timeline-range-selector-wrapper
+    ul.range-selector.list-unstyled
+      li(class="{{#if eq timelineRange '1month'}}active{{/if}}")
+        a(href="?timerange=1month") Month
+      li(class="{{#if eq timelineRange '1year'}}active{{/if}}")
+        a(href="?timerange=1year") Year
+      li(class="{{#if eq timelineRange 'all'}}active{{/if}}")
+        a(href="?timerange=all") All Time
+  .timeline
+    unless ready
+      +loader classes="centered subtle"
+    canvas(width='500' height='100%' hidden=noData)

@@ -1,4 +1,5 @@
 require './timeline.jade'
+
 Template.timeline.onCreated ->
   @ready = new ReactiveVar(false)
   @timelineRange = new ReactiveVar()
@@ -47,6 +48,7 @@ Template.timeline.onCreated ->
         console.error("Unknown date format:", element)
     else
       @selectedRangeRV.set null
+
 Template.timeline.onRendered ->
   @autorun =>
     @timelineRange.get()
@@ -140,6 +142,7 @@ Template.timeline.onRendered ->
             data: counts
           } ]
         options:
+          maintainAspectRatio: false
           animation:
             duration: 0
           showScale: false
@@ -154,6 +157,8 @@ Template.timeline.onRendered ->
               gridLines:
                 lineWidth: 0,
                 color: "rgba(255,255,255,0)"
+                zeroLineColor: 'rgb(11, 165, 255)'
+                zeroLineWidth: 3
             }]
             xAxes: [{
               ticks:
@@ -172,6 +177,7 @@ Template.timeline.helpers
     emptyResult = Template.instance().tld.find().count() == 0
     ready = Template.instance().ready.get()
     emptyResult or not ready
+
   timelineRange: ->
     Template.instance().timelineRange.get()
 
