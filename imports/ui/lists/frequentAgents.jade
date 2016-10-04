@@ -11,6 +11,6 @@ template(name="frequentAgents")
             td.frequentlyMentionedInfectiousAgentsTableRow(data-agentname=word)
               span.fmia-word
                 a(href="/detail/#{word}")= word
-            td appears in {{pluralize 'article' count}}
+            td= count
     unless ready
       +loader classes='inline'
