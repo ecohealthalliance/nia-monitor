@@ -1,18 +1,12 @@
-.timeline-range-selector
-  padding-left 0
-  a
-    color $secondary
+.timeline
+  // Shift chart over to counter phantom space
+  width calc(100% + 5px)
+  margin-left -5px
+
+.timeline-range-selector-wrapper
+  display flex
+  align-items center
+  justify-content center
+  margin .5em 0 2em 0
   li
-    display inline
-    margin 5px
-  li.active a
-    text-decoration underline
-    color $secondary-dark
-
-.timeline-range-selector
-  display inline
-  margin-left .5em
-
-.timeline-range-controls
-  line-height 2.5em
-  text-align center
+    font-size .85em
