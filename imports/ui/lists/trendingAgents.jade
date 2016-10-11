@@ -32,7 +32,7 @@ template(name="trendingAgents")
 template(name="trendingAgent")
   a.fmia-word(href="/detail/#{word}")= word
   if seasonal
-    a.fa.fa-sun-o.seasonal(
+    span.fa.fa-sun-o.seasonal(
       data-toggle="tooltip"
       data-placement="right"
       title="This may be a seasonal trend."

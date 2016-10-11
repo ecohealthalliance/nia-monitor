@@ -486,7 +486,9 @@ api.addRoute 'trendingAgents/:range',
     stopDateStr = trendingMoment.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr2 = date2.format("YYYY-MM-DD") + "T00:00:00+00:01"
+    # The number of days in the last 5 seasons used to establish seasonal rate.
     seasonDays = 3 * 5 * 30
+    # Month numbers for months in the season
     seasonMonths = [-1, 0, 1].map (offset)->
       ((trendingMoment.month() + offset) % 12) + 1
     query = prefixes + """
