@@ -486,23 +486,37 @@ api.addRoute 'trendingAgents/:range',
     stopDateStr = trendingMoment.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr = date.format("YYYY-MM-DD") + "T00:00:00+00:01"
     dateStr2 = date2.format("YYYY-MM-DD") + "T00:00:00+00:01"
+    # The number of days in the last 5 seasons used to establish seasonal rate.
+    seasonDays = 3 * 5 * 30
+    # Month numbers for months in the season
+    seasonMonths = [-1, 0, 1].map (offset)->
+      ((trendingMoment.month() + offset) % 12) + 1
     query = prefixes + """
       SELECT
         ?resolvedTerm ?word
-        ?count ?count2
+        ?rate ?rate2
         ?result
+        (count(DISTINCT ?seasonal_post) / xsd:float(#{seasonDays}) as ?seasonal_rate)
       WHERE {
-        # There is an extra level of nesting here bc virtuoso doesn't allow
-        # variables bound in select statements to be used for ordering.
+        ?seasonal_mention anno:source_doc ?seasonal_source
+        ; ^dc:relation ?resolvedTerm
+        ; anno:category "diseases"
+        .
+        ?seasonal_source pro:post ?seasonal_post .
+        ?seasonal_post pro:date ?seasonal_date
+        FILTER (month(?seasonal_date) IN (#{seasonMonths}))
+        # Use previous 5 years to establish seasonal baseline rate
+        FILTER (?seasonal_date > "#{trendingMoment.year() - 6}"^^xsd:dateTime)
+        FILTER (?seasonal_date <= "#{trendingMoment.year() - 1}"^^xsd:dateTime)
         {
           SELECT ?resolvedTerm
             (sample(?termLabel) as ?word)
             (count(DISTINCT ?post) as ?count)
             (sample(?c2) as ?count2)
           WHERE {
-            ?phrase anno:category "diseases"
+            ?phrase anno:source_doc ?source
             ; ^dc:relation ?resolvedTerm
-            ; anno:source_doc ?source
+            ; anno:category "diseases"
             .
             ?source pro:post ?post .
             ?post pro:date ?dateTime
@@ -514,10 +528,11 @@ api.addRoute 'trendingAgents/:range',
             FILTER (?dateTime > "#{escape(dateStr)}"^^xsd:dateTime)
             FILTER (?dateTime <= "#{escape(stopDateStr)}"^^xsd:dateTime)
             {
-              SELECT (count(DISTINCT ?post2) as ?c2) ?resolvedTerm ?termLabel2
+              SELECT (count(DISTINCT ?post2) as ?c2) ?resolvedTerm
               WHERE {
                 ?prev_mention anno:source_doc ?source2
                 ; ^dc:relation ?resolvedTerm
+                ; anno:category "diseases"
                 .
                 ?source2 pro:post ?post2 .
                 ?post2 pro:date ?dateTime2
@@ -525,11 +540,10 @@ api.addRoute 'trendingAgents/:range',
                   ; pro:feed_id "#{escape(promedFeedId)}"
                 """ else ""}
                 .
-          		  ?resolvedTerm rdfs:label ?termLabel2
                 FILTER (?dateTime2 > "#{escape(dateStr2)}"^^xsd:dateTime)
                 FILTER (?dateTime2 <= "#{escape(stopDateStr)}"^^xsd:dateTime)
-               }
-              GROUP BY ?resolvedTerm ?termLabel2
+              }
+              GROUP BY ?resolvedTerm
             }
           }
           GROUP BY ?resolvedTerm
@@ -539,6 +553,7 @@ api.addRoute 'trendingAgents/:range',
         BIND(?rate - ?rate2 AS ?result)
         FILTER(?result > 0)
       }
+      GROUP BY ?resolvedTerm ?word ?rate ?rate2 ?result
       ORDER BY DESC(?result)
       LIMIT 50
       """

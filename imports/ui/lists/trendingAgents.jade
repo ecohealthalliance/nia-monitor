@@ -20,10 +20,8 @@ template(name="trendingAgents")
 
     ul.trending-agents.list--sub-group.list-unstyled
       each trendingAgents
-        li(data-agentname=word)
-          a.fmia-word(href="/detail/#{word}")= word
-          .relative-strength
-            +powerBars
+        li
+          +trendingAgent
       else
         if ready
           p.no-priors.centered.subtle No Trending Infectious Agents in the last
@@ -31,7 +29,19 @@ template(name="trendingAgents")
         else
           +loader classes='inline'
 
-template(name="powerBars")
-  .power-bars(data-toggle="tooltip" data-placement="left" title="The number of bars indicates the relative strength of the trend.")
-    each bars
-      .power-bar
+template(name="trendingAgent")
+  a.fmia-word(href="/detail/#{word}")= word
+  if seasonal
+    span.fa.fa-sun-o.seasonal(
+      data-toggle="tooltip"
+      data-placement="right"
+      title="This may be a seasonal trend."
+    )
+  .relative-strength
+    .power-bars(
+      data-toggle="tooltip"
+      data-placement="left"
+      title="The number of bars indicates the relative strength of the trend."
+    )
+      each bars
+        .power-bar
