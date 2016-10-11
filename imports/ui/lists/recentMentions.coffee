@@ -51,15 +51,16 @@ Template.recentMentions.helpers
   range: ->
     selectedRange = Template.instance().selectedRangeRV.get()
     if selectedRange
-      moment(selectedRange[0]).format("MMM Do YYYY") + " - " + moment(selectedRange[1]).format("MMM Do YYYY")
+      moment(selectedRange[0]).format("MMM Do YYYY") +
+       " - " + moment(selectedRange[1]).format("MMM Do YYYY")
 Template.recentMentions.events
   'click .promed-link': (event, template) ->
-    if this.uri != undefined
-      $('#proMedIFrame').attr('src', this.uri)
-      $('#proMedURL').attr('href', this.uri)
-      $('#proMedURL').text(this.uri)
+    if @uri
+      $('#proMedIFrame').attr('src', @uri)
+      $('#proMedURL').attr('href', @uri)
+      $('#proMedURL').text(@uri)
     else
-      $('#proMedIFrame').attr('src', this.priorArticle)
-      $('#proMedURL').attr('href', this.priorArticle)
-      $('#proMedURL').text(this.priorArticle)
+      $('#proMedIFrame').attr('src', @priorArticle)
+      $('#proMedURL').attr('href', @priorArticle)
+      $('#proMedURL').text(@priorArticle)
     $('#proMedModal').modal("show")

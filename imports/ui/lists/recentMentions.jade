@@ -8,9 +8,11 @@ template(name="recentMentions")
       article.source
         .source--details.details
           h1
-            a.promed-link.featured.article-header-text(href="#" uri=uri)=postSubject
+            a.promed-link.featured.article-header-text(href="#" uri=uri)= postSubject
           .time-link
             p {{ageOrDate date}}
+            span.seperator
+            a.fa.fa-newspaper-o.promed-link(href="#" uri=uri)
         ul.source-mentions.keword-in-context-list.list--sub-group.list-unstyled
           each mentionsForSource _id
             li
@@ -20,3 +22,5 @@ template(name="recentMentions")
         p.no-priors.centered.subtle No Recent Mentions
       else
         +loader classes='inline'
+
+  +proMedModal
