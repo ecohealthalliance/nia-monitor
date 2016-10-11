@@ -26,13 +26,15 @@ Template.trendingAgents.onCreated ->
       maxScore = _.max(filteredResults, (binding)->binding.result).result
       for binding in filteredResults
         binding.bars = _.range(Math.round(3 * binding.result / maxScore))
+        # yearly trends cannot be seasonal
+        binding.seasonal = @trendingRange.get() != "year" and (binding.seasonal_rate / binding.rate) > 0.75
         @trendingAgents.insert(binding)
 
 Template.trendingAgents.onRendered ->
-    @$('.date-picker').data('DateTimePicker')?.destroy()
-    @$('.date-picker').datetimepicker(
-      format: 'MM/DD/YYYY'
-    )
+  @$('.date-picker').data('DateTimePicker')?.destroy()
+  @$('.date-picker').datetimepicker(
+    format: 'MM/DD/YYYY'
+  )
 
 Template.trendingAgents.helpers
   trendingAgents: ->
@@ -47,5 +49,5 @@ Template.trendingAgents.events
     d = $(event.target).data('DateTimePicker')?.date().toDate()
     if d then instance.trendingDate.set d
 
-Template.powerBars.onRendered ->
+Template.trendingAgent.onRendered ->
   @$('[data-toggle="tooltip"]').tooltip()
