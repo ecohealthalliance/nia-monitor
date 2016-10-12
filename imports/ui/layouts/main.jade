@@ -15,14 +15,11 @@ template(name='main')
       i.show-app-desc.fa.fa-question-circle.fa-2x
     ul.tabs.list-unstyled
       li(class="{{#if eq view 'recentAgents'}}active{{/if}}")
-        a(href='/')
-          span Recently Mentioned
+        a(href='/') Recently Mentioned
       li(class="{{#if eq view 'frequentAgents'}}active{{/if}}")
-        a(href='/frequent')
-          span Frequently Mentioned
+        a(href='/frequent') Frequently Mentioned
       li(class="{{#if eq view 'trendingAgents'}}active{{/if}}")
-        a(href='/trending')
-          span Trending
+        a(href='/trending') Trending
     .tab-content
       .tab-pane.active
         +Template.dynamic template=view
