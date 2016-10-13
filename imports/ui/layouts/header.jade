@@ -5,7 +5,9 @@ template(name='header')
       ul.list-unstyled
         li.dropdown
           a.feeds(href='#', data-toggle='dropdown')
-            .feed #{region}
+            .feed
+              span Feeds
+                span #{region}
               i.fa.fa-angle-down
           ul.dropdown-menu.region-selector(role='menu')
             li All Feeds

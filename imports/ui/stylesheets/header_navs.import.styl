@@ -14,16 +14,18 @@
 .main-nav
   margin-left auto
   display flex
-  align-items center
+  align-items stretch
   > ul
     display flex
     margin-bottom 0
-    height 100%
+    align-items stretch
     > li
       display flex
+      justify-content center
       align-items center
       cursor pointer
-      &:hover
+      &.open
+      &:not(.dropdown):hover
         background $primary-light
       a
         padding 0 1em
@@ -31,13 +33,9 @@
         font-weight 300
         font-size 1em
         color $nav-text-color
+        text-align center
         +above(2)
           font-size 1.3em
-
-  .dropdown
-    &:hover
-      ul
-        display block
 
   .dropdown-menu
     top 100%
@@ -68,6 +66,17 @@
       &:first-of-type
         font-weight 600
 
+.feed
+  i
+  span
+    display inline-block
+    vertical-align middle
+  span
+    text-align right
+    span
+      display block
+      font-size 50%
+
 .logo
   width 420px
 
@@ -76,13 +85,6 @@
   margin-top 22px
   font-size 1.5em
   color $d-gray
-
-.feedText
-.aboutText
-  font-family Lato
-  color $d-gray
-  font-size 1.5em
-  margin-right -25px
 
 .tabs
   position relative
@@ -102,9 +104,13 @@
     margin-left auto
 
 .tabs > li
+  display flex
   flex 1
-  text-align center
+  justify-content center
+  align-items center
   letter-spacing $letter-spacing
+  background-color lighten($primary-light, 20%)
+  border 1px solid lighten($primary, 60%)
   +above(4)
     margin 0 .5em
 
@@ -112,30 +118,27 @@
 .tabs > li > a:hover
 .tabs > li > a:focus
 .tabs > li > a:active
-  display flex
-  align-items center
-  justify-content center
-  height 100%
   padding .75em 1em
-  background-color lighten($primary-light, 20%)
-  border 1px solid lighten($primary, 60%)
   border-bottom 0
   color lighten($nav-text-color, 10%)
   font-size .9em
+  text-align center
   +above(2)
     font-size 1.25em
   +above(4)
     border-top-left-radius 4px
     border-top-right-radius 4px
 
-.tabs > li > a:hover
+.tabs > li:hover
   background-color darken($primary-light, 3%)
 
-.tabs > li.active > a
-.tabs > li.active > a:hover
-.tabs > li.active > a:focus
+.tabs > li.active
+.tabs > li.active:hover
+.tabs > li.active:focus
   border-color $primary
   background-color $primary
+
+.tabs > li.active > a
   color $body-text
 
 .tab-content

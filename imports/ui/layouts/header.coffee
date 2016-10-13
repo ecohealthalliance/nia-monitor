@@ -8,5 +8,12 @@ Template.header.helpers
     Feeds.findOne(Session.get('promedFeedId'))?.label or "All Feeds"
 
 Template.header.events
-  'click .region-selector li': (event, instance) ->
+  'click .dropdown, mouseover .dropdown': (event, instance) ->
+    instance.$(event.currentTarget).addClass('open')
+
+  'mouseout .dropdown': (event, instance) ->
+    instance.$(event.target).blur()
+
+  'click .region-selector li, touchend .region-selector li': (event, instance) ->
+    instance.$('.dropdown').removeClass('open').blur()
     Session.set('promedFeedId', @_id)
