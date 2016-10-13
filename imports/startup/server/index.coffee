@@ -17,6 +17,7 @@ excludedAgentArray = [
   'aortic valve stenosis'
   'proliferative diabetic retinopathy'
   'vaccinia'
+  'dysbaric osteonecrosis'
 ]
 excludedAgents = excludedAgentArray.map( (s) -> JSON.stringify(s) ).join(",")
 
@@ -51,7 +52,16 @@ makeRequest = (query) ->
 makeCachedRequest = null
 refreshCache = ->
   console.log "Refreshing Cache @ " + new Date()
-  makeCachedRequest = _.memoize(makeRequest)
+  _cache = {}
+  makeCachedRequest = (query)->
+    if query of _cache
+      return _cache[query]
+    else
+      response = makeRequest(query)
+      # Do not cache empty responses in case database hasn't been populated yet.
+      if response.results.bindings.length > 0
+        _cache[query] = response
+      return response
   Meteor.defer ->
     try
       HTTP.get(Meteor.absoluteUrl('/api/recentAgents?page=0&pp=75'))
