@@ -73,7 +73,7 @@ refreshCache()
 
 # Flush the request cache every 4 hours
 restartFrequency = 1000 * 3600 * 4
-setTimeout(refreshCache, restartFrequency)
+Meteor.setInterval(refreshCache, restartFrequency)
 
 escape = (text) ->
   if _.isString text
