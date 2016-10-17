@@ -12,7 +12,7 @@ Template.header.events
     instance.$(event.currentTarget).addClass('open')
 
   'mouseout .dropdown': (event, instance) ->
-    instance.$(event.target).blur()
+    instance.$(event.currentTarget).removeClass('open').blur()
 
   'click .region-selector li, touchend .region-selector li': (event, instance) ->
     instance.$('.dropdown').removeClass('open').blur()
