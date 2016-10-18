@@ -1,7 +1,7 @@
 template(name="about")
   +header
   .about
-    .container-fluid.about--intro-content
+    .container-fluid.about--intro-content.space-top--3
       .description-heading NIAM displays the diseases mentioned in ProMED-mail posts.
       .page-description
         | It indicates a disease's novelty by measuring the time since the prior mention.
@@ -18,13 +18,16 @@ template(name="about")
       .detail-image
         img(src="images/about/graph.svg")
 
+    .about--detail-centered.minor
+      a.btn.btn-default.btn-wide(href="/datasummary") View database summary stats
+
     h3 NIAM API
     .about--detail-centered
       .detail-text
         p
           | Other applications can use NIAM's disease mention data by
           | connecting to its API.
-      a.btn.btn-primary.btn-action(href="/.apidocs/index.html") Goto API
+      a.btn.btn-primary.btn-wide(href="/.apidocs/index.html") Goto API
 
     h3 Acknowledgements
     .about--detail-wide.acknowledgements
@@ -38,9 +41,6 @@ template(name="about")
         a(href="//www.promedmail.org/")
           img(src="images/logos/promed-logo.svg")
 
-    .about--detail-centered
+    .about--detail-centered.space-top--4
       p Need more info?
       a.btn.btn-default.btn-mail(href="mailto:tech@ecohealthalliance.org?subject=Question about NIAM") Email us
-
-    .about--detail-centered
-      a(href="/datasummary") Database summary stats

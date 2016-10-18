@@ -1,29 +1,63 @@
 .about
+  margin-top 22px
+  font-size 1.5em
+  color $d-gray
   h3
-    margin 0 auto 1em auto
     color $primary
     font-weight 800
     letter-spacing $letter-spacing
     text-align center
-    font-size 2.25em
+    font-size 1.25em
     text-transform uppercase
+    +above(3)
+      margin 0 auto 1em auto
+      font-size 2.25em
+  .btn
+    font-size .75em
+    +above(3)
+      font-size 1em
 
 .about--intro-content
-  padding-top 4em
-  padding-bottom 4em
+  padding-top 1em
+  padding-bottom 2em
+  padding-left 2em
+  padding-right 2em
   text-align center
-  font-size 1.25em
+  font-size 1em
   color darken($d-gray, 30%)
   max-width 33em
+  +above(2)
+    padding-top 4em
+    padding-bottom 4em
+    font-size 1.25em
+
+  +above(4)
+    padding-left 0
+    padding-right 0
+
+.page-description
+  font-size .8em
+  margin-top .5em
+  margin-bottom 0
+  +above(2)
+    font-size 1em
 
 .about--detail-centered
 .about--detail-wide
-  margin-bottom 10em
+  margin-bottom 6em
   +below(2)
-    margin-bottom 5em
+    margin-bottom 3em
   .detail-text
-    font-size 1.25em
+    font-size .75em
+    +above(2)
+      font-size .95em
     color darken($d-gray, 30%)
+  &.minor
+    margin-bottom 2em
+    margin-top -2em
+    +above(3)
+      margin-top -4em
+      margin-bottom 5em
 
 .about--detail-wide
   display flex
@@ -45,36 +79,56 @@
     p
       padding-left 15%
       padding-right 4em
+
 .about--detail-centered
-  max-width 50%
+  max-width 95%
   margin-left auto
   margin-right auto
   text-align center
-  +below(2)
-    max-width 95%
+  +above(3)
+    max-width 50%
   .detail-text
     margin-bottom 2em
-  .btn
-    padding-right 5em
-    padding-left 5em
 
 .detail-image
   flex 1
-  min-width 40%
-  +below(2)
-    min-width 100%
-    margin-top 1em
+  min-width 100%
+  margin-top 1em
+  display none
+  +above(3)
+    min-width 40%
+    display block
 
 .acknowledgements
-  margin-left 20%
-  margin-right 20%
+  display flex
+  margin-top 1em
+  +above(3)
+    margin-left 10%
+    margin-right 10%
+  +above(4)
+    margin-left 20%
+    margin-right 20%
 
 .acknowledgement
   flex 1
   text-align center
-  margin 1em
+  margin-bottom .5em
+  +above(2)
+    margin-bottom 1em
+    &:nth-of-type(2)
+      margin-bottom 2em
+      img
+        height 175px
+  +above(3)
+    margin-left 1em
+    margin-right 1em
   img
-    padding 1em
     max-width 100%
+    height 130px
+    +above(2)
+      height 80px
+    +above(3)
+      height auto
   .square
-    max-width 60%
+    +above(3)
+      max-width 60%
