@@ -43,7 +43,7 @@ Template.recentDescriptorMentions.helpers
   Template.recentDescriptorMentions.events
     'click .promed-link': (event, template) ->
       if @uri != undefined
-        $('#proMedIFrame').attr('src', @uri)
+        $('#proMedIFrame').attr('src', @uri.replace("http", "https"))
         $('#proMedURL').attr('href', @uri)
         $('#proMedURL').text(@uri)
         $('#proMedModal').modal('show')

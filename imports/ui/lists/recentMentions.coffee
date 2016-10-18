@@ -56,11 +56,11 @@ Template.recentMentions.helpers
 Template.recentMentions.events
   'click .promed-link': (event, template) ->
     if @uri
-      $('#proMedIFrame').attr('src', @uri)
+      $('#proMedIFrame').attr('src', @uri.replace("http", "https"))
       $('#proMedURL').attr('href', @uri)
       $('#proMedURL').text(@uri)
     else
-      $('#proMedIFrame').attr('src', @priorArticle)
+      $('#proMedIFrame').attr('src', @priorArticle.replace("http", "https"))
       $('#proMedURL').attr('href', @priorArticle)
       $('#proMedURL').text(@priorArticle)
     $('#proMedModal').modal("show")

@@ -123,12 +123,12 @@ Template.recentAgents.events
   'click .load-more-posts': (event, instance) ->
     instance.loadMorePosts()
   'click .promed-link': (event, template) ->
-    if this.uri != undefined
-      $('#proMedIFrame').attr('src', this.uri)
-      $('#proMedURL').attr('href', this.uri)
-      $('#proMedURL').text(this.uri)
+    if @uri != undefined
+      $('#proMedIFrame').attr('src', @uri.replace("http", "https"))
+      $('#proMedURL').attr('href', @uri)
+      $('#proMedURL').text(@uri)
     else
-      $('#proMedIFrame').attr('src', this.priorPost)
-      $('#proMedURL').attr('href', this.priorPost)
-      $('#proMedURL').text(this.priorPost)
+      $('#proMedIFrame').attr('src', @priorPost.replace("http", "https"))
+      $('#proMedURL').attr('href', @priorPost)
+      $('#proMedURL').text(@priorPost)
     $('#proMedModal').modal("show")
