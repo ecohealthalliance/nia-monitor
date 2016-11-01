@@ -22,12 +22,14 @@
     > li
       display flex
       justify-content center
-      align-items center
+      align-items stretch
       cursor pointer
       &.open
       &:not(.dropdown):hover
         background $primary-light
       a
+        display flex
+        align-items center
         padding 0 1em
         text-transform uppercase
         font-weight 300
@@ -79,12 +81,6 @@
 
 .logo
   width 420px
-
-.about
-  float right
-  margin-top 22px
-  font-size 1.5em
-  color $d-gray
 
 .tabs
   position relative
