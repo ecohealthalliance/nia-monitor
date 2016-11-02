@@ -1,7 +1,7 @@
 template(name="trendingAgents")
   .list
-    .list--options
-      .trend-interval
+    .list--options.row
+      .trend-interval.col-sm-4
         h2 Trend Interval
         ul.range-selector.list-unstyled
           li(class="{{#if eq trendingRange 'year'}}active{{/if}}")
@@ -11,7 +11,11 @@ template(name="trendingAgents")
           li(class="{{#if eq trendingRange 'week'}}active{{/if}}")
             a(href="/trending/week") Week
 
-      .trend-date
+      .show-seasonal.col-sm-4
+        h2 Seasonality
+        a.hide-seasonal Hide seasonal norms
+
+      .trend-date.col-sm-4
         h2 Trend Date
         .input-group.date#trendingDate
           input.date-button.form-control.input-sm.date-picker(value="{{trendingDate}}" type="text")

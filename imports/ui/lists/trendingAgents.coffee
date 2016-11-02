@@ -48,6 +48,8 @@ Template.trendingAgents.events
   'dp.change #trendingDate': (event,  instance) ->
     d = $(event.target).data('DateTimePicker')?.date().toDate()
     if d then instance.trendingDate.set d
+  'click .hide-seasonal' : (event, instance) ->
+    $('li span.seasonal').parent().toggle("hidden")
 
 Template.trendingAgent.onRendered ->
   @$('[data-toggle="tooltip"]').tooltip()
