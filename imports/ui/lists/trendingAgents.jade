@@ -12,10 +12,16 @@ template(name="trendingAgents")
             a(href="/trending/week") Week
 
       .trend-seasonality
-        h2 Seasonality
+        h2(
+          data-toggle="tooltip"
+          data-placement="left"
+          title="Hide and show seasonal trends."
+        ) Seasonality
         ul.range-selector.list-unstyled
           li(class="{{#if showingSeasonal}} active {{/if}}")
-            a.toggle-seasonal Trending Seasonally
+            a.toggle-seasonal.all All
+          li(class="{{#unless showingSeasonal}} active {{/unless}}")
+            a.toggle-seasonal.non Non-seasonal
 
       .trend-date
         h2 Trend Date

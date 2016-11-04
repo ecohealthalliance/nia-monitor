@@ -35,6 +35,7 @@ Template.trendingAgents.onRendered ->
   @$('.date-picker').data('DateTimePicker')?.destroy()
   @$('.date-picker').datetimepicker
     format: 'MM/DD/YYYY'
+  @$('[data-toggle="tooltip"]').tooltip()
 
 Template.trendingAgents.helpers
   trendingAgents: ->
@@ -60,9 +61,11 @@ Template.trendingAgents.events
     d = $(event.target).data('DateTimePicker')?.date().toDate()
     if d then instance.trendingDate.set d
 
-  'click .toggle-seasonal' : (event, instance) ->
-    showingSeasonal = instance.showingSeasonal
-    showingSeasonal.set not showingSeasonal.get()
+  'click .toggle-seasonal.all' : (event, instance) ->
+    instance.showingSeasonal.set true
+
+  'click .toggle-seasonal.non' : (event, instance) ->
+    instance.showingSeasonal.set false
 
 Template.trendingAgent.onRendered ->
   @$('[data-toggle="tooltip"]').tooltip()
