@@ -5,6 +5,7 @@ Template.trendingAgents.onCreated ->
   @ready = new ReactiveVar(false)
   @trendingRange = new ReactiveVar("month")
   @trendingDate = new ReactiveVar(new Date())
+  @showingSeasonal = new ReactiveVar true
   @autorun =>
     if Router.current().getParams()._trendingRange
       @trendingRange.set Router.current().getParams()._trendingRange
@@ -32,22 +33,39 @@ Template.trendingAgents.onCreated ->
 
 Template.trendingAgents.onRendered ->
   @$('.date-picker').data('DateTimePicker')?.destroy()
-  @$('.date-picker').datetimepicker(
+  @$('.date-picker').datetimepicker
     format: 'MM/DD/YYYY'
-  )
+  @$('[data-toggle="tooltip"]').tooltip()
 
 Template.trendingAgents.helpers
   trendingAgents: ->
     Template.instance().trendingAgents.find()
+
   trendingRange: ->
     Template.instance().trendingRange.get()
+
   trendingDate: ->
     moment(Template.instance().trendingDate.get()).format("MM/DD/YYYY")
+
+  showAgent: ->
+    if not Template.instance().showingSeasonal.get()
+      not @seasonal
+    else
+      true
+
+  showingSeasonal: ->
+    Template.instance().showingSeasonal.get()
 
 Template.trendingAgents.events
   'dp.change #trendingDate': (event,  instance) ->
     d = $(event.target).data('DateTimePicker')?.date().toDate()
     if d then instance.trendingDate.set d
+
+  'click .toggle-seasonal.all' : (event, instance) ->
+    instance.showingSeasonal.set true
+
+  'click .toggle-seasonal.non' : (event, instance) ->
+    instance.showingSeasonal.set false
 
 Template.trendingAgent.onRendered ->
   @$('[data-toggle="tooltip"]').tooltip()

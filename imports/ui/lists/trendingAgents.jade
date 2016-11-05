@@ -11,6 +11,18 @@ template(name="trendingAgents")
           li(class="{{#if eq trendingRange 'week'}}active{{/if}}")
             a(href="/trending/week") Week
 
+      .trend-seasonality
+        h2(
+          data-toggle="tooltip"
+          data-placement="left"
+          title="Hide and show seasonal trends."
+        ) Seasonality
+        ul.range-selector.list-unstyled
+          li(class="{{#if showingSeasonal}} active {{/if}}")
+            a.toggle-seasonal.all All
+          li(class="{{#unless showingSeasonal}} active {{/unless}}")
+            a.toggle-seasonal.non Non-seasonal
+
       .trend-date
         h2 Trend Date
         .input-group.date#trendingDate
@@ -20,8 +32,9 @@ template(name="trendingAgents")
 
     ul.trending-agents.list--sub-group.list-unstyled
       each trendingAgents
-        li
-          +trendingAgent
+        if showAgent
+          li
+            +trendingAgent
       else
         if ready
           p.no-priors.centered.subtle No Trending Infectious Agents in the last
