@@ -1,4 +1,7 @@
 template(name="recentAgents")
+  if ready
+    if endDateBeforeToday
+      p.centered Posts before #{endDate}
   .list
     each post
       article.post

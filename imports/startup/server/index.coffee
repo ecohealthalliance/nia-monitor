@@ -64,7 +64,7 @@ refreshCache = ->
       return response
   Meteor.defer ->
     try
-      HTTP.get(Meteor.absoluteUrl('/api/recentAgents?page=0&pp=75'))
+      HTTP.get(Meteor.absoluteUrl('/api/recentAgents'))
       console.log("recentAgents cached")
     catch e
       console.log "Cache error:"
@@ -274,15 +274,29 @@ api.addRoute 'recentDescriptorMentions',
 @apiName recentAgents
 @apiGroup agent
 @apiParam {String} promedFeedId=all The ProMED-mail regional feed to query
+@apiParam {ISODateString} start=2 weeks ago
+@apiParam {ISODateString} end=today
 ###
 api.addRoute 'recentAgents',
   get: ->
     promedFeedId = @queryParams.promedFeedId
     if promedFeedId == 'null'
       promedFeedId = null
-    page = @queryParams.page
-    pp = @queryParams.pp
-    offset = page * pp
+    start = moment(@queryParams.start or moment().subtract(2, 'weeks'))
+    end = moment(@queryParams.end or moment())
+    # Round dates up to the day end so that they are cached
+    start.set(
+      hour: 23
+      minute: 59
+      second: 59
+      millisecond: 0
+    )
+    end.set(
+      hour: 23
+      minute: 59
+      second: 59
+      millisecond: 0
+    )
     query = prefixes + """
       SELECT
           # For each of the most recently mentioned terms find the most recent
@@ -317,12 +331,12 @@ api.addRoute 'recentAgents',
                     ; pro:feed_id "#{escape(promedFeedId)}"
                   """ else ""}
                   .
+                  FILTER (?postDate > "#{start.toISOString()}"^^xsd:dateTime)
+                  FILTER (?postDate <= "#{end.toISOString()}"^^xsd:dateTime)
               }
               GROUP BY ?resolvedTerm ?termLabel ?postDate ?post ?postSubject
               # Sort by date, then document, then offset within the document.
               ORDER BY DESC(?postDate) DESC(?post) ASC(?firstMentionStart)
-              LIMIT #{escape(pp)}
-              OFFSET #{escape(offset)}
           }
           # Select the previous usages of the most recently mentioned terms
           OPTIONAL {
