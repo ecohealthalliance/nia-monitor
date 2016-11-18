@@ -39,13 +39,11 @@ Template.recentAgents.onCreated ->
             collapsed: false
         row.postId = postId
         if row.priorPostDate
-          row.priorPostDate = moment.utc(row.priorPostDate).toDate()
           postDate = moment.utc(row.postDate)
+          row.postDate = postDate.toDate()
+          row.priorPostDate = moment.utc(row.priorPostDate).toDate()
           row.days = postDate.diff(row.priorPostDate, 'days')
           row.months = postDate.diff(row.priorPostDate, 'months')
-          #show days or months since last mention
-          if row.days > 30
-            row.dm = true
         @recentAgents.insert(row)
       # ...
       @posts.find().forEach (post) =>

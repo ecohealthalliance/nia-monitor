@@ -18,9 +18,9 @@ template(name="recentAgents")
               a(href="/detail/{{plus word}}")= word
               .prior-mentions
                 if priorPost
-                  span {{since ../date priorPostDate}}
+                  span {{since postDate priorPostDate}}
                   span since
-                  a.promed-link.featured(href="#" uri=priorPost) prior mention
+                  a.featured(href="?date={{format priorPostDate 'YYYY-MM-DD'}}") prior mention
                 else
                   span.no-priors no prior mentions
         if collapsed
