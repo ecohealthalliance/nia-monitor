@@ -7,6 +7,9 @@ tick = ->
 
 setInterval tick, tickInterval
 
+Template.registerHelper 'format', (date, formatString) ->
+  moment(date).format(formatString)
+
 Template.registerHelper 'age', (date) ->
   Session.get('now') # triggers the reactivity every second
   moment(date).local().fromNow()

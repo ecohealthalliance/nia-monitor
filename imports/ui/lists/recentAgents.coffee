@@ -1,33 +1,32 @@
 require './recentAgents.jade'
 
-pp = 75
-
 Template.recentAgents.onCreated ->
   @recentAgents = new Meteor.Collection(null)
   @posts = new Meteor.Collection(null)
-  @currentPageNumber = new ReactiveVar(0)
-  @ready = new ReactiveVar(false)
-  @theEnd = new ReactiveVar(false)
-  order = 0
-
+  @startDate = new ReactiveVar(moment())
+  @endDate = new ReactiveVar(moment())
+  @pageEndDate = new ReactiveVar(moment())
+  @loadingMorePosts = new ReactiveVar(false)
+  @weeksWithNoPosts = new ReactiveVar(0)
   @loadMorePosts = =>
-    if not @ready.get() then return
-    pageNum = @currentPageNumber.get()
-    @currentPageNumber.set(pageNum + 1)
-    # @recentAgents.find({}, reactive: false).map((d) => @recentAgents.remove(d))
-    @ready.set(false)
+    if @loadingMorePosts.get() then return
+    @loadingMorePosts.set(true)
+    @pageEndDate.set @startDate.get()
+    @startDate.set moment(@startDate.get()).subtract(2, 'weeks')
     HTTP.get '/api/recentAgents', {
       params:
         promedFeedId: Session.get('promedFeedId')  or null
-        page: pageNum
-        pp: pp
+        end: @pageEndDate.get().toISOString()
+        start: @startDate.get().toISOString()
     }, (err, res) =>
-      @ready.set(true)
+      @loadingMorePosts.set(false)
       if err
         toastr.error(err.message)
         return
       unless res.data.results.length
-        @theEnd.set(true)
+        @weeksWithNoPosts.set(@weeksWithNoPosts.get() + 2)
+        if @weeksWithNoPosts.get() <= 2
+          @loadMorePosts()
         return
       for row in res.data.results
         postId = @posts.findOne(uri: row.post)?._id
@@ -37,16 +36,13 @@ Template.recentAgents.onCreated ->
             postSubject: row.postSubject
             postDate: moment.utc(row.postDate)
             collapsed: false
-            order: order++
         row.postId = postId
         if row.priorPostDate
-          row.priorPostDate = moment.utc(row.priorPostDate).toDate()
           postDate = moment.utc(row.postDate)
+          row.postDate = postDate.toDate()
+          row.priorPostDate = moment.utc(row.priorPostDate).toDate()
           row.days = postDate.diff(row.priorPostDate, 'days')
           row.months = postDate.diff(row.priorPostDate, 'months')
-          #show days or months since last mention
-          if row.days > 30
-            row.dm = true
         @recentAgents.insert(row)
       # ...
       @posts.find().forEach (post) =>
@@ -94,21 +90,41 @@ Template.recentAgents.onRendered ->
 
   infiniteScroll(options)
 
-  @autorun =>
-    Session.get("promedFeedId")
+  resetToDate = (date)=>
     @posts.remove({})
     @recentAgents.remove({})
-    @ready.set(true)
-    @theEnd.set(false)
-    @currentPageNumber.set(0)
+    @loadingMorePosts.set(false)
+    @weeksWithNoPosts.set(0)
+    @startDate.set(date)
+    @endDate.set(date)
+    @pageEndDate.set(date)
     _.defer =>
       @loadMorePosts()
+  @autorun =>
+    Session.get("promedFeedId")
+    date = Router.current().getParams().query?.date
+    if date
+      resetToDate(moment(date))
+    else
+      resetToDate(moment())
 
 Template.recentAgents.helpers
   post: ->
-    Template.instance().posts.find({}, {sort: {order: 1}})
+    Template.instance().posts.find({}, {sort: {postDate: -1}})
+  ready: ->
+    not Template.instance().loadingMorePosts.get()
+  startDate: ->
+    Template.instance().startDate.get().format("MMM Do YYYY")
+  endDate: ->
+    Template.instance().endDate.get().format("MMM Do YYYY")
+  endDateBeforeToday: ->
+    Template.instance().endDate.get() < moment().set(
+      hour:0
+      minute:0
+      second:0
+    )
   theEnd: ->
-    Template.instance().theEnd.get()
+    Template.instance().weeksWithNoPosts.get() > 6
   isCollapsed: (postId) ->
     Template.instance().posts.findOne(postId).collapsed
   recentAgentsForPost: (postId, limit) ->
