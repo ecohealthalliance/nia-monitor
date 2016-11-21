@@ -285,18 +285,16 @@ api.addRoute 'recentAgents',
     start = moment(@queryParams.start or moment().subtract(2, 'weeks'))
     end = moment(@queryParams.end or moment())
     # Round dates up to the day end so that they are cached
-    start.set(
+    start.set
       hour: 23
       minute: 59
       second: 59
       millisecond: 0
-    )
-    end.set(
+    end.set
       hour: 23
       minute: 59
       second: 59
       millisecond: 0
-    )
     query = prefixes + """
       SELECT
           # For each of the most recently mentioned terms find the most recent

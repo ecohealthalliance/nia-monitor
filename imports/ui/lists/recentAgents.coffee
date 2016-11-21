@@ -8,7 +8,6 @@ Template.recentAgents.onCreated ->
   @pageEndDate = new ReactiveVar(moment())
   @loadingMorePosts = new ReactiveVar(false)
   @weeksWithNoPosts = new ReactiveVar(0)
-  #Router.go("/?q=10")
   @loadMorePosts = =>
     if @loadingMorePosts.get() then return
     @loadingMorePosts.set(true)
