@@ -22,15 +22,17 @@
       a
         color $body-text
     &:hover
-      background darken(@background-color, 5%)
-      border-color darken(@background-color, 5%)
+      background darken(@background-color, 10%)
+      border-color darken(@background-color, 10%)
   a
-    padding .75em 1em
+    padding .7em .85em
     display block
     color $body-text
-    font-size .9em
+    font-size 1em
     line-height 1
-    +above(2)
+    +above(600px)
+      font-size .85em
+    +above(3)
       padding-top .5em
       padding-bottom .5em
       font-size 1em
