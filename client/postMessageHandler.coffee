@@ -1,3 +1,5 @@
+recentAgents = require '/imports/data/recentAgents.coffee'
+
 capitalize = (s)->
   if s.length
     s[0].toUpperCase() + s.slice(1)
@@ -13,7 +15,31 @@ postMessageHandler = (event)->
     title = "NIAM"
     url = window.location.toString()
     if window.location.pathname == "/"
-      title = "Recently Mentioned Diseases"
+      csvData = recentAgents.find().map (agentMention)->
+        postUrl: agentMention.post
+        postDate: agentMention.postDate
+        postSubject: agentMention.postSubject
+        priorMentionPost: agentMention.priorPost
+        priorMentionPostDate: agentMention.priorPostDate
+        resolvedDOIDTerm: agentMention.resolvedTerm
+        agent: agentMention.word
+      if csvData.length > 0
+        start = _.min(csvData.map((a)->a.postDate)).toISOString().split("T")[0]
+        end = _.max(csvData.map((a)->a.postDate)).toISOString().split("T")[0]
+        dataUrl = 'data:text/csv;charset=utf-8;base64,' + Base64.encode(
+          #excel BOM
+          "\ufeff" +
+          #headers
+          _.keys(csvData[0]).map(JSON.stringify).join(",") + "\n" +
+          #rows
+          csvData.map((r)->_.values(r).map(JSON.stringify).join(",")).join("\n")
+        )
+        return window.parent.postMessage(JSON.stringify(
+          type: "eha.dossierTag"
+          title: "Infectious agents mentioned on ProMED-mail between #{start} and #{end}"
+          html: """<a href='#{dataUrl}'>Download Data CSV</a><br />
+            <a target="_blank" href='#{url}'>Open NIAM</a>"""
+        ))
     else if url.match(/trend/)
       title = "Trending Diseases"
     else if window.location.pathname == "/frequent"
@@ -34,11 +60,11 @@ postMessageHandler = (event)->
         window.innerWidth, window.innerHeight
       )
       console.log "screenCapture done"
-      window.parent.postMessage(JSON.stringify({
+      window.parent.postMessage(JSON.stringify(
         type: "eha.dossierTag"
         screenCapture: tempCanvas.toDataURL()
         url: url
         title: title
-      }), event.origin)
+      ), event.origin)
 
 window.addEventListener("message", postMessageHandler, false)

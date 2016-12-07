@@ -72,6 +72,7 @@ npm-mongo@1.4.45
 observe-sequence@1.0.12
 okgrow:analytics@2.0.0
 ordered-dict@1.0.8
+ostrio:base64@1.0.0
 promise@0.7.3
 random@1.0.10
 rate-limit@1.0.5

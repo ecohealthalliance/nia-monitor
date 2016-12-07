@@ -1,8 +1,7 @@
 require './recentAgents.jade'
-
+recentAgentsPosts = require '/imports/data/recentAgentsPosts.coffee'
+recentAgents = require '/imports/data/recentAgents.coffee'
 Template.recentAgents.onCreated ->
-  @recentAgents = new Meteor.Collection(null)
-  @posts = new Meteor.Collection(null)
   @startDate = new ReactiveVar(moment())
   @endDate = new ReactiveVar(moment())
   @pageEndDate = new ReactiveVar(moment())
@@ -29,9 +28,9 @@ Template.recentAgents.onCreated ->
           @loadMorePosts()
         return
       for row in res.data.results
-        postId = @posts.findOne(uri: row.post)?._id
+        postId = recentAgentsPosts.findOne(uri: row.post)?._id
         unless postId
-          postId = @posts.insert
+          postId = recentAgentsPosts.insert
             uri: row.post
             postSubject: row.postSubject
             postDate: moment.utc(row.postDate)
@@ -43,11 +42,11 @@ Template.recentAgents.onCreated ->
           row.priorPostDate = moment.utc(row.priorPostDate).toDate()
           row.days = postDate.diff(row.priorPostDate, 'days')
           row.months = postDate.diff(row.priorPostDate, 'months')
-        @recentAgents.insert(row)
+        recentAgents.insert(row)
       # ...
-      @posts.find().forEach (post) =>
-        if @recentAgents.find(postId: post._id).count() > 5
-          @posts.update(post._id, { $set: { collapsed: true } })
+      recentAgentsPosts.find().forEach (post) =>
+        if recentAgents.find(postId: post._id).count() > 5
+          recentAgentsPosts.update(post._id, { $set: { collapsed: true } })
 
 Template.recentAgents.onRendered ->
   prevScrollPos = window.pageYOffset
@@ -91,8 +90,8 @@ Template.recentAgents.onRendered ->
   infiniteScroll(options)
 
   resetToDate = (date)=>
-    @posts.remove({})
-    @recentAgents.remove({})
+    recentAgentsPosts.remove({})
+    recentAgents.remove({})
     @loadingMorePosts.set(false)
     @weeksWithNoPosts.set(0)
     @startDate.set(date)
@@ -110,7 +109,7 @@ Template.recentAgents.onRendered ->
 
 Template.recentAgents.helpers
   post: ->
-    Template.instance().posts.find({}, {sort: {postDate: -1}})
+    recentAgentsPosts.find({}, {sort: {postDate: -1}})
   ready: ->
     not Template.instance().loadingMorePosts.get()
   startDate: ->
@@ -126,16 +125,16 @@ Template.recentAgents.helpers
   theEnd: ->
     Template.instance().weeksWithNoPosts.get() > 6
   isCollapsed: (postId) ->
-    Template.instance().posts.findOne(postId).collapsed
+    recentAgentsPosts.findOne(postId).collapsed
   recentAgentsForPost: (postId, limit) ->
     options = { sort: { 'priorPostDate': 1 } }
     if limit
       options.limit = 5
-    Template.instance().recentAgents.find(postId: postId, options)
+    recentAgents.find(postId: postId, options)
 
 Template.recentAgents.events
   'click .btn-show-all-ia': (event, instance) ->
-    instance.posts.update(@_id, { $set: { collapsed: false } })
+    recentAgentsPosts.update(@_id, { $set: { collapsed: false } })
   'click .load-more-posts': (event, instance) ->
     instance.loadMorePosts()
   'click .promed-link': (event, template) ->
