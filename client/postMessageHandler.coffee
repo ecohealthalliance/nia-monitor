@@ -39,7 +39,7 @@ postMessageHandler = (event)->
           title: "Infectious agents mentioned on ProMED-mail between #{start} and #{end}"
           html: """<a href='#{dataUrl}'>Download Data CSV</a><br />
             <a target="_blank" href='#{url}'>Open NIAM</a>"""
-        ))
+        ), event.origin)
     else if url.match(/trend/)
       title = "Trending Diseases"
     else if window.location.pathname == "/frequent"
