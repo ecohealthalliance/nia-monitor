@@ -15,8 +15,8 @@ Template.recentMentions.onCreated ->
         from: @selectedRangeRV.get()[0].toISOString()
         to: @selectedRangeRV.get()[1].toISOString()
     agent = Router.current().getParams()._agentName
-    @mentions.remove()
-    @sources.remove()
+    @mentions.remove({})
+    @sources.remove({})
     HTTP.get '/api/recentMentions/' + agent, {
       params: params
     }, (err, response) =>
