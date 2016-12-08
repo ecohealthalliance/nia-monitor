@@ -13,10 +13,9 @@ template(name="recentMentions")
             p {{ageOrDate date}}
             span.seperator
             a.fa.fa-newspaper-o.promed-link(href="#" uri=uri)
-        ul.source-mentions.keword-in-context-list.list--sub-group.list-unstyled
+        table.keyword-in-context-table
           each mentionsForSource _id
-            li
-              p.keword-in-context #{kwic}
+            tr=kwic
     else
       if ready
         p.no-priors.centered.subtle No Recent Mentions
