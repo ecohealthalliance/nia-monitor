@@ -6,9 +6,8 @@ template(name="recentDescriptorMentions")
           a.promed-link.featured(href="#" uri=uri)=postSubject
         .time-link
           p {{age date}}
-      ul.keword-in-context-list.list--sub-group.list-unstyled
+      table.keyword-in-context-table
         each mentionsForSource _id
-          li
-            p.keword-in-context #{kwic}
+          tr=kwic
   else
     +loader classes='inline'
