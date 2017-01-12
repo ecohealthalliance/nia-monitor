@@ -36,8 +36,8 @@ castBinding = (binding) ->
   result
 
 
-readFile = (path, callback) ->
-  fs.readFile path, 'utf8', (err, data)=>
+readFile = (callback) ->
+  fs.readFile path.join(process.env.PWD, 'revision.txt'), 'utf8', (err, data)=>
     if err
       console.log(err)
       callback("Error getting revision. Check the server log for details.")
@@ -652,4 +652,4 @@ api.addRoute 'totalArticleCount',
 api.addRoute 'revision',
   get: =>
     syncReadFile = Meteor.wrapAsync readFile
-    syncReadFile(path.join(process.env.PWD, 'revision.txt'))
+    syncReadFile()
