@@ -1,3 +1,6 @@
+fs = Npm.require('fs')
+path = Npm.require('path')
+
 SPARQurL = process.env.SPARQURL || 'http://localhost:3030/dataset/query'
 prefixes = '''
 prefix pro: <http://www.eha.io/types/promed/>
@@ -31,6 +34,15 @@ castBinding = (binding) ->
     else
       result[key] = value.value
   result
+
+
+readFile = (callback) ->
+  fs.readFile path.join(process.env.PWD, 'revision.txt'), 'utf8', (err, data)=>
+    if err
+      console.log(err)
+      callback("Error getting revision. Check the server log for details.")
+    else
+      return callback(data)
 
 makeRequest = (query) ->
   try
@@ -631,3 +643,13 @@ api.addRoute 'totalArticleCount',
       status: "success"
       results: response.results.bindings.map(castBinding)
     }
+
+###
+@api {get} revision
+@apiName revision
+@apiGroup revision
+###
+api.addRoute 'revision',
+  get: =>
+    syncReadFile = Meteor.wrapAsync readFile
+    syncReadFile()
