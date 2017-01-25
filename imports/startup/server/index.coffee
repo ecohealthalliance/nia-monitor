@@ -36,17 +36,13 @@ castBinding = (binding) ->
   result
 
 readFile = (callback) ->
-  try
-    fs.readFile path.join(process.env.PWD, 'revision.txt'), 'utf8', (err, data)=>
-      if err
-        console.log(err)
-        callback(null, "Error getting revision. Check the server log for details.")
-      else
-        return callback(data)
-  catch e
-    console.log "Exception in readFile method"
-    console.log e
-    callback(e, "Exception in readFile method")
+  fs.readFile path.join(process.env.PWD, 'revision.txt'), 'utf8', (err, data)=>
+    if err
+      console.log "Error in readFile"
+      console.log(err)
+      callback(err, "Error getting revision. Check the server log for details.")
+    else
+      return callback(null, data)
 
 makeRequest = (query) ->
   try
