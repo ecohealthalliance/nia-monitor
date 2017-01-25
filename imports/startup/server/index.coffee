@@ -40,13 +40,13 @@ readFile = (callback) ->
     fs.readFile path.join(process.env.PWD, 'revision.txt'), 'utf8', (err, data)=>
       if err
         console.log(err)
-        callback("Error getting revision. Check the server log for details.")
+        callback(null, "Error getting revision. Check the server log for details.")
       else
         return callback(data)
   catch e
     console.log "Exception in readFile method"
     console.log e
-    callback("Exception in readFile method")
+    callback(e, "Exception in readFile method")
 
 makeRequest = (query) ->
   try
@@ -657,3 +657,4 @@ api.addRoute 'revision',
   get: =>
     syncReadFile = Meteor.wrapAsync readFile
     syncReadFile()
+
