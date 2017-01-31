@@ -23,8 +23,8 @@
     "url": "",
     "version": "0.0.0",
     "filename": "./public/.apidocs/main.js",
-    "group": "_home_nathan_t11_nia_monitor_public__apidocs_main_js",
-    "groupTitle": "_home_nathan_t11_nia_monitor_public__apidocs_main_js",
+    "group": "_mnt_t11_nia_monitor_public__apidocs_main_js",
+    "groupTitle": "_mnt_t11_nia_monitor_public__apidocs_main_js",
     "name": ""
   },
   {
@@ -51,8 +51,8 @@
     "url": "",
     "version": "0.0.0",
     "filename": "./public/static/main.js",
-    "group": "_home_nathan_t11_nia_monitor_public_static_main_js",
-    "groupTitle": "_home_nathan_t11_nia_monitor_public_static_main_js",
+    "group": "_mnt_t11_nia_monitor_public_static_main_js",
+    "groupTitle": "_mnt_t11_nia_monitor_public_static_main_js",
     "name": ""
   },
   {
@@ -80,7 +80,7 @@
     "groupTitle": "agent",
     "sampleRequest": [
       {
-        "url": "http://niam.eha.io/api/frequentAgents"
+        "url": "https://niam.eha.io/api/frequentAgents"
       }
     ]
   },
@@ -100,6 +100,22 @@
             "field": "promedFeedId",
             "defaultValue": "all",
             "description": "<p>The ProMED-mail regional feed to query</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "ISODateString",
+            "optional": false,
+            "field": "start",
+            "defaultValue": "2",
+            "description": "<p>weeks ago</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "ISODateString",
+            "optional": false,
+            "field": "end",
+            "defaultValue": "today",
+            "description": ""
           }
         ]
       }
@@ -109,7 +125,7 @@
     "groupTitle": "agent",
     "sampleRequest": [
       {
-        "url": "http://niam.eha.io/api/recentAgents"
+        "url": "https://niam.eha.io/api/recentAgents"
       }
     ]
   },
@@ -152,7 +168,7 @@
     "groupTitle": "agent",
     "sampleRequest": [
       {
-        "url": "http://niam.eha.io/api/recentDescriptorMentions"
+        "url": "https://niam.eha.io/api/recentDescriptorMentions"
       }
     ]
   },
@@ -196,7 +212,7 @@
     "groupTitle": "agent",
     "sampleRequest": [
       {
-        "url": "http://niam.eha.io/api/trendingAgents/:range"
+        "url": "https://niam.eha.io/api/trendingAgents/:range"
       }
     ]
   },
@@ -211,7 +227,7 @@
     "groupTitle": "article",
     "sampleRequest": [
       {
-        "url": "http://niam.eha.io/api/articleCountByAnnotator"
+        "url": "https://niam.eha.io/api/articleCountByAnnotator"
       }
     ]
   },
@@ -226,7 +242,7 @@
     "groupTitle": "article",
     "sampleRequest": [
       {
-        "url": "http://niam.eha.io/api/totalArticleCount"
+        "url": "https://niam.eha.io/api/totalArticleCount"
       }
     ]
   },
@@ -262,7 +278,7 @@
     "groupTitle": "descriptors",
     "sampleRequest": [
       {
-        "url": "http://niam.eha.io/api/frequentDescriptors/:term"
+        "url": "https://niam.eha.io/api/frequentDescriptors/:term"
       }
     ]
   },
@@ -298,7 +314,7 @@
     "groupTitle": "descriptors",
     "sampleRequest": [
       {
-        "url": "http://niam.eha.io/api/historicalData/:term"
+        "url": "https://niam.eha.io/api/historicalData/:term"
       }
     ]
   },
@@ -349,7 +365,22 @@
     "groupTitle": "descriptors",
     "sampleRequest": [
       {
-        "url": "http://niam.eha.io/api/recentMentions/:term"
+        "url": "https://niam.eha.io/api/recentMentions/:term"
+      }
+    ]
+  },
+  {
+    "type": "get",
+    "url": "revision",
+    "title": "",
+    "name": "revision",
+    "group": "revision",
+    "version": "0.0.0",
+    "filename": "./imports/startup/server/index.coffee",
+    "groupTitle": "revision",
+    "sampleRequest": [
+      {
+        "url": "https://niam.eha.io/api/revision"
       }
     ]
   }
